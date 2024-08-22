@@ -35,7 +35,7 @@ class _ForgetState extends State<Forget> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://developmentalphawizz.com/pickport/api/Authentication/DeliveryLogin'));
+            'https://pickport.in/api/Authentication/DeliveryLogin'));
     request.fields.addAll({'user_phone': mobileNumber.text});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();

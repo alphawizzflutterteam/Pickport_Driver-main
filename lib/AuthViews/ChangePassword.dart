@@ -32,7 +32,7 @@
 //     var headers = {
 //       'Cookie': 'ci_session=b3b229754d182b6e4d05901374d052785b664b07'
 //     };
-//     var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/pickport/Api/change_password'));
+//     var request = http.MultipartRequest('POST', Uri.parse('https://pickport.in/Api/change_password'));
 //     request.fields.addAll({
 //       'user_id': '${userid}',
 //       'current_password': '${oldpswController.text}',

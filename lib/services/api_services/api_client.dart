@@ -18,8 +18,8 @@ class ApiClient extends GetConnect {
   ApiClient._internal();
 
   static const baseAppUrl2 =
-      'https://developmentalphawizz.com/pickport/api/Authentication/';
-  static const baseAppUrl = 'https://developmentalphawizz.com/pickport/api/';
+      'https://pickport.in/api/Authentication/';
+  static const baseAppUrl = 'https://pickport.in/api/';
 
   @override
   void onInit() {

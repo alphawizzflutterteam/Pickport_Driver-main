@@ -32,7 +32,7 @@ class _ShareQRCodeState extends State<ShareQRCode> {
   ScreenshotController screenshotController = ScreenshotController();
   final TextEditingController tfController = TextEditingController();
 
-  String baseURL = 'https://developmentalphawizz.com/pickport/api/';
+  String baseURL = 'https://pickport.in/api/';
   Position? _position;
 
 

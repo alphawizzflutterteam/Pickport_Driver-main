@@ -42,7 +42,7 @@ class _NeedHelpState extends State<NeedHelp> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://developmentalphawizz.com/pickport/api/Authentication/get_driver_help'));
+            'https://pickport.in/api/Authentication/get_driver_help'));
 
     request.headers.addAll(headers);
 

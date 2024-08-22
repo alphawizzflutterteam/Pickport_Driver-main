@@ -646,7 +646,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://developmentalphawizz.com/pickport/api/Authentication/deliveryBoyRegistration'));
+            'https://pickport.in/api/Authentication/deliveryBoyRegistration'));
 
     request.fields.addAll({
       'user_fullname': nameController.text,

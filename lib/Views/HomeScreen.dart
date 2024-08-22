@@ -495,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
         desiredAccuracy: LocationAccuracy.high,
       );
       final response = await http.post(
-        Uri.parse("https://developmentalphawizz.com/pickport/api/Authentication/driver_lat_lang_update"),
+        Uri.parse("https://pickport.in/api/Authentication/driver_lat_lang_update"),
         body: {
           'user_id':userId.toString(),
           'latitude': position.latitude.toString(),
@@ -640,7 +640,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 SizedBox(
-                  width: 5,
+                  width: 8,
                 ),
                 Expanded(
                   child: Text(
@@ -660,6 +660,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     setState(() {
                       status = value ? 1 : 2;
                       getStatus(status);
+                      value ? Fluttertoast.showToast(msg: "Driver is Online", gravity: ToastGravity.CENTER)
+                          : Fluttertoast.showToast(msg: "Driver is Offline", gravity: ToastGravity.CENTER);
                     });
                   },
                 ),
@@ -1071,6 +1073,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           //   'Data not available'
                         ))
                       : ListView.builder(
+                          reverse: true,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -1548,7 +1551,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://developmentalphawizz.com/pickport/api/authentication/driver_min_wallet'));
+            'https://pickport.in/api/authentication/driver_min_wallet'));
     request.fields.addAll({'user_id': '613'});
 
     request.headers.addAll(headers);
@@ -2403,7 +2406,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://developmentalphawizz.com/pickport/api/Authentication/get_delivery_boy_rating'));
+            'https://pickport.in/api/Authentication/get_delivery_boy_rating'));
     request.fields.addAll({RequestKeys.deliveryBoyId: driverId});
 
     request.headers.addAll(headers);
@@ -3391,6 +3394,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     //  'Data Not Available'
                   ))
                 : ListView.builder(
+                    reverse: true,
                     scrollDirection: Axis.vertical,
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,

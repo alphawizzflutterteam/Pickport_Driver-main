@@ -290,7 +290,7 @@ class _OnlineOfflineHistoryScreenState
                                                         filterList[i]
                                                                 .totalTime
                                                                 .toString() ??
-                                                            ""))
+                                                            "0"))
                                                   ],
                                                 )
                                               ],

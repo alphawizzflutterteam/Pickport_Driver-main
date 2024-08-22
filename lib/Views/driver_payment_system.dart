@@ -164,7 +164,7 @@ class _DriverPaymentSystemState extends State<DriverPaymentSystem> {
       var request = http.MultipartRequest(
           'POST',
           Uri.parse(
-              'https://developmentalphawizz.com/pickport/api/Authentication/driver_pay_amount_for_vendor'));
+              'https://pickport.in/api/Authentication/driver_pay_amount_for_vendor'));
       request.fields.addAll({
         RequestKeys.deliveryBoyId: userId ?? '',
         RequestKeys.amount: amountController.text,

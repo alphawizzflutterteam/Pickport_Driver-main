@@ -1545,7 +1545,7 @@ class _ParcelDetailsViewState extends State<ParcelDetailsView> {
       var request = http.MultipartRequest(
           'POST',
           Uri.parse(
-              'https://developmentalphawizz.com/pickport/api/Authentication/otp_order_complete'));
+              'https://pickport.in/api/Authentication/otp_order_complete'));
       request.fields.addAll({
         'user_id': userId ?? '300',
         'otp': otp,

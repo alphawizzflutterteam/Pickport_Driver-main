@@ -115,7 +115,7 @@ class _VerificationPageState extends State<VerificationPage> {
   //   var headers = {
   //     'Cookie': 'ci_session=c59791396657a1155df9f32cc7d7b547a40d648c'
   //   };
-  //   var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/pickport/api/Authentication/DeliveryLogin'));
+  //   var request = http.MultipartRequest('POST', Uri.parse('https://pickport.in/api/Authentication/DeliveryLogin'));
   //   request.fields.addAll({
   //     'mobile':widget.mobile.toString()
   //   });

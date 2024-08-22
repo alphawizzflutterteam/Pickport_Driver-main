@@ -76,7 +76,7 @@
 //     var headers = {
 //       'Cookie': 'ci_session=f9248f94280271245402dd0f5f7a337996575439'
 //     };
-//     var request = http.MultipartRequest('GET', Uri.parse('https://developmentalphawizz.com/pickport/api/payment/contact_setting'));
+//     var request = http.MultipartRequest('GET', Uri.parse('https://pickport.in/api/payment/contact_setting'));
 //     request.headers.addAll(headers);
 //     http.StreamedResponse response = await request.send();
 //     if (response.statusCode == 200) {
