@@ -166,7 +166,7 @@ class ChangeLanguageee extends StatefulWidget {
 }
 
 class _ChangeLanguageeeState extends State<ChangeLanguageee> {
-  int? selectLan = 2;
+  int selectLan = 2;
 
   @override
   void initState() {
@@ -301,7 +301,7 @@ class _ChangeLanguageeeState extends State<ChangeLanguageee> {
               if (mounted)
                 setState(() {
                   selectLan = index;
-                  _changeLan(langCode[index], ctx);
+                  // _changeLan(langCode[index], ctx);
                 });
               SharedPreferences pref =
               await SharedPreferences.getInstance();
@@ -434,6 +434,7 @@ class _ChangeLanguageeeState extends State<ChangeLanguageee> {
                 ),
                 InkWell(
                   onTap: () {
+                    _changeLan(langCode[selectLan], context);
                     Navigator.push(
                         context,
                         MaterialPageRoute(

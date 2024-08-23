@@ -155,6 +155,7 @@ class _ParcelHistoryState extends State<ParcelHistory> {
                         child: parcelDataList == null
                             ? Center(child: CircularProgressIndicator())
                             : ListView.builder(
+                                reverse: true,
                                 // scrollDirection: Axis.vertical,
                                 // physics: const NeverScrollableScrollPhysics(),
                                 // shrinkWrap: false,

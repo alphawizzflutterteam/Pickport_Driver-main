@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:jdx/Controller/home_controller.dart';
 import 'package:jdx/Models/driverFeedbackModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
 import 'package:jdx/services/location/location.dart';
@@ -74,47 +75,46 @@ class _PercelDetailsState extends State<PercelDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: colors.primary,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        elevation: 0,
-        title: Text(
-          getTranslated(context, "Parcel Details"),
-          // 'Parcel Details',
-          style: const TextStyle(
-              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          height: 35,
-          width: 35,
-          decoration:
-              const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-          child: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
+    return RefreshIndicator(
+      onRefresh: () async {
+        Future.delayed(const Duration(seconds: 2));
+        bookingOrderDetailsApi();
+      },
+      child: Scaffold(
+        backgroundColor: colors.primary,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          elevation: 0,
+          title: Text(
+            getTranslated(context, "Parcel Details"),
+            // 'Parcel Details',
+            style: const TextStyle(
+                fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          leading: Container(
+            margin: const EdgeInsets.all(8),
+            height: 35,
+            width: 35,
+            decoration:
+                const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
-      ),
-      body: singleBookingModel == null
-          ? const Center(
-              child: CircularProgressIndicator(
-              color: Colors.white,
-            ))
-          : RefreshIndicator(
-        onRefresh: () async {
-          Future.delayed(Duration(seconds: 2));
-          initState();
-
-        },
-            child: Container(
+        body: singleBookingModel == null
+            ? const Center(
+                child: CircularProgressIndicator(
+                color: Colors.white,
+              ))
+            : Container(
                 child: Stack(
                   children: [
                     Container(
@@ -180,6 +180,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
                               child: Column(
                                 children: [
                                   const SizedBox(
@@ -1318,7 +1319,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                   ],
                 ),
               ),
-          ),
+      ),
     );
   }
 
@@ -1686,11 +1687,10 @@ class _PercelDetailsState extends State<PercelDetails> {
                   height: 12,
                 ),
                 InkWell(
-                  onTap: () {
-                    Get.back();
-                    orderDelevertCompleteByOtp()
+                  onTap: () async{
+                  await  orderDelevertCompleteByOtp()
                         .then((value) => bookingOrderDetailsApi());
-                    initState();
+                  Get.back();
                   },
                   child: Container(
                     height: 40,
@@ -1859,7 +1859,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                 singleBookingModel?.data?.first.saleId ?? "0",
                 singleBookingModel?.data?.first.totalAmount ?? "");
           } else {
-            Get.back();
+            // Get.back();
           }
         } else {
           Fluttertoast.showToast(msg: 'Wrong Otp...please enter correct otp');

@@ -819,7 +819,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10),
+                      horizontal: 10, vertical: 20),
                   decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: const BorderRadius.only(
@@ -827,7 +827,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           topRight: Radius.circular(35))),
                   child: ListView(
                     children: [
-                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment:
                         CrossAxisAlignment.start,
@@ -1590,6 +1589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           //   'Data not available'
                         ))
                       : ListView.builder(
+                          reverse: true,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),

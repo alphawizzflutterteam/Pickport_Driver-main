@@ -461,7 +461,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                           getTranslated(context, "I agree to all"),
                           //'I agree to all ',
                           style: const TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.bold),
+                              fontSize: 14),
                         ),
                         InkWell(
                           onTap: () {
@@ -480,7 +480,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                             // "T&C",
                             // getTranslated(context, "Terms and Conditions"),
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: colors.primary,
                             ),
@@ -490,9 +490,9 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                           width: 5,
                         ),
                         const Text(
-                          '& ',
+                          '&',
                           style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.bold),
+                              fontSize: 14),
                         ),
                         const SizedBox(
                           width: 2,
@@ -508,7 +508,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                             getTranslated(context, "Privacy Policy"),
                             //"Privacy Policy",
                             style: const TextStyle(
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: colors.primary),
                           ),
