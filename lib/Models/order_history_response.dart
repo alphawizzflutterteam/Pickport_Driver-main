@@ -93,7 +93,7 @@ class OrderHistoryData {
     saleIds: json["sale_ids"],
     isAccepted: false,
     status: json['status'],
-    orderDis: json['order_distance'],
+    orderDis: json['order_distance'].toString(),
     parcelDetails: List<ParcelDetail>.from(json["parcel_details"].map((x) => ParcelDetail.fromJson(x))),
   );
 

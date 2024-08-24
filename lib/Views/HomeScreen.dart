@@ -455,9 +455,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   inIt() async {
+
     setState(() {
       isLoading = true;
     });
+    // ctrl.getOrders(status: selectedSegmentVal.toString());
+
     SharedPreferences prefs1 = await SharedPreferences.getInstance();
     userId = prefs1.getString('userId');
     name = prefs1.getString('userName');
@@ -480,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("PLACE CMAKR ERRR $err");
     }
 
-    // getUserOrderHistory("0");
+    getUserOrderHistory("0");
     getDriverRating(userId ?? '300');
     getDriverRating(userId ?? '300');
     getDriverApi();
@@ -585,10 +588,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ? CircularProgressIndicator()
         : RefreshIndicator(
       onRefresh: () async {
-        Future.delayed(Duration(seconds: 2));
+        Future.delayed(const Duration(seconds: 2));
         inIt();
-        ctrl.getOrders(status: selectedSegmentVal.toString());
-
+        getUserOrderHistory("0");
       },
       child: Scaffold(
         // FloatingActionButton
@@ -1072,7 +1074,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           //   'Data not available'
                         ))
                       : ListView.builder(
-                          reverse: true,
+                          // reverse: true,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -1326,7 +1328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Text(getTranslated(
                                               context, "Total Distance")),
                                           Text(
-                                              "${ctrl.currentOrderHistoryList[index].parcelDetails.first.distance} Km"),
+                                              "${double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString()) + double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())} Km"),
                                         ],
                                       ),
                                       const SizedBox(
@@ -1589,7 +1591,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           //   'Data not available'
                         ))
                       : ListView.builder(
-                          reverse: true,
+                          // reverse: true,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -2367,8 +2369,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body[RequestKeys.userId1] = userId.toString() ?? '';
       body[RequestKeys.status] = status.toString();
       var res = await api.getOrderHistoryData(body);
-      print(body);
-      print('____ffff__888888888____ggg_${res.data.toString()}__________');
       if (res.status ?? false) {
         orderHistoryList = res.data;
 
@@ -2412,7 +2412,7 @@ class _HomeScreenState extends State<HomeScreen> {
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
-
+print("RatingAPI----${request.url}");
     print('__________${request.fields}_____________');
 
     if (response.statusCode == 200) {

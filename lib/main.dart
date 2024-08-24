@@ -112,7 +112,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PickPort Driver Partner App',
+      title: 'PickPort Driver',
       locale: _locale,
       supportedLocales: [
         Locale("kn", "IN"),

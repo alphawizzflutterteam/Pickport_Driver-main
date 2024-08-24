@@ -22,6 +22,7 @@ class HomeProvider extends GetxController{
   List<OrderHistoryData> orderHistoryList = [];
   List isActive = [];
   bool isLoading=false;
+
   Future<void> getOrders({required String status})async{
     try{
       SharedPreferences prefs1 = await SharedPreferences.getInstance();
@@ -34,8 +35,8 @@ class HomeProvider extends GetxController{
       body[RequestKeys.userId1] = userId.toString() ?? '';
       body[RequestKeys.status] = status.toString();
       var res = await api.getOrderHistoryData(body);
-      print(body);
-      print('____ffff__888888888____ggg_${res.data.toString()}__________');
+      print("prvderResponse------${body}");
+      print('____ffff__888888888____prvder_${res.data.toString()}__________');
       if (res.status ?? false) {
 
         orderHistoryList = res.data ;

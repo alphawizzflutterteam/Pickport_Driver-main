@@ -21,7 +21,7 @@
     </queries>
 
     <application
-        android:label="PICKPORT Driver Partner"
+        android:label="PICKPORT Driver"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

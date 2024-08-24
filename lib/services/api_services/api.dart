@@ -79,8 +79,7 @@ class Api {
     String res = await _apiClient.postMethod(
         method: _apiMethods.orderHistory, body: body);
 
-    log(body.toString());
-    log(_apiMethods.orderHistory.toString());
+  //  log(body.toString());
 
     if (res.isNotEmpty) {
       try {

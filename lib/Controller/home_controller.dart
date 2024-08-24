@@ -75,8 +75,6 @@ class HomeController extends AppBaseController {
       body[RequestKeys.userId1] = userId.toString() ?? '';
       body[RequestKeys.status] = status.toString();
       var res = await api.getOrderHistoryData(body);
-      print(body);
-      print('____ffff__888888888____ggg_${res.data..toString()}__________');
       if (res.status ?? false) {
 
         if(status=="0"){

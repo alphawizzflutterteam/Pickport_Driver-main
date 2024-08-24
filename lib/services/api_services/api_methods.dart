@@ -16,7 +16,7 @@ class ApiMethods {
   String changePassword = 'Authentication/changePassword';
   String getDriverCodEarning = 'Authentication/get_driver_cod_earning';
   String driverParcelHistory = 'Payment/driver_parcel_history';
-  String deliverBoyOrderHistory = 'Authentication/deliverBoyOrderHistory';
+  // String deliverBoyOrderHistory = 'Authentication/deliverBoyOrderHistory';
   String getNotificationList = 'Payment/GetNotificationList';
   String resetPassword = 'Authentication/ResetPassword';
   String deliverBoyOrderStatus = 'Authentication/deliverBoyOrderStatus';
