@@ -590,7 +590,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onRefresh: () async {
         Future.delayed(const Duration(seconds: 2));
         inIt();
-        getUserOrderHistory("0");
+        setSegmentValue(0);
       },
       child: Scaffold(
         // FloatingActionButton
@@ -2173,6 +2173,8 @@ class _HomeScreenState extends State<HomeScreen> {
         'POST', Uri.parse('${Urls.baseUrl}Payment/driverAmounts'));
     request.fields.addAll({'user_id': userId.toString()});
     request.headers.addAll(headers);
+    print("driverAmounts----------${request.url}");
+    print("driverAmounts----------${request.fields}");
 
     http.StreamedResponse response = await request.send();
 
@@ -2578,7 +2580,7 @@ print("RatingAPI----${request.url}");
       ctrl.getOrders(status: '1');
       //getAcceptedOrder('2');
     } else {
-      // getAcceptedOrder('4');
+      getAcceptedOrder('4');
       ctrl.getOrders(status: '4');
       // getParcelHistory();
     }

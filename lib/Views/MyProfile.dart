@@ -556,7 +556,7 @@ class _MyprofileState extends State<Myprofile> {
                 ),
                 Expanded(
                     child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.only(left: 16, right: 16, top: 70),
                   decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: const BorderRadius.only(
@@ -564,9 +564,6 @@ class _MyprofileState extends State<Myprofile> {
                           topRight: Radius.circular(40))),
                   child: ListView(
                     children: [
-                      const SizedBox(
-                        height: 60,
-                      ),
                       Card(
                         elevation: 1,
                         shape: RoundedRectangleBorder(
@@ -2484,15 +2481,22 @@ class _MyprofileState extends State<Myprofile> {
                                     "assets/images/profileImage.jpg",
                                     fit: BoxFit.fill,
                                   ))
-                              : Container(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          image: NetworkImage(
-                                            "${widget.getProfileModel!.data!.user!.userImage}",
-                                          ),
-                                          fit: BoxFit.fill)),
-                                )
+                              : ClipRRect(
+                          borderRadius:
+                          BorderRadius.circular(100),
+                          child: Image.network(
+                            "${widget.getProfileModel!.data!.user!.userImage}",
+                            fit: BoxFit.fill,
+                          ))
+                      // Container(
+                      //             decoration: BoxDecoration(
+                      //                 shape: BoxShape.circle,
+                      //                 image: DecorationImage(
+                      //                     image: NetworkImage(
+                      //                       "${widget.getProfileModel!.data!.user!.userImage}",
+                      //                     ),
+                      //                     fit: BoxFit.fill)),
+                      //           )
 
                           //  ClipRRect(
                           // borderRadius: BorderRadius.circular(100),

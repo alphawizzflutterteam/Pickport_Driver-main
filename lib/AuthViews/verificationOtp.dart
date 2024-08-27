@@ -264,12 +264,12 @@ class _VerificationPageState extends State<VerificationPage> {
                     Text(
                       getTranslated(context, "Code has sent to"),
                       // "Code has sent to",
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(fontSize: 16,color: Colors.black),
                     ),
                     Text(
                       "+91 ${widget.mobile.toString()}",
                       style: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
+                          fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                     // Text(
                     //   "OTP: ${widget.otp.toString()}",

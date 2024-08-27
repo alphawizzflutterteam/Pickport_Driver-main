@@ -318,7 +318,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         //  physics: BouncingScrollPhysics(),
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               InkWell(
                                 onTap: () {
@@ -350,6 +350,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
+                              SizedBox(width: 20),
                               InkWell(
                                 onTap: () {
                                   setState(() {

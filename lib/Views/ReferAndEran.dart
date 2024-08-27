@@ -268,9 +268,9 @@ class _ReferAndEranScreenState extends State<ReferAndEranScreen> {
   bool iconVisible = true;
   Future<void> share({String? referCode}) async {
     FlutterShare.share(
-        title: 'Refer and Earn',
-        text: '$referCode',
-        linkUrl: 'Refer and Earn',
+        title: 'PickPort Driver',
+        text: 'Use my reference code : $referCode',
+        linkUrl: 'https://play.google.com/store/apps/details?id=com.pickportdriver',
         chooserTitle: 'PickPort Driver');
   }
 }

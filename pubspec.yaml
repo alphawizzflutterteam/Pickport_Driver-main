@@ -72,6 +72,8 @@ dependencies:
   youtube_player_flutter:
   shimmer: ^3.0.0
   location: ^4.4.0
+  connectivity: any
+  flutter_svg: any
 #  cloud_firestore: ^1.0.0
 #  flutter_native_splash:
 

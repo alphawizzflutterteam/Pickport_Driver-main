@@ -1840,7 +1840,8 @@ class _PercelDetailsState extends State<PercelDetails> {
         'order_id': widget.pId.toString(),
         "city": city
       });
-      print('____Som______${request.fields}_________');
+      print(request.url);
+      print('otp_order_complete____Som______${request.fields}_________');
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
