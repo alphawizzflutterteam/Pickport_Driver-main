@@ -112,7 +112,6 @@ class HomeController extends AppBaseController {
     final userId = prefs.getString('userId');
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}Payment/accept_order_request'));
-    print(request.fields);
     request.fields.addAll({
       'user_id': userId ?? '',
       'order_id':status=='0'?currentOrderHistoryList[index].orderId  :schedOrderHistoryList[index].orderId,
@@ -126,6 +125,7 @@ class HomeController extends AppBaseController {
     http.Response.fromStream(response).then((response) {
       print('___________${response.statusCode}__________');
       if (response.statusCode == 200) {
+        print("____Som___accept_order_RESPONSE-----${response.body}");
         var json=jsonDecode(response.body);
         Fluttertoast.showToast(msg: json['message']);
         log(response.body);

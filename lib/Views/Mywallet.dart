@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:jdx/Utils/Color.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/SupportNewScreen.dart';
 import 'package:jdx/Views/withdrawal_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,10 +28,12 @@ class MyWallet extends StatefulWidget {
 }
 
 class _MyWalletState extends State<MyWallet> {
+  bool _isNetworkAvail = true;
   TextEditingController amountController = TextEditingController();
 
   WalletHistoryModel? walletHistorymodel;
   walletHistroy() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
 
@@ -69,6 +72,7 @@ class _MyWalletState extends State<MyWallet> {
   String qrCodeResult = "Not Yet Scanned";
 
   getProfile() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     print(" this is  User++++++++++++++>$userId");
@@ -147,6 +151,7 @@ class _MyWalletState extends State<MyWallet> {
 
   GetBalanceModel? getBalanceModel;
   getWalletBalance() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=c3663036678f59c6e1598643dc7b12f9ed509821'
     };
@@ -173,7 +178,8 @@ class _MyWalletState extends State<MyWallet> {
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
       backgroundColor: colors.primary,
       body: Column(
         children: [
@@ -552,6 +558,18 @@ class _MyWalletState extends State<MyWallet> {
           )
         ],
       ),
-    );
+    )
+        : NoInternetScreen(onPressed: (){
+      Future.delayed(Duration(seconds: 1)).then((_) async {
+        _isNetworkAvail = await isNetworkAvailable();
+        if (_isNetworkAvail) {
+          if (mounted)
+            setState(() {
+              _isNetworkAvail = true;
+            });
+          // callApi();
+        }
+      });
+    });
   }
 }

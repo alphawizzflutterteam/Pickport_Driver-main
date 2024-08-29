@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:jdx/AuthViews/sign.dart';
 import 'package:jdx/Models/SignUpModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/PrivacyPolicy.dart';
 import 'package:jdx/Views/TermsAndConditions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,6 +40,7 @@ class SignUpScreenBasicDetails extends StatefulWidget {
 }
 
 class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
+  bool _isNetworkAvail = true;
   singUpModel? information;
 
   TextEditingController nameController = TextEditingController();
@@ -54,7 +56,8 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
       backgroundColor: colors.primary,
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -556,7 +559,8 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                             height: 50,
                             width: MediaQuery.of(context).size.width,
                             child: Center(
-                              child: Text(
+                              child: isLoading ? CircularProgressIndicator(color: Colors.white)
+                                  : Text(
                                 getTranslated(context, "Next"),
                                 // 'Next',
                                 style: const TextStyle(
@@ -606,7 +610,19 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
           ],
         ),
       ),
-    );
+    )
+        : NoInternetScreen(onPressed: (){
+          Future.delayed(Duration(seconds: 1)).then((_) async {
+            _isNetworkAvail = await isNetworkAvailable();
+            if (_isNetworkAvail) {
+              if (mounted)
+                setState(() {
+                  _isNetworkAvail = true;
+                });
+              // callApi();
+            }
+          });
+        });
   }
 
   validateForm(val) {
@@ -614,6 +630,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
   }
 
   checkEmail() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=023100c1035f5f0b55db582760dbd86312368c54'
     };
@@ -640,6 +657,10 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
   }
 
   signUpApi() async {
+    setState(() {
+      isLoading = true;
+    });
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=441db6d062b9f121348edb7be09465992a51c601'
     };
@@ -661,6 +682,9 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
       final str = await response.stream.bytesToString();
       var finalData = json.decode(str);
       print(str.toString());
@@ -688,6 +712,9 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
         ),
       );
     } else {
+      setState(() {
+        isLoading = false;
+      });
       print(response.reasonPhrase);
     }
   }

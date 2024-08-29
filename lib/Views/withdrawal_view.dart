@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jdx/Utils/Color.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/SupportNewScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +28,8 @@ class WithdrawalScreen extends StatefulWidget {
 }
 
 class _WithdrawalScreenState extends State<WithdrawalScreen> {
+  bool _isNetworkAvail = true;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +48,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   String qrCodeResult = "Not Yet Scanned";
 
   getProfile() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     print(" this is  User++++++++++++++>${userId}");
@@ -81,7 +85,8 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+    Scaffold(
         backgroundColor: colors.primary,
         body: ListView(
           children: [
@@ -171,7 +176,21 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   )),
             )
           ],
-        ));
+        ))
+        : NoInternetScreen(
+        onPressed: () {
+          Future.delayed(Duration(seconds: 1)).then((_) async {
+            _isNetworkAvail = await isNetworkAvailable();
+            if (_isNetworkAvail) {
+              if (mounted)
+                setState(() {
+                  _isNetworkAvail = true;
+                });
+              // callApi();
+            }
+          });
+        },
+    );
   }
 
   int _currentIndex = 1;
@@ -471,6 +490,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   bool isLodding = false;
 
   getWithdrawApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     setState(() {
       isLodding = true;
     });
@@ -569,6 +589,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   GetTransactionModel? getTransactionModel;
 
   getTransactionApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     var headers = {

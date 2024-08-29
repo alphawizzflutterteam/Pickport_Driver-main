@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:jdx/Utils/CustomColor.dart';
 
 class NoInternetScreen extends StatelessWidget {
-  const NoInternetScreen({Key? key,}) : super(key: key);
+  void Function()? onPressed;
+  NoInternetScreen({Key? key, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,16 +35,16 @@ class NoInternetScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 18,
-                  color: CustomColors.primaryColor,
+                  color: Colors.black,
                 ),
               ),
               const Divider(
                 color: Colors.transparent,
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: onPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: CustomColors.primaryColor,
                 ),
                 child: Text(
                   "Try Again".tr,

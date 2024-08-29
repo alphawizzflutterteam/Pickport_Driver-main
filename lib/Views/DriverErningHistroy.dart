@@ -252,6 +252,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/ParcelDetails.dart';
 import 'package:jdx/Views/withdrawal_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -272,6 +273,7 @@ class DriverErningHistroy extends StatefulWidget {
 }
 
 class _DriverErningHistroyState extends State<DriverErningHistroy> {
+  bool _isNetworkAvail = true;
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -295,6 +297,7 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
   }
   DriverEarnModel? getOnlineOfflineModel;
   onlineOfflineHistoryApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     var headers = {
@@ -326,6 +329,7 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
   bool isStart = false;
   bool isEnd = false;
   Future<void> _selectDate(BuildContext context, int status) async {
+    _isNetworkAvail = await isNetworkAvailable();
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -347,7 +351,8 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
       backgroundColor: colors.primary,
       body: Column(
         children: [
@@ -724,6 +729,18 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
           )
         ],
       ),
-    );
+    )
+        : NoInternetScreen(onPressed: (){
+      Future.delayed(Duration(seconds: 1)).then((_) async {
+        _isNetworkAvail = await isNetworkAvailable();
+        if (_isNetworkAvail) {
+          if (mounted)
+            setState(() {
+              _isNetworkAvail = true;
+            });
+          // callApi();
+        }
+      });
+    });
   }
 }

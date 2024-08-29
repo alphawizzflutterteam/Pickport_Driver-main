@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:jdx/AuthViews/verificationOtp.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/TermsAndConditions.dart';
 import 'package:jdx/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _isNetworkAvail = true;
   bool isLoading = false;
   bool isVisible = true;
   bool isTerm = false;
@@ -43,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   int selected = 0;
   getLoginApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     isLoading = true;
     setState(() {});
     var headers = {
@@ -104,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? mobileOtp, mobileNo;
 
   loginWithMobileNumberApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     isLoading = true;
     setState(() {});
    await getToken();
@@ -216,7 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
         // }
         return true;
       },
-      child: Scaffold(
+      child: _isNetworkAvail ?
+      Scaffold(
         backgroundColor: colors.primary,
         body: Form(
           key: _formKey,
@@ -768,7 +773,20 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         // bottomSheet:
-      ),
+      )
+          : NoInternetScreen(onPressed: (){
+        Future.delayed(Duration(seconds: 1)).then((_) async {
+          _isNetworkAvail = await isNetworkAvailable();
+          if (_isNetworkAvail) {
+            if (mounted)
+              setState(() {
+                _isNetworkAvail = true;
+                isLoading = false;
+              });
+            // callApi();
+          }
+        });
+      })
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jdx/AuthViews/LoginScreen.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/services/session.dart';
 // import 'package:job_dekho_app/Jdx_screens/signin_Screen.dart';
 // import 'package:job_dekho_app/Utils/color.dart';
@@ -20,6 +21,7 @@ class ChangeLanguage extends StatefulWidget {
 
 class _ChangeLanguageState extends State<ChangeLanguage> {
   int? selectLan = 2;
+  bool _isNetworkAvail = true;
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   }
 
   changeSelectedLang() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     String languageCode = _prefs.getString('languageCode') ?? "en";
 
@@ -238,7 +241,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
       backgroundColor: Color(0xFF0F368C),
       appBar: AppBar(
         backgroundColor: Color(0xFF0F368C),
@@ -341,6 +345,20 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
               ],
             ),
           )),
+    )
+        : NoInternetScreen(
+            onPressed: () {
+              Future.delayed(Duration(seconds: 1)).then((_) async {
+                _isNetworkAvail = await isNetworkAvailable();
+                if (_isNetworkAvail) {
+                  if (mounted)
+                    setState(() {
+                      _isNetworkAvail = true;
+                    });
+                  // callApi();
+                }
+              });
+            },
     );
   }
 

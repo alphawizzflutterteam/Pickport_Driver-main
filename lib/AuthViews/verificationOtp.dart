@@ -259,17 +259,17 @@ class _VerificationPageState extends State<VerificationPage> {
                 child: Column(
                   children: [
                     const SizedBox(
-                      height: 80,
+                      height: 60,
                     ),
                     Text(
                       getTranslated(context, "Code has sent to"),
                       // "Code has sent to",
-                      style: TextStyle(fontSize: 16,color: Colors.black),
+                      style: TextStyle(fontSize: 18,color: Colors.black),
                     ),
                     Text(
                       "+91 ${widget.mobile.toString()}",
                       style: const TextStyle(
-                          fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                          fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                     // Text(
                     //   "OTP: ${widget.otp.toString()}",
@@ -281,31 +281,35 @@ class _VerificationPageState extends State<VerificationPage> {
                     // Text('OTP: ${otp}',style: const TextStyle(fontSize: 20,color: Colors.white),),
 
                     const SizedBox(
-                      height: 50,
+                      height: 40,
                     ),
-                    PinCodeTextField(
-                      //errorBorderColor:Color(0xFF5ACBEF),
-                      //defaultBorderColor: Color(0xFF5ACBEF),
-                      keyboardType: TextInputType.phone,
-                      onChanged: (value) {
-                        widget.otp = value.toString();
-                        newPin = value.toString();
-                      },
-                      textStyle: const TextStyle(color: Colors.black),
-                      pinTheme: PinTheme(
-                        shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(10),
-                        activeColor: colors.primary,
-                        inactiveColor: colors.primary,
-                        selectedColor: colors.primary,
-                        fieldHeight: 60,
-                        fieldWidth: 60,
-                        selectedFillColor: colors.primary,
-                        inactiveFillColor: colors.primary,
-                        activeFillColor: colors.primary,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width / 1.3,
+                      child: PinCodeTextField(
+                        //errorBorderColor:Color(0xFF5ACBEF),
+                        //defaultBorderColor: Color(0xFF5ACBEF),
+                        keyboardType: TextInputType.phone,
+                        onChanged: (value) {
+                          widget.otp = value.toString();
+                          newPin = value.toString();
+                        },
+                        textStyle: const TextStyle(color: Colors.black),
+                        cursorColor: colors.blackTemp,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(10),
+                          activeColor: colors.primary,
+                          inactiveColor: colors.primary,
+                          selectedColor: colors.primary,
+                          fieldHeight: 60,
+                          fieldWidth: 60,
+                          selectedFillColor: colors.primary,
+                          inactiveFillColor: colors.primary,
+                          activeFillColor: colors.primary,
+                        ),
+                        //pinBoxRadius:20,
+                        appContext: context, length: 4,
                       ),
-                      //pinBoxRadius:20,
-                      appContext: context, length: 4,
                     ),
 
                     const SizedBox(

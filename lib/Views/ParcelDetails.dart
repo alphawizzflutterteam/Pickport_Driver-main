@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:jdx/Controller/home_controller.dart';
 import 'package:jdx/Models/driverFeedbackModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/services/location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,6 +35,7 @@ class PercelDetails extends StatefulWidget {
 }
 
 class _PercelDetailsState extends State<PercelDetails> {
+  bool isNetworkAvail = true;
   final _formKey = GlobalKey<FormState>();
   Position? _position;
 
@@ -50,6 +52,7 @@ class _PercelDetailsState extends State<PercelDetails> {
 
   String city = "";
   inIt() async {
+    isNetworkAvail = await isNetworkAvailable();
     _position = await getUserCurrentPosition();
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -77,10 +80,12 @@ class _PercelDetailsState extends State<PercelDetails> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
+        isNetworkAvail = await isNetworkAvailable();
         Future.delayed(const Duration(seconds: 2));
         bookingOrderDetailsApi();
       },
-      child: Scaffold(
+      child: isNetworkAvail ?
+            Scaffold(
         backgroundColor: colors.primary,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -1319,11 +1324,24 @@ class _PercelDetailsState extends State<PercelDetails> {
                   ],
                 ),
               ),
-      ),
+      )
+          : NoInternetScreen(onPressed: (){
+        Future.delayed(Duration(seconds: 1)).then((_) async {
+          isNetworkAvail = await isNetworkAvailable();
+          if (isNetworkAvail) {
+            if (mounted)
+              setState(() {
+                isNetworkAvail = true;
+              });
+            // callApi();
+          }
+        });
+      }),
     );
   }
 
   Future<void> getDriverFeedback(String user_id, String parcelId) async {
+    isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=9e8fdef277e1d8cbe9bb3dbf010b09b848f2297a'
     };
@@ -1688,9 +1706,9 @@ class _PercelDetailsState extends State<PercelDetails> {
                 ),
                 InkWell(
                   onTap: () async{
+                    Get.back();
                   await  orderDelevertCompleteByOtp()
                         .then((value) => bookingOrderDetailsApi());
-                  Get.back();
                   },
                   child: Container(
                     height: 40,
@@ -1776,6 +1794,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   String? orderId, senderOTP, receiverOtp;
   SingleBookingModel? singleBookingModel;
   bookingOrderDetailsApi() async {
+    isNetworkAvail = await isNetworkAvailable();
     enablePickup = false;
     var headers = {
       'Cookie': 'ci_session=7e0de117fa84bd318ef38c6fd83f368d5bbc9700'
@@ -1813,6 +1832,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   }
 
   Future orderDelevertCompleteByOtp() async {
+    isNetworkAvail = await isNetworkAvailable();
     if (_otpController.text.isEmpty) {
       Fluttertoast.showToast(
         msg: getTranslated(context, "please enter otp"),
@@ -1888,6 +1908,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   }
 
   void _launchURL(Uri url) async {
+    isNetworkAvail = await isNetworkAvailable();
     print("url ....$url");
     if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
       //await launch(url);
@@ -1901,6 +1922,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   }
 
   orderUpdateApi(String? status) async {
+    isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     var headers = {
@@ -1953,6 +1975,7 @@ class _PercelDetailsState extends State<PercelDetails> {
 
   String? Otp;
   getOtpApi() async {
+    isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=127419c90abafa0b72f2bc62ac629ffdb6745994'
     };

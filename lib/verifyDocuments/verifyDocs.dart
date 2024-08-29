@@ -67,6 +67,7 @@ class VerifyDocs extends StatefulWidget {
 }
 
 class _VerifyDocs extends State<VerifyDocs> {
+  bool isLoading = false;
   singUpModel? information;
 
   TextEditingController nameController = TextEditingController();
@@ -190,6 +191,9 @@ class _VerifyDocs extends State<VerifyDocs> {
   }
 
   signUpAPISECOND() async {
+    setState(() {
+      isLoading = true;
+    });
     var headers = {
       'Cookie': 'ci_session=321abd54770ce394b6c89c07e2d20a0996c1cff8'
     };
@@ -282,6 +286,9 @@ class _VerifyDocs extends State<VerifyDocs> {
     print('____Som___response___${response.statusCode}_________');
 
     if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
 
@@ -304,6 +311,9 @@ class _VerifyDocs extends State<VerifyDocs> {
         Fluttertoast.showToast(msg: "${finalResult['message']}");
       }
     } else {
+      setState(() {
+        isLoading = false;
+      });
       print(response.reasonPhrase);
     }
   }
@@ -839,7 +849,7 @@ class _VerifyDocs extends State<VerifyDocs> {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
@@ -1988,364 +1998,372 @@ class _VerifyDocs extends State<VerifyDocs> {
                             const SizedBox(
                               height: 8,
                             ),
-                            Text(
-                              getTranslated(context, "Vehicle type"),
-                              // "Vehicle type",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              selected = 1;
-                                              print(
-                                                  '____Som______${selected}_________');
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  selected == 1
-                                                      ? Icons
-                                                          .radio_button_checked
-                                                      : Icons
-                                                          .radio_button_off_outlined,
-                                                  color: colors.secondary,
-                                                  size: 20,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text(
-                                                  getTranslated(context,
-                                                      "2 Wheeler Gear"),
-                                                  // '2 Wheeler Gear',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    getTranslated(context, "Vehicle type"),
+                                    // "Vehicle type",
+                                    style:
+                                    const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                  Column(
+                                    children: [
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 1;
+                                                    print(
+                                                        '____Som______${selected}_________');
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        selected == 1
+                                                            ? Icons
+                                                            .radio_button_checked
+                                                            : Icons
+                                                            .radio_button_off_outlined,
+                                                        color: colors.secondary,
+                                                        size: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        getTranslated(context,
+                                                            "2 Wheeler Gear"),
+                                                        // '2 Wheeler Gear',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              selected = 5;
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  selected == 5
-                                                      ? Icons
-                                                          .radio_button_checked
-                                                      : Icons
-                                                          .radio_button_off_outlined,
-                                                  color: colors.secondary,
-                                                  size: 20,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text(
-                                                  "${getTranslated(context, "3 Wheeler")}     ",
+                                              ),
+                                              const SizedBox(
+                                                height: 4,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 5;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        selected == 5
+                                                            ? Icons
+                                                            .radio_button_checked
+                                                            : Icons
+                                                            .radio_button_off_outlined,
+                                                        color: colors.secondary,
+                                                        size: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        "${getTranslated(context, "3 Wheeler")}     ",
 
-                                                  // 'Mahindra Pickup',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                                                        // 'Mahindra Pickup',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              selected = 3;
-                                              print(
-                                                  '____Som__ddd____${selected}_________');
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  selected == 3
-                                                      ? Icons
-                                                          .radio_button_checked
-                                                      : Icons
-                                                          .radio_button_off_outlined,
-                                                  color: colors.secondary,
-                                                  size: 20,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text(
-                                                  getTranslated(context,
-                                                      "Mahindra Pickup"),
-                                                  //'3 Wheeler',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                                              ),
+                                              const SizedBox(
+                                                height: 4,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 3;
+                                                    print(
+                                                        '____Som__ddd____${selected}_________');
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        selected == 3
+                                                            ? Icons
+                                                            .radio_button_checked
+                                                            : Icons
+                                                            .radio_button_off_outlined,
+                                                        color: colors.secondary,
+                                                        size: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        getTranslated(context,
+                                                            "Mahindra Pickup"),
+                                                        //'3 Wheeler',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              selected = 6;
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  selected == 6
-                                                      ? Icons
-                                                          .radio_button_checked
-                                                      : Icons
-                                                          .radio_button_off_outlined,
-                                                  color: colors.secondary,
-                                                  size: 20,
-                                                ),
-                                                const SizedBox(
-                                                  width: 2,
-                                                ),
-                                                Text(
-                                                  getTranslated(context,
-                                                      "2 Wheeler Non Gear"),
-                                                  // '2 Wheeler Non Gear',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                                          Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 6;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        selected == 6
+                                                            ? Icons
+                                                            .radio_button_checked
+                                                            : Icons
+                                                            .radio_button_off_outlined,
+                                                        color: colors.secondary,
+                                                        size: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 2,
+                                                      ),
+                                                      Text(
+                                                        getTranslated(context,
+                                                            "2 Wheeler Non Gear"),
+                                                        // '2 Wheeler Non Gear',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              selected = 4;
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  selected == 4
-                                                      ? Icons
-                                                          .radio_button_checked
-                                                      : Icons
-                                                          .radio_button_off_outlined,
-                                                  color: colors.secondary,
-                                                  size: 20,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text(
-                                                  "${getTranslated(context, "Tata Ace")}                 ",
+                                              ),
+                                              const SizedBox(
+                                                height: 4,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 4;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        selected == 4
+                                                            ? Icons
+                                                            .radio_button_checked
+                                                            : Icons
+                                                            .radio_button_off_outlined,
+                                                        color: colors.secondary,
+                                                        size: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        "${getTranslated(context, "Tata Ace")}                 ",
 
-                                                  // 'Tata 407',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                                                        // 'Tata 407',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                              const SizedBox(
+                                                height: 4,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 2;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        selected == 2
+                                                            ? Icons
+                                                            .radio_button_checked
+                                                            : Icons
+                                                            .radio_button_off_outlined,
+                                                        color: colors.secondary,
+                                                        size: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        getTranslated(
+                                                            context, "Tato 407"),
+                                                        // 'Tata Ace',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    getTranslated(context, "Insurance"),
+                                    //  "Insurance",
+                                    style:
+                                    const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Radio(
+                                        value: 0,
+                                        fillColor: MaterialStateColor.resolveWith(
+                                                (states) => colors.secondary),
+                                        activeColor: colors.secondary,
+                                        groupValue: _value,
+                                        onChanged: (int? value) {
+                                          setState(() {
+                                            _value = value!;
+                                            isNonAvailable = false;
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        getTranslated(context, "YES"),
+                                        // "Yes",
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Radio(
+                                          value: 1,
+                                          fillColor: MaterialStateColor.resolveWith(
+                                                  (states) => colors.secondary),
+                                          activeColor: colors.secondary,
+                                          groupValue: _value,
+                                          onChanged: (int? value) {
                                             setState(() {
-                                              selected = 2;
+                                              _value = value!;
+                                              isAvailable = true;
                                             });
-                                          },
-                                          child: Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  selected == 2
-                                                      ? Icons
-                                                          .radio_button_checked
-                                                      : Icons
-                                                          .radio_button_off_outlined,
-                                                  color: colors.secondary,
-                                                  size: 20,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text(
-                                                  getTranslated(
-                                                      context, "Tato 407"),
-                                                  // 'Tata Ace',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              getTranslated(context, "Insurance"),
-                              //  "Insurance",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Row(
-                              children: [
-                                Radio(
-                                  value: 0,
-                                  fillColor: MaterialStateColor.resolveWith(
-                                      (states) => colors.secondary),
-                                  activeColor: colors.secondary,
-                                  groupValue: _value,
-                                  onChanged: (int? value) {
-                                    setState(() {
-                                      _value = value!;
-                                      isNonAvailable = false;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  getTranslated(context, "YES"),
-                                  // "Yes",
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Radio(
-                                    value: 1,
-                                    fillColor: MaterialStateColor.resolveWith(
-                                        (states) => colors.secondary),
-                                    activeColor: colors.secondary,
-                                    groupValue: _value,
-                                    onChanged: (int? value) {
-                                      setState(() {
-                                        _value = value!;
-                                        isAvailable = true;
-                                      });
-                                    }),
-                                // SizedBox(width: 10.0,),
-                                Text(
-                                  getTranslated(context, "NO"),
-                                  //"No",
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              getTranslated(context, "Pollution Emission"),
-                              // "Pollution Emission",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Row(
-                              children: [
-                                Radio(
-                                  value: 0,
-                                  fillColor: MaterialStateColor.resolveWith(
-                                      (states) => colors.secondary),
-                                  activeColor: colors.secondary,
-                                  groupValue: _value1,
-                                  onChanged: (int? value) {
-                                    setState(() {
-                                      _value1 = value!;
-                                      isNonAvailable1 = false;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  getTranslated(context, "YES"),
-                                  //   "Yes",
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Radio(
-                                    value: 1,
-                                    fillColor: MaterialStateColor.resolveWith(
-                                        (states) => colors.secondary),
-                                    activeColor: colors.secondary,
-                                    groupValue: _value1,
-                                    onChanged: (int? value) {
-                                      setState(() {
-                                        _value1 = value!;
-                                        isAvailable1 = true;
-                                      });
-                                    }),
-                                // SizedBox(width: 10.0,),
-                                Text(
-                                  getTranslated(context, "NO"),
-                                  //  "No",
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                              ],
+                                          }),
+                                      // SizedBox(width: 10.0,),
+                                      Text(
+                                        getTranslated(context, "NO"),
+                                        //"No",
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    getTranslated(context, "Pollution Emission"),
+                                    // "Pollution Emission",
+                                    style:
+                                    const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Radio(
+                                        value: 0,
+                                        fillColor: MaterialStateColor.resolveWith(
+                                                (states) => colors.secondary),
+                                        activeColor: colors.secondary,
+                                        groupValue: _value1,
+                                        onChanged: (int? value) {
+                                          setState(() {
+                                            _value1 = value!;
+                                            isNonAvailable1 = false;
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        getTranslated(context, "YES"),
+                                        //   "Yes",
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Radio(
+                                          value: 1,
+                                          fillColor: MaterialStateColor.resolveWith(
+                                                  (states) => colors.secondary),
+                                          activeColor: colors.secondary,
+                                          groupValue: _value1,
+                                          onChanged: (int? value) {
+                                            setState(() {
+                                              _value1 = value!;
+                                              isAvailable1 = true;
+                                            });
+                                          }),
+                                      // SizedBox(width: 10.0,),
+                                      Text(
+                                        getTranslated(context, "NO"),
+                                        //  "No",
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
 
                       Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
+                        padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 4),
                         child: InkWell(
                           onTap: () {
                             bool isValidateFiles = isValidate();
@@ -2361,7 +2379,8 @@ class _VerifyDocs extends State<VerifyDocs> {
                               height: 50,
                               width: MediaQuery.of(context).size.width,
                               child: Center(
-                                child: Text(
+                                child: isLoading ? CircularProgressIndicator(color: Colors.white,)
+                                : Text(
                                   getTranslated(context, "Next"),
                                   // 'Next',
                                   style: const TextStyle(
@@ -2481,15 +2500,11 @@ class _VerifyDocs extends State<VerifyDocs> {
     }
   }
 
-  bool isLoading = false;
   String? cityId;
   GetStateList? getStateList;
   GetCityModel? getCityModel;
 
   getCityApi(String stateId) async {
-    setState(() {
-      isLoading = true;
-    });
     var headers = {
       'Cookie': 'ci_session=c59791396657a1155df9f32cc7d7b547a40d648c'
     };
@@ -2509,11 +2524,6 @@ class _VerifyDocs extends State<VerifyDocs> {
         // Fluttertoast.showToast(msg: "${finalResult['message']}");
       });
     } else {
-      setState(() {
-        setState(() {
-          isLoading = false;
-        });
-      });
       print(response.reasonPhrase);
     }
   }

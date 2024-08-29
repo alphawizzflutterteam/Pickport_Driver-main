@@ -782,7 +782,7 @@ class _AddBankDetailsState extends State<AddBankDetails> {
                             child: Center(
                               child: isLoding == true
                                   ? const Center(
-                                      child: CircularProgressIndicator())
+                                      child: CircularProgressIndicator(color: Colors.white,))
                                   : Text(
                                       getTranslated(context, "Sign Up"),
                                       // 'Sign Up',

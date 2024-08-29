@@ -21,6 +21,7 @@ import 'package:jdx/Models/order_history_response.dart';
 import 'package:jdx/Provider/HomeProvider.dart';
 import 'package:jdx/Views/DriverErningHistroy.dart';
 import 'package:jdx/Views/Mywallet.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/order_details.dart';
 import 'package:jdx/Views/parcel_details.dart';
 import 'package:jdx/verifyDocuments/pendingScreen.dart';
@@ -59,6 +60,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isNetworkAvail = true;
   Api api = Api();
   bool isSwitched = true;
   bool isdocumetsVerified = true;
@@ -332,6 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getProfile() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     print(" this is  User++++++++++++++>$userId");
@@ -455,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   inIt() async {
-
+    _isNetworkAvail = await isNetworkAvailable();
     setState(() {
       isLoading = true;
     });
@@ -492,6 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GetSliderModel? getSliderModel;
 
   Future<void> fetchAndUploadLocation() async {
+    _isNetworkAvail = await isNetworkAvailable();
     try {
 
       Position position = await Geolocator.getCurrentPosition(
@@ -519,6 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   getSliderApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=8c63df600f4c9c930d8b1e2d1e10feb8278887c0'
     };
@@ -588,11 +593,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ? CircularProgressIndicator()
         : RefreshIndicator(
       onRefresh: () async {
+        _isNetworkAvail = await isNetworkAvailable();
         Future.delayed(const Duration(seconds: 2));
         inIt();
         setSegmentValue(0);
       },
-      child: Scaffold(
+      child: _isNetworkAvail ?
+      Scaffold(
         // FloatingActionButton
         floatingActionButtonLocation:
         FloatingActionButtonLocation.centerFloat,
@@ -1049,7 +1056,20 @@ class _HomeScreenState extends State<HomeScreen> {
         //     ))
         //   ]),
         // ),
-      ),
+      )
+          : NoInternetScreen(onPressed: () {
+        Future.delayed(Duration(seconds: 1)).then((_) async {
+          _isNetworkAvail = await isNetworkAvailable();
+          if (_isNetworkAvail) {
+            if (mounted)
+              setState(() {
+                _isNetworkAvail = true;
+                isLoading = false;
+              });
+            // callApi();
+          }
+        });
+      })
     );
   }
 
@@ -1546,6 +1566,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<int> getMinimumWallet() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=30f7a5a1f9dd96a4fc44ef6aa7de3f031bc38734'
     };
@@ -2164,6 +2185,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? driverAmount;
 
   getDriverApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     var headers = {
@@ -2285,6 +2307,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getUserStatusOnlineOrOffline(String status) async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
@@ -2305,6 +2328,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getStatus(int status) async {
+    _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     var headers = {
@@ -2328,6 +2352,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getCheckStatusApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     print("order is ---------3");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -2356,6 +2381,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 //Cuurrent Delivery api
   getUserOrderHistory(String status) async {
+    _isNetworkAvail = await isNetworkAvailable();
     print("order is ---------2");
     orderHistoryList.clear();
     setState(() {
@@ -2402,6 +2428,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   getDriverRating(String driverId) async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=6e2bbfaeac31fb0c3fcbcd0ae36ef35cb60a73d9'
     };
@@ -3598,6 +3625,7 @@ print("RatingAPI----${request.url}");
   }
 
   void whatsAppLaunch(String num) async {
+    _isNetworkAvail = await isNetworkAvailable();
     var whatsapp = "${num}";
     // var whatsapp = "+919644595859";
     var whatsappURl_android = "whatsapp://send?phone=" +
@@ -3626,6 +3654,7 @@ print("RatingAPI----${request.url}");
   getAcceptedOrder(
     String status,
   ) async {
+    _isNetworkAvail = await isNetworkAvailable();
     isLoading2 = true;
     setState(() {});
     SharedPreferences prefs = await SharedPreferences.getInstance();
