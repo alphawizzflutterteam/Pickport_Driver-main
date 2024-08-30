@@ -61,7 +61,7 @@ class _MyWalletState extends State<MyWallet> {
         data.addAll(walletHistorymodel!.data!);
         filterList.addAll(data);
         print("Lengthhhhhh: ${data.length}");
-        print(filterList.first.date);
+        print(filterList.last.date);
       });
     } else {
       print(response.reasonPhrase);
@@ -109,6 +109,7 @@ class _MyWalletState extends State<MyWallet> {
       if (DateTime.parse(data[i].date.toString()).isAfter(startDate) &&
           (DateTime.parse(data[i].date.toString()).isBefore(endDate) ||
               DateTime.parse(data[i].date.toString()).day == endDate.day)) {
+        print("asdf");
         filterList.add(data[i]);
       }
     }
@@ -535,7 +536,7 @@ class _MyWalletState extends State<MyWallet> {
                                                             FontWeight.bold),
                                                   ),
                                                   Text(
-                                                    "${DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(item?.createDt ?? ""))}",
+                                                    "${DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(item?.date ?? ""))}", //createDt
                                                     style: const TextStyle(
                                                         fontSize: 14.0,
                                                         fontWeight:

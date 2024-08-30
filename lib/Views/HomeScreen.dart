@@ -1348,7 +1348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Text(getTranslated(
                                               context, "Total Distance")),
                                           Text(
-                                              "${double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString()) + double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())} Km"),
+                                              "${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString()) + double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())).toStringAsFixed(2)} Km"),
                                         ],
                                       ),
                                       const SizedBox(
