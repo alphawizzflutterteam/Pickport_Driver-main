@@ -282,12 +282,17 @@ class _MyAccountState extends State<MyAccount> {
                                           fontSize: 14,
                                         ),
                                       ),
-                                      Text(
-                                        getProfileModel!
-                                                .data!.user!.userEmail ??
-                                            "",
-                                        style: const TextStyle(
-                                          fontSize: 14,
+                                      SizedBox(
+                                        width: MediaQuery.of(context).size.width / 2.2,
+                                        child: Text(
+                                          getProfileModel!
+                                                  .data!.user!.userEmail ??
+                                              "",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
                                         ),
                                       ),
                                     ],

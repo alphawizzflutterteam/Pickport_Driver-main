@@ -460,12 +460,12 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                 ? Text(
                               'Approved',
                               style: TextStyle(
-                                  color: Colors.red),
+                                  color: Colors.green),
                             )
                                 : Text(
                               'Rejected',
                               style: TextStyle(
-                                  color: Colors.green),
+                                  color: Colors.red),
                             )
                                   // Text(
                                   //   "${getTransactionModel?.data?[i].paymentStatus}",

@@ -1337,7 +1337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: [
                                           Text(getTranslated(context, 'Pickup Distance')),
                                           Text(
-                                              "${ctrl.currentOrderHistoryList[index].orderDis} Km"),
+                                              "${(double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())).toStringAsFixed(2)} Km"),
                                         ],
                                       ),
                                       const SizedBox(height: 10),
@@ -1346,9 +1346,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(getTranslated(
-                                              context, "Total Distance")),
+                                              context, "Drop Distance")),
                                           Text(
-                                              "${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString()) + double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())).toStringAsFixed(2)} Km"),
+                                              "${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString())).toStringAsFixed(2)} Km"),
                                         ],
                                       ),
                                       const SizedBox(
