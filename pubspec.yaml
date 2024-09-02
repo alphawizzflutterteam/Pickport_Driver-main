@@ -74,6 +74,11 @@ dependencies:
   location: ^4.4.0
   connectivity: any
   flutter_svg: any
+  flutter_polyline_points: 1.0.0
+  custom_map_markers: ^0.0.2+1
+
+
+
 #  cloud_firestore: ^1.0.0
 #  flutter_native_splash:
 

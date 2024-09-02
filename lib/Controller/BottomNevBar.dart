@@ -65,7 +65,6 @@
 //
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jdx/Utils/CustomColor.dart';
@@ -76,7 +75,9 @@ import 'package:jdx/Views/Parcel%20HistoryPage.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key,}) : super(key: key);
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
 
   static const String _title = 'Flutter Code Sample';
 
@@ -90,7 +91,7 @@ class MyApp extends StatelessWidget {
 }
 
 class BottomNav extends StatefulWidget {
-  const BottomNav({Key,key});
+  const BottomNav({Key, key});
 
   @override
   State<BottomNav> createState() => _BottomNavState();
@@ -99,7 +100,7 @@ class BottomNav extends StatefulWidget {
 class _BottomNavState extends State<BottomNav> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     ParcelHistory(),
@@ -127,8 +128,7 @@ class _BottomNavState extends State<BottomNav> {
                 actions: <Widget>[
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        primary:CustomColors.accentColor
-                    ),
+                        backgroundColor: CustomColors.accentColor),
                     child: Text("YES"),
                     onPressed: () {
                       SystemNavigator.pop();
@@ -136,8 +136,7 @@ class _BottomNavState extends State<BottomNav> {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        primary:CustomColors.accentColor
-                    ),
+                        backgroundColor: CustomColors.accentColor),
                     child: Text("NO"),
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -145,8 +144,7 @@ class _BottomNavState extends State<BottomNav> {
                   )
                 ],
               );
-            }
-        );
+            });
         // if (_tabController.index != 0) {
         //   _tabController.animateTo(0);
         //   return false;
@@ -188,4 +186,3 @@ class _BottomNavState extends State<BottomNav> {
     );
   }
 }
-

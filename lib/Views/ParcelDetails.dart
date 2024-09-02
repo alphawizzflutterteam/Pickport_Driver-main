@@ -7,10 +7,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jdx/Controller/home_controller.dart';
 import 'package:jdx/Models/driverFeedbackModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
+import 'package:jdx/Views/trackLocationScreen.dart';
 import 'package:jdx/services/location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,6 +29,7 @@ class PercelDetails extends StatefulWidget {
   GetProfileModel? getProfileModel;
 
   PercelDetails({this.getProfileModel, this.pId, this.isCheck});
+
   String? pId;
   bool? isCheck;
 
@@ -51,6 +54,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   }
 
   String city = "";
+
   inIt() async {
     isNetworkAvail = await isNetworkAvailable();
     _position = await getUserCurrentPosition();
@@ -84,895 +88,889 @@ class _PercelDetailsState extends State<PercelDetails> {
         Future.delayed(const Duration(seconds: 2));
         bookingOrderDetailsApi();
       },
-      child: isNetworkAvail ?
-            Scaffold(
-        backgroundColor: colors.primary,
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          elevation: 0,
-          title: Text(
-            getTranslated(context, "Parcel Details"),
-            // 'Parcel Details',
-            style: const TextStyle(
-                fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          leading: Container(
-            margin: const EdgeInsets.all(8),
-            height: 35,
-            width: 35,
-            decoration:
-                const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-            child: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
-        body: singleBookingModel == null
-            ? const Center(
-                child: CircularProgressIndicator(
-                color: Colors.white,
-              ))
-            : Container(
-                child: Stack(
-                  children: [
-                    Container(
-                      // padding: EdgeInsets.symmetric(horizontal: 20),
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(color: colors.primary),
-                      // child: Padding(
-                      //   padding: const EdgeInsets.only(left: 10),
-                      //   child: Row(
-                      //     children: [
-                      //       Container(
-                      //         height: 35,
-                      //         width: 35,
-                      //         decoration: const BoxDecoration(
-                      //             shape: BoxShape.circle,
-                      //             color: Colors.white),
-                      //         child: InkWell(
-                      //           onTap: () {
-                      //             Navigator.pop(context);
-                      //           },
-                      //           child: const Icon(
-                      //             Icons.arrow_back,
-                      //             color: Colors.black,
-                      //           ),
-                      //         ),
-                      //       ),
-                      //
-                      //       Expanded(
-                      //         child: Container(
-                      //           child: Center(
-                      //             child: Padding(
-                      //               padding: const EdgeInsets.only(right: 20),
-                      //               child: Text(
-                      //                 getTranslated(context, "Parcel Details"),
-                      //                 // 'Parcel Details',
-                      //                 style: const TextStyle(
-                      //                     fontSize: 18,
-                      //                     color: Colors.white,
-                      //                     fontWeight: FontWeight.bold),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // )
+      child: isNetworkAvail
+          ? Scaffold(
+              backgroundColor: colors.primary,
+              extendBodyBehindAppBar: true,
+              appBar: AppBar(
+                elevation: 0,
+                title: Text(
+                  getTranslated(context, "Parcel Details"),
+                  // 'Parcel Details',
+                  style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+                centerTitle: true,
+                leading: Container(
+                  margin: const EdgeInsets.all(8),
+                  height: 35,
+                  width: 35,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.white),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
                     ),
-                    Positioned(
-                      top: MediaQuery.of(context).size.height * 0.13,
-                      child: Container(
-                          height: MediaQuery.of(context).size.height * 0.88,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          width: MediaQuery.of(context).size.width,
-                          // height: MediaQuery.of(context).size.height * 0.85,
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30)),
+                  ),
+                ),
+              ),
+              body: singleBookingModel == null
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ))
+                  : Container(
+                      child: Stack(
+                        children: [
+                          Container(
+                            // padding: EdgeInsets.symmetric(horizontal: 20),
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            decoration:
+                                const BoxDecoration(color: colors.primary),
+                            // child: Padding(
+                            //   padding: const EdgeInsets.only(left: 10),
+                            //   child: Row(
+                            //     children: [
+                            //       Container(
+                            //         height: 35,
+                            //         width: 35,
+                            //         decoration: const BoxDecoration(
+                            //             shape: BoxShape.circle,
+                            //             color: Colors.white),
+                            //         child: InkWell(
+                            //           onTap: () {
+                            //             Navigator.pop(context);
+                            //           },
+                            //           child: const Icon(
+                            //             Icons.arrow_back,
+                            //             color: Colors.black,
+                            //           ),
+                            //         ),
+                            //       ),
+                            //
+                            //       Expanded(
+                            //         child: Container(
+                            //           child: Center(
+                            //             child: Padding(
+                            //               padding: const EdgeInsets.only(right: 20),
+                            //               child: Text(
+                            //                 getTranslated(context, "Parcel Details"),
+                            //                 // 'Parcel Details',
+                            //                 style: const TextStyle(
+                            //                     fontSize: 18,
+                            //                     color: Colors.white,
+                            //                     fontWeight: FontWeight.bold),
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // )
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              child: Column(
-                                children: [
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Text(
-                                            getTranslated(context, "Parcel Id"),
-                                            //   "Parcel Id"
-                                            style: const TextStyle(
-                                                color: colors.blackTemp,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(
-                                              "#${singleBookingModel?.data?.first.orderId}"),
-                                        ],
-                                      ),
-                                      Column(
-                                        children: [
-                                          Text(
-                                            getTranslated(context, "Parcel Date"),
-                                            // "Parcel Date",
-                                            style: const TextStyle(
-                                                color: colors.blackTemp,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(singleBookingModel
-                                                  ?.data?.first.bookingDate
-                                                  .toString() ??
-                                              ""),
-                                        ],
-                                      ),
-                                      Column(
-                                        children: [
-                                          Text(
-                                            getTranslated(context, "Parcel Time"),
-                                            // "Parcel Time",
-                                            style: const TextStyle(
-                                                color: colors.blackTemp,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(singleBookingModel
-                                                  ?.data?.first.bookingTime
-                                                  .toString() ??
-                                              ""),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10)),
-                                    elevation: 2,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: colors.whiteTemp,
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                          Positioned(
+                            top: MediaQuery.of(context).size.height * 0.13,
+                            child: Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.88,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                width: MediaQuery.of(context).size.width,
+                                // height: MediaQuery.of(context).size.height * 0.85,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(30),
+                                      topRight: Radius.circular(30)),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: SingleChildScrollView(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    child: Column(
+                                      children: [
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Container(
-                                              //color: Colors.red,
-                                              child: Row(
-                                                // mainAxisAlignment:
-                                                //     MainAxisAlignment.spaceBetween,
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  getTranslated(
+                                                      context, "Parcel Id"),
+                                                  //   "Parcel Id"
+                                                  style: const TextStyle(
+                                                      color: colors.blackTemp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                    "#${singleBookingModel?.data?.first.orderId}"),
+                                              ],
+                                            ),
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  getTranslated(
+                                                      context, "Parcel Date"),
+                                                  // "Parcel Date",
+                                                  style: const TextStyle(
+                                                      color: colors.blackTemp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(singleBookingModel?.data
+                                                        ?.first.bookingDate
+                                                        .toString() ??
+                                                    ""),
+                                              ],
+                                            ),
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  getTranslated(
+                                                      context, "Parcel Time"),
+                                                  // "Parcel Time",
+                                                  style: const TextStyle(
+                                                      color: colors.blackTemp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(singleBookingModel?.data
+                                                        ?.first.bookingTime
+                                                        .toString() ??
+                                                    ""),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Card(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          elevation: 2,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: colors.whiteTemp,
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        constraints: BoxConstraints(
-                                                            maxWidth:
-                                                                190), // Adjust the maxWidth as needed
-                                                        child: Row(
+                                                  Container(
+                                                    //color: Colors.red,
+                                                    child: Row(
+                                                      // mainAxisAlignment:
+                                                      //     MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Flexible(
-                                                              child: Text(
-                                                                getTranslated(
-                                                                    context,
-                                                                    "Sender Name"),
-                                                                style: const TextStyle(
-                                                                    color: colors
-                                                                        .blackTemp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                maxLines: 1,
+                                                            Container(
+                                                              constraints:
+                                                                  const BoxConstraints(
+                                                                      maxWidth:
+                                                                          190),
+                                                              // Adjust the maxWidth as needed
+                                                              child: Row(
+                                                                children: [
+                                                                  Flexible(
+                                                                    child: Text(
+                                                                      getTranslated(
+                                                                          context,
+                                                                          "Sender Name"),
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .blackTemp,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 8,
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                const Icon(
+                                                                  Icons.person,
+                                                                  size: 20,
+                                                                ),
+                                                                Text(
+                                                                    "${singleBookingModel?.data?.first.senderName}"),
+                                                              ],
                                                             ),
                                                           ],
                                                         ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 8,
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          const Icon(
-                                                            Icons.person,
-                                                            size: 20,
-                                                          ),
-                                                          Text(
-                                                              "${singleBookingModel?.data?.first.senderName}"),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      _launchPhoneDialer(
-                                                          "${singleBookingModel?.data?.first.phoneNo}");
-                                                    },
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Container(
-                                                            // constraints:
-                                                            // BoxConstraints(
-                                                            //     maxWidth: 200),
-                                                            child: Container(
-                                                          constraints: BoxConstraints(
-                                                              maxWidth:
-                                                                  100), // Adjust the maxWidth as needed
-                                                          child: Row(
-                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            _launchPhoneDialer(
+                                                                "${singleBookingModel?.data?.first.phoneNo}");
+                                                          },
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
-                                                              Flexible(
-                                                                child: Text(
-                                                                  getTranslated(
-                                                                      context,
-                                                                      "Sender Mobile No."),
-                                                                  style: const TextStyle(
-                                                                      color: colors
-                                                                          .blackTemp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  maxLines: 1,
+                                                              Container(
+                                                                  // constraints:
+                                                                  // BoxConstraints(
+                                                                  //     maxWidth: 200),
+                                                                  child:
+                                                                      Container(
+                                                                constraints:
+                                                                    const BoxConstraints(
+                                                                        maxWidth:
+                                                                            100),
+                                                                // Adjust the maxWidth as needed
+                                                                child: Row(
+                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Flexible(
+                                                                      child:
+                                                                          Text(
+                                                                        getTranslated(
+                                                                            context,
+                                                                            "Sender Mobile No."),
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                colors.blackTemp,
+                                                                            fontWeight: FontWeight.bold),
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        maxLines:
+                                                                            1,
+                                                                      ),
+                                                                    ),
+                                                                  ],
                                                                 ),
+                                                              )
+
+                                                                  // Text(
+                                                                  //       getTranslated(context,
+                                                                  //           "Sender Mobile No."),
+                                                                  //       overflow: TextOverflow.ellipsis,
+                                                                  //       maxLines: 1,
+                                                                  //       // "Sender Mobile No.",
+                                                                  //       style: const TextStyle(
+                                                                  //           color:
+                                                                  //               colors.blackTemp,
+                                                                  //           fontWeight:
+                                                                  //               FontWeight.bold),
+                                                                  //     ),
+                                                                  ),
+                                                              const SizedBox(
+                                                                height: 5,
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        _launchPhoneDialer(
+                                                                            "${singleBookingModel?.data?.first.phoneNo}");
+                                                                      },
+                                                                      child:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .call,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )),
+                                                                  Text(
+                                                                      "${singleBookingModel?.data?.first.phoneNo}"),
+                                                                ],
                                                               ),
                                                             ],
                                                           ),
-                                                        )
-
-                                                            // Text(
-                                                            //       getTranslated(context,
-                                                            //           "Sender Mobile No."),
-                                                            //       overflow: TextOverflow.ellipsis,
-                                                            //       maxLines: 1,
-                                                            //       // "Sender Mobile No.",
-                                                            //       style: const TextStyle(
-                                                            //           color:
-                                                            //               colors.blackTemp,
-                                                            //           fontWeight:
-                                                            //               FontWeight.bold),
-                                                            //     ),
-                                                            ),
-                                                        const SizedBox(
-                                                          height: 5,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            InkWell(
-                                                                onTap: () {
-                                                                  _launchPhoneDialer(
-                                                                      "${singleBookingModel?.data?.first.phoneNo}");
-                                                                },
-                                                                child: const Icon(
-                                                                  Icons.call,
-                                                                  color: Colors
-                                                                      .green,
-                                                                )),
-                                                            Text(
-                                                                "${singleBookingModel?.data?.first.phoneNo}"),
-                                                          ],
                                                         ),
                                                       ],
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              getTranslated(
-                                                  context, "Sender Address"),
-                                              //  "Sender Address",
-                                              style: const TextStyle(
-                                                  color: colors.blackTemp,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Row(
-                                              children: [
-                                                Image.asset(
-                                                    "assets/images/gstlo-removebg-preview.png"),
-                                                Container(
-                                                    width: 250,
-                                                    child: Text(
-                                                      "${singleBookingModel?.data?.first.senderFulladdress}",
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines: 3,
-                                                    )),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            singleBookingModel
-                                                        ?.data?.first.status ==
-                                                    "4"
-                                                ? const SizedBox.shrink()
-                                                : singleBookingModel?.data?.first
-                                                            .status ==
-                                                        "3"
-                                                    ? const SizedBox.shrink()
-                                                    : Row(
-                                                        children: [
-                                                          InkWell(
-                                                            onTap: () {
-                                                              enablePickup = true;
-                                                              setState(() {});
-
-                                                              print("Status ${singleBookingModel?.data?.first.status}");
-                                                              if(singleBookingModel?.data?.first.status == "2"){
-                                                                String lat =
-                                                                    "${singleBookingModel?.data?.first.senderLatitude}" ??
-                                                                        ''; //'22.7177'; //
-                                                                String lon =
-                                                                    "${singleBookingModel?.data?.first.senderLongitude}" ??
-                                                                        ''; //'75.8545'; //
-                                                                String CURENT_LAT =
-                                                                    _position
-                                                                        ?.latitude
-                                                                        .toString() ??
-                                                                        '';
-                                                                String CURENT_LONG =
-                                                                    _position
-                                                                        ?.longitude
-                                                                        .toString() ??
-                                                                        '';
-
-                                                                final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
-                                                                    CURENT_LAT +
-                                                                    ',' +
-                                                                    CURENT_LONG +
-                                                                    ' &destination=' +
-                                                                    lat.toString() +
-                                                                    ',' +
-                                                                    lon.toString() +
-                                                                    '&travelmode=driving&dir_action=navigate');
-
-                                                                _launchURL(
-                                                                  url,
-                                                                );
-                                                              }else{
-
-                                                                String lat =
-                                                                    "${singleBookingModel?.data?.first.receiverLatitude}" ??
-                                                                        ''; //'22.7177'; //
-                                                                String lon =
-                                                                    "${singleBookingModel?.data?.first.receiverLongitude}" ??
-                                                                        ''; //'75.8545'; //
-                                                                String CURENT_LAT =
-                                                                    _position
-                                                                        ?.latitude
-                                                                        .toString() ??
-                                                                        '';
-                                                                String CURENT_LONG =
-                                                                    _position
-                                                                        ?.longitude
-                                                                        .toString() ??
-                                                                        '';
-
-                                                                final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
-                                                                    CURENT_LAT +
-                                                                    ',' +
-                                                                    CURENT_LONG +
-                                                                    ' &destination=' +
-                                                                    lat.toString() +
-                                                                    ',' +
-                                                                    lon.toString() +
-                                                                    '&travelmode=driving&dir_action=navigate');
-
-                                                                _launchURL(
-                                                                  url,
-                                                                );
-
-                                                              }
-
-
-                                                            },
-                                                            child: Container(
-                                                              width: 300,
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      left: 5,
-                                                                      right: 10,
-                                                                      top: 5,
-                                                                      bottom: 5),
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              15),
-                                                                  color: colors
-                                                                      .primary),
-                                                              child: Center(
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Container(
-                                                                      height: 20,
-                                                                      width: 20,
-                                                                      // padding: const EdgeInsets.all(8),
-                                                                      decoration: const BoxDecoration(
-                                                                          shape: BoxShape
-                                                                              .circle,
-                                                                          color: Colors
-                                                                              .red),
-                                                                      child:
-                                                                          const Center(
-                                                                        child:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .pin_drop,
-                                                                          size:
-                                                                              14,
-                                                                          color: Colors
-                                                                              .white,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      width: 5,
-                                                                    ),
-                                                                    Text(
-                                                                      getTranslated(
-                                                                          context,
-                                                                          "Go To Pickup Location"),
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              12,
-                                                                          color: Colors
-                                                                              .white),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10)),
-                                    elevation: 2,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: colors.whiteTemp,
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    // Text(
-                                                    //   getTranslated(context,
-                                                    //       "Receiver's Name"),
-                                                    //   // "Receiver's Name",
-                                                    //   style: const TextStyle(
-                                                    //       color: colors.blackTemp,
-                                                    //       fontWeight:
-                                                    //           FontWeight.bold),
-                                                    // ),
-                                                    Container(
-                                                      constraints: BoxConstraints(
-                                                          maxWidth:
-                                                              100), // Adjust the maxWidth as needed
-                                                      child: Row(
-                                                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Flexible(
-                                                            child: Text(
-                                                              getTranslated(
-                                                                  context,
-                                                                  "Receiver's Name"),
-                                                              style: const TextStyle(
-                                                                  color: colors
-                                                                      .blackTemp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              maxLines: 1,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 8,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.start,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Icon(
-                                                          Icons.person,
-                                                          size: 20,
-                                                        ),
-                                                        Text(
-                                                            "${singleBookingModel?.data?.first.receiverName}"),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    _launchPhoneDialer(
-                                                        "${singleBookingModel?.data?.first.receiverPhone}");
-                                                  },
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    getTranslated(context,
+                                                        "Sender Address"),
+                                                    //  "Sender Address",
+                                                    style: const TextStyle(
+                                                        color: colors.blackTemp,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Row(
                                                     children: [
-                                                      // Container(
-                                                      //   child: Text(
-                                                      //     getTranslated(context,
-                                                      //         "Receiver's Mobile No."),
-                                                      //     // "Receiver's Mobile No.",
-                                                      //     style: const TextStyle(
-                                                      //         color: colors
-                                                      //             .blackTemp,
-                                                      //         fontWeight:
-                                                      //             FontWeight
-                                                      //                 .bold),
-                                                      //   ),
-                                                      // ),
-
+                                                      Image.asset(
+                                                          "assets/images/gstlo-removebg-preview.png"),
                                                       Container(
-                                                        constraints: BoxConstraints(
-                                                            maxWidth:
-                                                            100), // Adjust the maxWidth as needed
-                                                        child: Row(
-                                                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Flexible(
-                                                              child: Text(
-                                                                getTranslated(
-                                                                    context,
-                                                                    "Receiver's Mobile No."),
-                                                                style: const TextStyle(
-                                                                    color: colors
-                                                                        .blackTemp,
-                                                                    fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                                overflow:
+                                                          width: 250,
+                                                          child: Text(
+                                                            "${singleBookingModel?.data?.first.senderFulladdress}",
+                                                            overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
-                                                                maxLines: 1,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-
-                                                      Row(
-                                                        children: [
-                                                          InkWell(
-                                                              onTap: () {
-                                                                _launchPhoneDialer(
-                                                                    "${singleBookingModel?.data?.first.receiverPhone}");
-                                                              },
-                                                              child: Icon(
-                                                                Icons.call,
-                                                                color:
-                                                                    Colors.green,
-                                                              )),
-                                                          Text(
-                                                              "${singleBookingModel?.data?.first.receiverPhone}"),
-                                                        ],
-                                                      ),
-                                                      // Row(
-                                                      //   children: [
-                                                      //     const Icon(
-                                                      //       Icons.call,
-                                                      //       size: 20,
-                                                      //     ),
-                                                      //     InkWell(
-                                                      //       onTap: () {
-                                                      //         _launchPhoneDialer(
-                                                      //             "${singleBookingModel?.data?.first.receiverPhone}");
-                                                      //       },
-                                                      //       child: Text(
-                                                      //           "${singleBookingModel?.data?.first.receiverPhone}"),
-                                                      //     ),
-                                                      //   ],
-                                                      // ),
+                                                            maxLines: 3,
+                                                          )),
                                                     ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              getTranslated(
-                                                  context, "Receiver's Address"),
-                                              // "Receiver's Address",
-                                              style: const TextStyle(
-                                                  color: colors.blackTemp,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Row(
-                                              children: [
-                                                Image.asset(
-                                                    "assets/images/gstlo-removebg-preview.png"),
-                                                SizedBox(
-                                                  width: 250,
-                                                  child: Text(
-                                                    "${singleBookingModel?.data?.first.receiverAddress}",
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 3,
+                                                  const SizedBox(
+                                                    height: 10,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            singleBookingModel
-                                                        ?.data?.first.status ==
-                                                    "4"
-                                                ? const SizedBox.shrink()
-                                                : selectedStatus == 'Delivered'
-                                                    ? const SizedBox.shrink()
-                                                    : singleBookingModel?.data
-                                                                ?.first.status ==
-                                                            "3"
-                                                        ? Row(
-                                                            children: [
-                                                              InkWell(
-                                                                onTap: () {
-                                                                  enablePickup =
-                                                                      true;
-                                                                  setState(() {});
+                                                  singleBookingModel?.data
+                                                              ?.first.status ==
+                                                          "4"
+                                                      ? const SizedBox.shrink()
+                                                      : singleBookingModel
+                                                                  ?.data
+                                                                  ?.first
+                                                                  .status ==
+                                                              "3"
+                                                          ? const SizedBox
+                                                              .shrink()
+                                                          : Row(
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    enablePickup =
+                                                                        true;
+                                                                    setState(
+                                                                        () {});
 
-                                                                  String lat =
-                                                                      "${singleBookingModel?.data?.first.receiverLatitude}" ??
-                                                                          ''; //'22.7177'; //
-                                                                  String lon =
-                                                                      "${singleBookingModel?.data?.first.receiverLongitude}" ??
-                                                                          ''; //'75.8545'; //
-                                                                  String
-                                                                      CURENT_LAT =
-                                                                      _position
-                                                                              ?.latitude
-                                                                              .toString() ??
-                                                                          '';
-                                                                  String
-                                                                      CURENT_LONG =
-                                                                      _position
-                                                                              ?.longitude
-                                                                              .toString() ??
-                                                                          '';
+                                                                    if (singleBookingModel
+                                                                            ?.data
+                                                                            ?.first
+                                                                            .status ==
+                                                                        "2") {
+                                                                      // String lat =
+                                                                      //     "${singleBookingModel?.data?.first.senderLatitude}" ??
+                                                                      //         ''; //'22.7177'; //
+                                                                      // String lon =
+                                                                      //     "${singleBookingModel?.data?.first.senderLongitude}" ??
+                                                                      //         ''; //'75.8545'; //
+                                                                      // String CURENT_LAT =
+                                                                      //     _position
+                                                                      //         ?.latitude
+                                                                      //         .toString() ??
+                                                                      //         '';
+                                                                      // String CURENT_LONG =
+                                                                      //     _position
+                                                                      //         ?.longitude
+                                                                      //         .toString() ??
+                                                                      //         '';
+                                                                      //
+                                                                      // final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
+                                                                      //     CURENT_LAT +
+                                                                      //     ',' +
+                                                                      //     CURENT_LONG +
+                                                                      //     ' &destination=' +
+                                                                      //     lat.toString() +
+                                                                      //     ',' +
+                                                                      //     lon.toString() +
+                                                                      //     '&travelmode=driving&dir_action=navigate');
+                                                                      //
+                                                                      // _launchURL(
+                                                                      //   url,
+                                                                      // );
 
-                                                                  final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
-                                                                      CURENT_LAT +
-                                                                      ',' +
-                                                                      CURENT_LONG +
-                                                                      ' &destination=' +
-                                                                      lat.toString() +
-                                                                      ',' +
-                                                                      lon.toString() +
-                                                                      '&travelmode=driving&dir_action=navigate');
-
-                                                                  _launchURL(url);
-                                                                },
-                                                                child: Container(
-                                                                  width: 300,
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .only(
-                                                                          left: 5,
-                                                                          right:
-                                                                              10,
-                                                                          top: 5,
-                                                                          bottom:
-                                                                              5),
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15),
-                                                                      color: colors
-                                                                          .primary),
-                                                                  child: Center(
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Container(
-                                                                          height:
-                                                                              20,
-                                                                          width:
-                                                                              20,
-                                                                          // padding:
-                                                                          // const EdgeInsets
-                                                                          //     .all(8),
-                                                                          decoration: const BoxDecoration(
-                                                                              shape:
-                                                                                  BoxShape.circle,
-                                                                              color: Colors.red),
-                                                                          child:
-                                                                              const Icon(
-                                                                            Icons
-                                                                                .pin_drop,
-                                                                            size:
-                                                                                14,
-                                                                            color:
-                                                                                Colors.white,
+                                                                      Navigator.push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (context) => TrackLocationScreen(
+                                                                                    userLatLong: LatLng(
+                                                                                      double.parse(singleBookingModel?.data?.first.receiverLatitude ?? '0.0'),
+                                                                                      double.parse(singleBookingModel?.data?.first.receiverLongitude ?? '0.0'),
+                                                                                    ),
+                                                                                    driverLatLong: LatLng(
+                                                                                      _position?.latitude ?? 0.0,
+                                                                                      _position?.longitude ?? 0.0,
+                                                                                    ),
+                                                                                  )));
+                                                                    } else {
+                                                                      // String
+                                                                      //     lat =
+                                                                      //     "${singleBookingModel?.data?.first.receiverLatitude}" ??
+                                                                      //         ''; //'22.7177'; //
+                                                                      // String
+                                                                      //     lon =
+                                                                      //     "${singleBookingModel?.data?.first.receiverLongitude}" ??
+                                                                      //         ''; //'75.8545'; //
+                                                                      // String
+                                                                      //     CURENT_LAT =
+                                                                      //     _position?.latitude.toString() ??
+                                                                      //         '';
+                                                                      // String
+                                                                      //     CURENT_LONG =
+                                                                      //     _position?.longitude.toString() ??
+                                                                      //         '';
+                                                                      //
+                                                                      // final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
+                                                                      //     CURENT_LAT +
+                                                                      //     ',' +
+                                                                      //     CURENT_LONG +
+                                                                      //     ' &destination=' +
+                                                                      //     lat.toString() +
+                                                                      //     ',' +
+                                                                      //     lon.toString() +
+                                                                      //     '&travelmode=driving&dir_action=navigate');
+                                                                      //
+                                                                      // _launchURL(
+                                                                      //   url,
+                                                                      // );
+                                                                      Navigator.push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (context) => TrackLocationScreen(
+                                                                                    userLatLong: LatLng(
+                                                                                      double.parse(singleBookingModel?.data?.first.senderLatitude ?? '0.0'),
+                                                                                      double.parse(singleBookingModel?.data?.first.senderLongitude ?? '0.0'),
+                                                                                    ),
+                                                                                    driverLatLong: LatLng(
+                                                                                      _position?.latitude ?? 0.0,
+                                                                                      _position?.longitude ?? 0.0,
+                                                                                    ),
+                                                                                  )));
+                                                                    }
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    width: 300,
+                                                                    padding: const EdgeInsets
+                                                                            .only(
+                                                                        left: 5,
+                                                                        right:
+                                                                            10,
+                                                                        top: 5,
+                                                                        bottom:
+                                                                            5),
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                15),
+                                                                        color: colors
+                                                                            .primary),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Container(
+                                                                            height:
+                                                                                20,
+                                                                            width:
+                                                                                20,
+                                                                            // padding: const EdgeInsets.all(8),
+                                                                            decoration:
+                                                                                const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                                                                            child:
+                                                                                const Center(
+                                                                              child: Icon(
+                                                                                Icons.pin_drop,
+                                                                                size: 14,
+                                                                                color: Colors.white,
+                                                                              ),
+                                                                            ),
                                                                           ),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        const Text(
-                                                                          'Go To DropUp Location',
-                                                                          style: TextStyle(
-                                                                              fontSize:
-                                                                                  12,
-                                                                              color:
-                                                                                  Colors.white),
-                                                                        )
-                                                                      ],
+                                                                          const SizedBox(
+                                                                            width:
+                                                                                5,
+                                                                          ),
+                                                                          Text(
+                                                                            getTranslated(context,
+                                                                                "Go To Pickup Location"),
+                                                                            style:
+                                                                                const TextStyle(fontSize: 12, color: Colors.white),
+                                                                          )
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : const SizedBox.shrink()
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  singleBookingModel?.data?.first.status != "4"
-                                      ? Container()
-                                      : Card(
-                                          child: Column(
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Delivery Ratings",
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 5,
-                                                    ),
-                                                    feedbacks.isNotEmpty
-                                                        ? Row(
-                                                            children: [
-                                                              Icon(
-                                                                Icons.star,
-                                                                color:
-                                                                    Colors.yellow,
-                                                              ),
-                                                              Text("(" +
-                                                                  (feedbacks.first
-                                                                          .rating ??
-                                                                      "") +
-                                                                  ")"),
-                                                            ],
-                                                          )
-                                                        : Text(
-                                                            "No Delivery Ratings yet..."),
-                                                    feedbacks.isNotEmpty
-                                                        ? Text(feedbacks
-                                                                .first.feedback ??
-                                                            "")
-                                                        : Container(),
-                                                  ],
-                                                ),
+                                                              ],
+                                                            )
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (ctx) => Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: AlertDialog(
-                                                insetPadding: EdgeInsets.zero,
-                                                contentPadding: EdgeInsets.zero,
-                                                clipBehavior:
-                                                    Clip.antiAliasWithSaveLayer,
-                                                title: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  elevation: 0,
-                                                  child: Container(
-                                                    width: 400,
-                                                    decoration: BoxDecoration(
-                                                        color: colors.whiteTemp,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                10)),
-                                                    child: Padding(
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Card(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          elevation: 2,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: colors.whiteTemp,
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          // Text(
+                                                          //   getTranslated(context,
+                                                          //       "Receiver's Name"),
+                                                          //   // "Receiver's Name",
+                                                          //   style: const TextStyle(
+                                                          //       color: colors.blackTemp,
+                                                          //       fontWeight:
+                                                          //           FontWeight.bold),
+                                                          // ),
+                                                          Container(
+                                                            constraints:
+                                                                const BoxConstraints(
+                                                                    maxWidth:
+                                                                        100),
+                                                            // Adjust the maxWidth as needed
+                                                            child: Row(
+                                                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    getTranslated(
+                                                                        context,
+                                                                        "Receiver's Name"),
+                                                                    style: const TextStyle(
+                                                                        color: colors
+                                                                            .blackTemp,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    maxLines: 1,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 8,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Icon(
+                                                                Icons.person,
+                                                                size: 20,
+                                                              ),
+                                                              Text(
+                                                                  "${singleBookingModel?.data?.first.receiverName}"),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _launchPhoneDialer(
+                                                              "${singleBookingModel?.data?.first.receiverPhone}");
+                                                        },
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            // Container(
+                                                            //   child: Text(
+                                                            //     getTranslated(context,
+                                                            //         "Receiver's Mobile No."),
+                                                            //     // "Receiver's Mobile No.",
+                                                            //     style: const TextStyle(
+                                                            //         color: colors
+                                                            //             .blackTemp,
+                                                            //         fontWeight:
+                                                            //             FontWeight
+                                                            //                 .bold),
+                                                            //   ),
+                                                            // ),
+
+                                                            Container(
+                                                              constraints:
+                                                                  const BoxConstraints(
+                                                                      maxWidth:
+                                                                          100),
+                                                              // Adjust the maxWidth as needed
+                                                              child: Row(
+                                                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: [
+                                                                  Flexible(
+                                                                    child: Text(
+                                                                      getTranslated(
+                                                                          context,
+                                                                          "Receiver's Mobile No."),
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .blackTemp,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+
+                                                            Row(
+                                                              children: [
+                                                                InkWell(
+                                                                    onTap: () {
+                                                                      _launchPhoneDialer(
+                                                                          "${singleBookingModel?.data?.first.receiverPhone}");
+                                                                    },
+                                                                    child:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .call,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )),
+                                                                Text(
+                                                                    "${singleBookingModel?.data?.first.receiverPhone}"),
+                                                              ],
+                                                            ),
+                                                            // Row(
+                                                            //   children: [
+                                                            //     const Icon(
+                                                            //       Icons.call,
+                                                            //       size: 20,
+                                                            //     ),
+                                                            //     InkWell(
+                                                            //       onTap: () {
+                                                            //         _launchPhoneDialer(
+                                                            //             "${singleBookingModel?.data?.first.receiverPhone}");
+                                                            //       },
+                                                            //       child: Text(
+                                                            //           "${singleBookingModel?.data?.first.receiverPhone}"),
+                                                            //     ),
+                                                            //   ],
+                                                            // ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    getTranslated(context,
+                                                        "Receiver's Address"),
+                                                    // "Receiver's Address",
+                                                    style: const TextStyle(
+                                                        color: colors.blackTemp,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Row(
+                                                    children: [
+                                                      Image.asset(
+                                                          "assets/images/gstlo-removebg-preview.png"),
+                                                      SizedBox(
+                                                        width: 250,
+                                                        child: Text(
+                                                          "${singleBookingModel?.data?.first.receiverAddress}",
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 3,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  singleBookingModel?.data
+                                                              ?.first.status ==
+                                                          "4"
+                                                      ? const SizedBox.shrink()
+                                                      : selectedStatus ==
+                                                              'Delivered'
+                                                          ? const SizedBox
+                                                              .shrink()
+                                                          : singleBookingModel
+                                                                      ?.data
+                                                                      ?.first
+                                                                      .status ==
+                                                                  "3"
+                                                              ? Row(
+                                                                  children: [
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        enablePickup =
+                                                                            true;
+                                                                        setState(
+                                                                            () {});
+
+                                                                        // String
+                                                                        //     lat =
+                                                                        //     "${singleBookingModel?.data?.first.receiverLatitude}" ??
+                                                                        //         ''; //'22.7177'; //
+                                                                        // String
+                                                                        //     lon =
+                                                                        //     "${singleBookingModel?.data?.first.receiverLongitude}" ??
+                                                                        //         ''; //'75.8545'; //
+                                                                        // String
+                                                                        //     CURENT_LAT =
+                                                                        //     _position?.latitude.toString() ??
+                                                                        //         '';
+                                                                        // String
+                                                                        //     CURENT_LONG =
+                                                                        //     _position?.longitude.toString() ??
+                                                                        //         '';
+                                                                        //
+                                                                        // final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
+                                                                        //     CURENT_LAT +
+                                                                        //     ',' +
+                                                                        //     CURENT_LONG +
+                                                                        //     ' &destination=' +
+                                                                        //     lat.toString() +
+                                                                        //     ',' +
+                                                                        //     lon.toString() +
+                                                                        //     '&travelmode=driving&dir_action=navigate');
+                                                                        //
+                                                                        // _launchURL(
+                                                                        //     url);
+                                                                        Navigator.push(
+                                                                            context,
+                                                                            MaterialPageRoute(
+                                                                                builder: (context) => TrackLocationScreen(
+                                                                                      userLatLong: LatLng(
+                                                                                        double.parse(singleBookingModel?.data?.first.receiverLatitude ?? '0.0'),
+                                                                                        double.parse(singleBookingModel?.data?.first.receiverLongitude ?? '0.0'),
+                                                                                      ),
+                                                                                      driverLatLong: LatLng(
+                                                                                        _position?.latitude ?? 0.0,
+                                                                                        _position?.longitude ?? 0.0,
+                                                                                      ),
+                                                                                    )));
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        width:
+                                                                            300,
+                                                                        padding: const EdgeInsets.only(
+                                                                            left:
+                                                                                5,
+                                                                            right:
+                                                                                10,
+                                                                            top:
+                                                                                5,
+                                                                            bottom:
+                                                                                5),
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(15),
+                                                                            color: colors.primary),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              Container(
+                                                                                height: 20,
+                                                                                width: 20,
+                                                                                // padding:
+                                                                                // const EdgeInsets
+                                                                                //     .all(8),
+                                                                                decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                                                                                child: const Icon(
+                                                                                  Icons.pin_drop,
+                                                                                  size: 14,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              const Text(
+                                                                                'Go To DropUp Location',
+                                                                                style: TextStyle(fontSize: 12, color: Colors.white),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                )
+                                                              : const SizedBox
+                                                                  .shrink()
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        singleBookingModel
+                                                    ?.data?.first.status !=
+                                                "4"
+                                            ? Container()
+                                            : Card(
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               8.0),
@@ -981,362 +979,421 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: [
-                                                          Center(
-                                                            child: Text(
-                                                              getTranslated(
-                                                                  context,
-                                                                  "Parcel Details"),
-                                                              //"Parcel Details",
-                                                              style: const TextStyle(
-                                                                  color: colors
-                                                                      .primary,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 18),
-                                                            ),
+                                                          const Text(
+                                                            "Delivery Ratings",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
                                                           ),
                                                           const SizedBox(
-                                                            height: 10,
+                                                            height: 5,
                                                           ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                getTranslated(
-                                                                    context,
-                                                                    "Material Category"),
-                                                                // "Material Category",
-                                                                style: const TextStyle(
-                                                                    color: colors
-                                                                        .blackTemp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize: 15),
-                                                              ),
-                                                              Text(
-                                                                  "${singleBookingModel?.data?.first.title}"),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                getTranslated(
-                                                                    context,
-                                                                    "Parcel Weight"),
-                                                                // "Parcel Weight",
-                                                                style: const TextStyle(
-                                                                    color: colors
-                                                                        .blackTemp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize: 15),
-                                                              ),
-                                                              Row(
-                                                                children: [
-                                                                  Text(
-                                                                      "${singleBookingModel?.data?.first.parcelWeight}Kg"),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                  getTranslated(
-                                                                      context,
-                                                                      "Total Distance"),
-                                                                  // "Total Distance",
-                                                                  style: const TextStyle(
-                                                                      color: colors
-                                                                          .blackTemp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          15)),
-                                                              Text(
-                                                                  "${singleBookingModel?.data?.first.distance} Km."),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                  getTranslated(
-                                                                      context,
-                                                                      "Amount"),
-                                                                  // "Amount",
-                                                                  style: const TextStyle(
-                                                                      color: colors
-                                                                          .blackTemp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          15)),
-                                                              Text(
-                                                                  "₹ ${double.parse(singleBookingModel?.data?.first.totalAmount.toString() ?? "0.0") - double.parse(singleBookingModel?.data?.first.couponDiscount.toString() ?? '0.0')}"),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              const Text(
-                                                                  "PickPort Fee",
-                                                                  style: TextStyle(
-                                                                      color: colors
-                                                                          .blackTemp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          15)),
-                                                              Text(
-                                                                  "₹ ${singleBookingModel?.data?.first.adminCommission}"),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          // Row(
-                                                          //   mainAxisAlignment:
-                                                          //       MainAxisAlignment
-                                                          //           .spaceBetween,
-                                                          //   children: [
-                                                          //     Text(
-                                                          //       getTranslated(
-                                                          //           context,
-                                                          //           "Promo Code"),
-                                                          //       //  "Payment Status",
-                                                          //       style: const TextStyle(
-                                                          //           color: colors
-                                                          //               .blackTemp,
-                                                          //           fontWeight:
-                                                          //               FontWeight
-                                                          //                   .bold,
-                                                          //           fontSize: 15),
-                                                          //     ),
-                                                          //     Text(
-                                                          //         "₹ ${singleBookingModel?.data?.first.couponDiscount == "" ? "0" : singleBookingModel?.data?.first.couponDiscount}"),
-                                                          //   ],
-                                                          // ),
-                                                          // const SizedBox(
-                                                          //   height: 10,
-                                                          // ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                getTranslated(
-                                                                    context,
-                                                                    "Total Amount To be paid"),
-                                                                // "Total Amount To be paid",
-                                                                style: const TextStyle(
-                                                                    color: colors
-                                                                        .blackTemp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize: 15),
-                                                              ),
-                                                              Text(
-                                                                  "₹ ${double.parse(singleBookingModel?.data?.first.totalAmount ?? "0") - double.parse(singleBookingModel?.data?.first.couponDiscount ?? "0")}"),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                getTranslated(
-                                                                    context,
-                                                                    "Payment Status"),
-                                                                //  "Payment Status",
-                                                                style: const TextStyle(
-                                                                    color: colors
-                                                                        .blackTemp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize: 15),
-                                                              ),
-                                                              (singleBookingModel
-                                                                              ?.data
-                                                                              ?.first
-                                                                              .paymentMethod ==
-                                                                          "Online Payment" ||
-                                                                      singleBookingModel
-                                                                              ?.data
-                                                                              ?.first
-                                                                              .status ==
-                                                                          "4")
-                                                                  ? Text(
-                                                                      getTranslated(
-                                                                          context,
-                                                                          "Paid"),
-                                                                      // "Paid",
-                                                                      style: const TextStyle(
-                                                                          color: Colors
-                                                                              .green,
-                                                                          fontWeight:
-                                                                              FontWeight.w600),
-                                                                    )
-                                                                  : Text(
-                                                                      getTranslated(
-                                                                          context,
-                                                                          "UnPaid"),
-                                                                      //  "UnPaid",
-                                                                      style: const TextStyle(
-                                                                          color: Colors
-                                                                              .red,
-                                                                          fontWeight:
-                                                                              FontWeight.w600))
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                  getTranslated(
-                                                                      context,
-                                                                      "Payment Method"),
-                                                                  //"Payment Method",
-                                                                  style: const TextStyle(
-                                                                      color: colors
-                                                                          .red,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          15)),
-                                                              singleBookingModel
-                                                                          ?.data
-                                                                          ?.first
-                                                                          .paymentMethod ==
-                                                                      getTranslated(
-                                                                          context,
-                                                                          "Cash On Delivery")
-                                                                  ? Text(
-                                                                      getTranslated(
-                                                                        context,
-                                                                        "Cash Payment",
-                                                                      ),
-                                                                      style: const TextStyle(
-                                                                          color: Colors
-                                                                              .red))
-                                                                  : Text(
-                                                                      "${singleBookingModel?.data?.first.paymentMethod}",
-                                                                      style: const TextStyle(
-                                                                          color: Colors
-                                                                              .red))
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
+                                                          feedbacks.isNotEmpty
+                                                              ? Row(
+                                                                  children: [
+                                                                    const Icon(
+                                                                      Icons
+                                                                          .star,
+                                                                      color: Colors
+                                                                          .yellow,
+                                                                    ),
+                                                                    Text(
+                                                                        "(${feedbacks.first.rating ?? ""})"),
+                                                                  ],
+                                                                )
+                                                              : const Text(
+                                                                  "No Delivery Ratings yet..."),
+                                                          feedbacks.isNotEmpty
+                                                              ? Text(feedbacks
+                                                                      .first
+                                                                      .feedback ??
+                                                                  "")
+                                                              : Container(),
                                                         ],
                                                       ),
                                                     ),
+                                                  ],
+                                                ),
+                                              ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (ctx) => Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: AlertDialog(
+                                                      insetPadding:
+                                                          EdgeInsets.zero,
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                      clipBehavior: Clip
+                                                          .antiAliasWithSaveLayer,
+                                                      title: Card(
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        elevation: 0,
+                                                        child: Container(
+                                                          width: 400,
+                                                          decoration: BoxDecoration(
+                                                              color: colors
+                                                                  .whiteTemp,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10)),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Center(
+                                                                  child: Text(
+                                                                    getTranslated(
+                                                                        context,
+                                                                        "Parcel Details"),
+                                                                    //"Parcel Details",
+                                                                    style: const TextStyle(
+                                                                        color: colors
+                                                                            .primary,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            18),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      getTranslated(
+                                                                          context,
+                                                                          "Material Category"),
+                                                                      // "Material Category",
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .blackTemp,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              15),
+                                                                    ),
+                                                                    Text(
+                                                                        "${singleBookingModel?.data?.first.title}"),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      getTranslated(
+                                                                          context,
+                                                                          "Parcel Weight"),
+                                                                      // "Parcel Weight",
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .blackTemp,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              15),
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "${singleBookingModel?.data?.first.parcelWeight}Kg"),
+                                                                      ],
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                        getTranslated(
+                                                                            context,
+                                                                            "Total Distance"),
+                                                                        // "Total Distance",
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                colors.blackTemp,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 15)),
+                                                                    Text(
+                                                                        "${singleBookingModel?.data?.first.distance} Km."),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                        getTranslated(
+                                                                            context,
+                                                                            "Amount"),
+                                                                        // "Amount",
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                colors.blackTemp,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 15)),
+                                                                    Text(
+                                                                        "₹ ${double.parse(singleBookingModel?.data?.first.totalAmount.toString() ?? "0.0") - double.parse(singleBookingModel?.data?.first.couponDiscount.toString() ?? '0.0')}"),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    const Text(
+                                                                        "PickPort Fee",
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                colors.blackTemp,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 15)),
+                                                                    Text(
+                                                                        "₹ ${singleBookingModel?.data?.first.adminCommission}"),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                // Row(
+                                                                //   mainAxisAlignment:
+                                                                //       MainAxisAlignment
+                                                                //           .spaceBetween,
+                                                                //   children: [
+                                                                //     Text(
+                                                                //       getTranslated(
+                                                                //           context,
+                                                                //           "Promo Code"),
+                                                                //       //  "Payment Status",
+                                                                //       style: const TextStyle(
+                                                                //           color: colors
+                                                                //               .blackTemp,
+                                                                //           fontWeight:
+                                                                //               FontWeight
+                                                                //                   .bold,
+                                                                //           fontSize: 15),
+                                                                //     ),
+                                                                //     Text(
+                                                                //         "₹ ${singleBookingModel?.data?.first.couponDiscount == "" ? "0" : singleBookingModel?.data?.first.couponDiscount}"),
+                                                                //   ],
+                                                                // ),
+                                                                // const SizedBox(
+                                                                //   height: 10,
+                                                                // ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      getTranslated(
+                                                                          context,
+                                                                          "Total Amount To be paid"),
+                                                                      // "Total Amount To be paid",
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .blackTemp,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              15),
+                                                                    ),
+                                                                    Text(
+                                                                        "₹ ${double.parse(singleBookingModel?.data?.first.totalAmount ?? "0") - double.parse(singleBookingModel?.data?.first.couponDiscount ?? "0")}"),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      getTranslated(
+                                                                          context,
+                                                                          "Payment Status"),
+                                                                      //  "Payment Status",
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .blackTemp,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              15),
+                                                                    ),
+                                                                    (singleBookingModel?.data?.first.paymentMethod ==
+                                                                                "Online Payment" ||
+                                                                            singleBookingModel?.data?.first.status ==
+                                                                                "4")
+                                                                        ? Text(
+                                                                            getTranslated(context,
+                                                                                "Paid"),
+                                                                            // "Paid",
+                                                                            style:
+                                                                                const TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+                                                                          )
+                                                                        : Text(
+                                                                            getTranslated(context,
+                                                                                "UnPaid"),
+                                                                            //  "UnPaid",
+                                                                            style:
+                                                                                const TextStyle(color: Colors.red, fontWeight: FontWeight.w600))
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                        getTranslated(
+                                                                            context,
+                                                                            "Payment Method"),
+                                                                        //"Payment Method",
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                colors.red,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 15)),
+                                                                    singleBookingModel?.data?.first.paymentMethod ==
+                                                                            getTranslated(context,
+                                                                                "Cash On Delivery")
+                                                                        ? Text(
+                                                                            getTranslated(
+                                                                              context,
+                                                                              "Cash Payment",
+                                                                            ),
+                                                                            style: const TextStyle(
+                                                                                color: Colors
+                                                                                    .red))
+                                                                        : Text(
+                                                                            "${singleBookingModel?.data?.first.paymentMethod}",
+                                                                            style:
+                                                                                const TextStyle(color: Colors.red))
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                width: 100,
+                                                height: 30,
+                                                padding: const EdgeInsets.only(
+                                                    left: 5,
+                                                    right: 10,
+                                                    top: 5,
+                                                    bottom: 5),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    color: colors.primary),
+                                                child: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        getTranslated(context,
+                                                            "View Detail"),
+                                                        style: const TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors.white),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: 100,
-                                          height: 30,
-                                          padding: const EdgeInsets.only(
-                                              left: 5,
-                                              right: 10,
-                                              top: 5,
-                                              bottom: 5),
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              color: colors.primary),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  getTranslated(
-                                                      context, "View Detail"),
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.white),
-                                                )
-                                              ],
-                                            ),
-                                          ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        statusDelivery(),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  statusDelivery(),
-                                ],
-                              ),
-                            ),
-                          )),
+                                )),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-      )
-          : NoInternetScreen(onPressed: (){
-        Future.delayed(Duration(seconds: 1)).then((_) async {
-          isNetworkAvail = await isNetworkAvailable();
-          if (isNetworkAvail) {
-            if (mounted)
-              setState(() {
-                isNetworkAvail = true;
+            )
+          : NoInternetScreen(onPressed: () {
+              Future.delayed(const Duration(seconds: 1)).then((_) async {
+                isNetworkAvail = await isNetworkAvailable();
+                if (isNetworkAvail) {
+                  if (mounted)
+                    setState(() {
+                      isNetworkAvail = true;
+                    });
+                  // callApi();
+                }
               });
-            // callApi();
-          }
-        });
-      }),
+            }),
     );
   }
 
@@ -1345,10 +1402,8 @@ class _PercelDetailsState extends State<PercelDetails> {
     var headers = {
       'Cookie': 'ci_session=9e8fdef277e1d8cbe9bb3dbf010b09b848f2297a'
     };
-    var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://pickport.in/api/payment/get_driver_feedback'));
+    var request = http.MultipartRequest('POST',
+        Uri.parse('https://pickport.in/api/payment/get_driver_feedback'));
     request.fields.addAll({'user_id': user_id, 'parcel_id': parcelId});
 
     request.headers.addAll(headers);
@@ -1683,9 +1738,8 @@ class _PercelDetailsState extends State<PercelDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 singleBookingModel?.data?.first.status == "3"
-                    ?
-                Text("")
-                    : Text(""),
+                    ? const Text("")
+                    : const Text(""),
                 const SizedBox(
                   height: 8,
                 ),
@@ -1705,9 +1759,9 @@ class _PercelDetailsState extends State<PercelDetails> {
                   height: 12,
                 ),
                 InkWell(
-                  onTap: () async{
+                  onTap: () async {
                     Get.back();
-                  await  orderDelevertCompleteByOtp()
+                    await orderDelevertCompleteByOtp()
                         .then((value) => bookingOrderDetailsApi());
                   },
                   child: Container(
@@ -1773,15 +1827,16 @@ class _PercelDetailsState extends State<PercelDetails> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: RichText(
         text: TextSpan(
-          style: TextStyle(color: Colors.black, fontSize: 16.0),
+          style: const TextStyle(color: Colors.black, fontSize: 16.0),
           children: [
             TextSpan(
               text: '$title: ',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             TextSpan(
               text: value,
-              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+              style:
+                  const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
             ),
           ],
         ),
@@ -1793,6 +1848,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   String? selectedStatus; // Default status
   String? orderId, senderOTP, receiverOtp;
   SingleBookingModel? singleBookingModel;
+
   bookingOrderDetailsApi() async {
     isNetworkAvail = await isNetworkAvailable();
     enablePickup = false;
@@ -1974,6 +2030,7 @@ class _PercelDetailsState extends State<PercelDetails> {
   }
 
   String? Otp;
+
   getOtpApi() async {
     isNetworkAvail = await isNetworkAvailable();
     var headers = {
