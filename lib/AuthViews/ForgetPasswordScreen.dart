@@ -10,6 +10,7 @@ import 'package:jdx/AuthViews/verificationOtp.dart';
 import 'package:jdx/Utils/CustomColor.dart';
 import 'package:http/http.dart' as http;
 import 'package:jdx/Views/GetHelp.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import '../Utils/Color.dart';
 import '../Views/HelpScreen.dart';
 import '../services/session.dart';
@@ -22,6 +23,7 @@ class Forget extends StatefulWidget {
 }
 
 class _ForgetState extends State<Forget> {
+  bool _isNetworkAvail = true;
   TextEditingController mobileNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -29,6 +31,7 @@ class _ForgetState extends State<Forget> {
   String mobileOtp = '';
   String mobileNo = '';
   loginWithMobileNumberApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=418394d486487780888e62b557385cca98626dde'
     };
@@ -80,7 +83,8 @@ class _ForgetState extends State<Forget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
       backgroundColor: colors.primary,
       body: Container(
         child: ListView(
@@ -270,6 +274,20 @@ class _ForgetState extends State<Forget> {
           ],
         ),
       ),
+    )
+        : NoInternetScreen(
+      onPressed: () {
+        Future.delayed(Duration(seconds: 1)).then((_) async {
+          _isNetworkAvail = await isNetworkAvailable();
+          if (_isNetworkAvail) {
+            if (mounted)
+              setState(() {
+                _isNetworkAvail = true;
+              });
+            // callApi();
+          }
+        });
+      }
     );
   }
 }

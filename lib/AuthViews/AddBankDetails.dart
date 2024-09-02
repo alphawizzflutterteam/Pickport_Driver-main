@@ -14,6 +14,7 @@ import 'package:jdx/AuthViews/registraionSuccess.dart';
 import 'package:jdx/Utils/CustomColor.dart';
 import 'package:http/http.dart' as http;
 import 'package:jdx/Views/GetHelp.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Utils/ApiPath.dart';
@@ -69,6 +70,7 @@ class AddBankDetails extends StatefulWidget {
 }
 
 class _AddBankDetailsState extends State<AddBankDetails> {
+  bool _isNetworkAvail = true;
   String? bankName;
   TextEditingController accountHolderName = TextEditingController();
   TextEditingController accountNumber = TextEditingController();
@@ -230,7 +232,8 @@ class _AddBankDetailsState extends State<AddBankDetails> {
   @override
   Widget build(BuildContext context) {
     print('____Som___ddddd___${widget.vType}_________');
-    return Scaffold(
+    return _isNetworkAvail ?
+      Scaffold(
       backgroundColor: colors.primary,
       body: Container(
         child: ListView(
@@ -855,12 +858,26 @@ class _AddBankDetailsState extends State<AddBankDetails> {
           ],
         ),
       ),
-    );
+    )
+        : NoInternetScreen(
+    onPressed: () {
+      Future.delayed(Duration(seconds: 1)).then((_) async {
+        _isNetworkAvail = await isNetworkAvailable();
+        if (_isNetworkAvail) {
+          if (mounted)
+            setState(() {
+              _isNetworkAvail = true;
+            });
+          // callApi();
+        }
+      });
+    });
   }
 
   bool? isLoding = false;
 
   signUp() async {
+    _isNetworkAvail = await isNetworkAvailable();
     setState(() {
       isLoding = true;
     });
@@ -929,6 +946,7 @@ class _AddBankDetailsState extends State<AddBankDetails> {
   }
 
   signUpApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     setState(() {
       isLoding = true;
     });

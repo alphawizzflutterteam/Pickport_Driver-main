@@ -154,6 +154,7 @@ import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/CustomWidgets/CustomElevetedButton.dart';
 import 'package:jdx/Models/chnage_pasword_response.dart';
 import 'package:jdx/Utils/ApiPath.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/SupportNewScreen.dart';
 import 'package:jdx/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -171,6 +172,7 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  bool _isNetworkAvail = true;
   TextEditingController newpswController = TextEditingController();
   TextEditingController cnfrmpswController = TextEditingController();
   bool isVisible = true;
@@ -185,6 +187,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   ChangepasswordModel? changepasswordModel;
   changePassword() async {
+    _isNetworkAvail = await isNetworkAvailable();
     print("Change Password");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userid = prefs.getString('userId');
@@ -221,7 +224,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return SafeArea(
-        child: Scaffold(
+        child: _isNetworkAvail ?
+              Scaffold(
       backgroundColor: colors.primary,
       body: Column(
         children: [
@@ -469,6 +473,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       //     ),
       //   ),
       // ),
-    ));
+    )
+            : NoInternetScreen(
+          onPressed: () {
+            Future.delayed(Duration(seconds: 1)).then((_) async {
+              _isNetworkAvail = await isNetworkAvailable();
+              if (_isNetworkAvail) {
+                if (mounted)
+                  setState(() {
+                    _isNetworkAvail = true;
+                  });
+                // callApi();
+              }
+            });
+          }
+        )
+    );
   }
 }

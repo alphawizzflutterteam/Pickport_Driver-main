@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jdx/Controller/BottomNevBar.dart';
 import 'package:jdx/Models/GetProfileModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/services/session.dart';
 import 'package:jdx/verifyDocuments/VerifyBankDetails.dart';
 import 'package:jdx/verifyDocuments/reviewScreens.dart';
@@ -21,6 +23,7 @@ class PendingScreen extends StatefulWidget {
 }
 
 class _PendingScreenState extends State<PendingScreen> {
+  bool _isNetworkAvail = true;
   bool isdocumetsVerified = true;
   GetProfileModel? getProfileModel;
   bool _isLoading = false;
@@ -31,7 +34,8 @@ class _PendingScreenState extends State<PendingScreen> {
       onWillPop: () async {
         return false;
       },
-      child: Scaffold(
+      child: _isNetworkAvail ?
+            Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Text(getTranslated(context, "Pending for approval") ),
@@ -106,6 +110,20 @@ class _PendingScreenState extends State<PendingScreen> {
             ],
           ),
         ),
+      )
+          : NoInternetScreen(
+        onPressed: () {
+          Future.delayed(Duration(seconds: 1)).then((_) async {
+            _isNetworkAvail = await isNetworkAvailable();
+            if (_isNetworkAvail) {
+              if (mounted)
+                setState(() {
+                  _isNetworkAvail = true;
+                });
+              // callApi();
+            }
+          });
+        },
       ),
     );
   }

@@ -13,6 +13,7 @@ import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:jdx/Models/SignUpModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/PrivacyPolicy.dart';
 import 'package:jdx/Views/TermsAndConditions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +52,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreen extends State<SignUpScreen> {
+  bool _isNetworkAvail = true;
   singUpModel? information;
 
   TextEditingController nameController = TextEditingController();
@@ -108,6 +110,7 @@ class _SignUpScreen extends State<SignUpScreen> {
   }
 
   signUpApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=441db6d062b9f121348edb7be09465992a51c601'
     };
@@ -264,6 +267,7 @@ class _SignUpScreen extends State<SignUpScreen> {
   }
 
   signUpAPISECOND() async {
+    _isNetworkAvail = await isNetworkAvailable();
     setState(() {
       isLoading = true;
     });
@@ -827,7 +831,8 @@ class _SignUpScreen extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
       backgroundColor: colors.primary,
       body: Form(
         key: _formKey,
@@ -2519,6 +2524,20 @@ class _SignUpScreen extends State<SignUpScreen> {
           ),
         ),
       ),
+    )
+        : NoInternetScreen(
+      onPressed: () {
+        Future.delayed(Duration(seconds: 1)).then((_) async {
+          _isNetworkAvail = await isNetworkAvailable();
+          if (_isNetworkAvail) {
+            if (mounted)
+              setState(() {
+                _isNetworkAvail = true;
+              });
+            // callApi();
+          }
+        });
+      },
     );
   }
 
@@ -2593,6 +2612,7 @@ class _SignUpScreen extends State<SignUpScreen> {
   GetCityList? getCityList;
   GetStatusModel? getStatusModel;
   getStateApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=72caa85cedaa1a0d8ccc629445189f73af6a9946'
     };
@@ -2620,6 +2640,7 @@ class _SignUpScreen extends State<SignUpScreen> {
   GetCityModel? getCityModel;
 
   getCityApi(String stateId) async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=c59791396657a1155df9f32cc7d7b547a40d648c'
     };

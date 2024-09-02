@@ -6,6 +6,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jdx/AuthViews/ChangePassword.dart';
+import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Controller/BottomNevBar.dart';
@@ -27,10 +28,12 @@ class VerificationPage extends StatefulWidget {
 }
 
 class _VerificationPageState extends State<VerificationPage> {
+  bool _isNetworkAvail = true;
   var pinValue;
 
   String FCM='';
   getToken() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var fcmToken = await FirebaseMessaging.instance.getToken();
 
     FCM = fcmToken.toString();
@@ -38,6 +41,7 @@ class _VerificationPageState extends State<VerificationPage> {
   }
   bool isLoading = false;
   verifyOtpApi() async {
+    _isNetworkAvail = await isNetworkAvailable();
     setState(() {
       isLoading = true;
     });
@@ -158,6 +162,7 @@ class _VerificationPageState extends State<VerificationPage> {
   //
   // }
   resendOtp() async {
+    _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=418394d486487780888e62b557385cca98626dde'
     };
@@ -201,7 +206,8 @@ class _VerificationPageState extends State<VerificationPage> {
   String? newPin;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _isNetworkAvail ?
+          Scaffold(
         backgroundColor: colors.primary,
         appBar: AppBar(
           backgroundColor: colors.primary,
@@ -420,7 +426,21 @@ class _VerificationPageState extends State<VerificationPage> {
               )
             ]),
           ),
-        ));
+        ))
+        : NoInternetScreen(
+        onPressed: () {
+          Future.delayed(Duration(seconds: 1)).then((_) async {
+            _isNetworkAvail = await isNetworkAvailable();
+            if (_isNetworkAvail) {
+              if (mounted)
+                setState(() {
+                  _isNetworkAvail = true;
+                });
+              // callApi();
+            }
+          });
+        }
+    );
   }
 }
 
