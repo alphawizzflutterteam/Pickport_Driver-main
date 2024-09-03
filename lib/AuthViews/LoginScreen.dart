@@ -128,6 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
+      print("MobileLogin---$finalResult");
 
       setState(() {
         isLoading = false;

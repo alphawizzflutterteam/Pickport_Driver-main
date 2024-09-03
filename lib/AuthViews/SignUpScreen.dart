@@ -2533,6 +2533,7 @@ class _SignUpScreen extends State<SignUpScreen> {
             if (mounted)
               setState(() {
                 _isNetworkAvail = true;
+                isLoading = false;
               });
             // callApi();
           }

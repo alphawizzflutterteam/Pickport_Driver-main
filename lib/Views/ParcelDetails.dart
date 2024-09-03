@@ -471,98 +471,60 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                                             ?.first
                                                                             .status ==
                                                                         "2") {
-                                                                      // String lat =
-                                                                      //     "${singleBookingModel?.data?.first.senderLatitude}" ??
-                                                                      //         ''; //'22.7177'; //
-                                                                      // String lon =
-                                                                      //     "${singleBookingModel?.data?.first.senderLongitude}" ??
-                                                                      //         ''; //'75.8545'; //
-                                                                      // String CURENT_LAT =
-                                                                      //     _position
-                                                                      //         ?.latitude
-                                                                      //         .toString() ??
-                                                                      //         '';
-                                                                      // String CURENT_LONG =
-                                                                      //     _position
-                                                                      //         ?.longitude
-                                                                      //         .toString() ??
-                                                                      //         '';
-                                                                      //
-                                                                      // final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
-                                                                      //     CURENT_LAT +
-                                                                      //     ',' +
-                                                                      //     CURENT_LONG +
-                                                                      //     ' &destination=' +
-                                                                      //     lat.toString() +
-                                                                      //     ',' +
-                                                                      //     lon.toString() +
-                                                                      //     '&travelmode=driving&dir_action=navigate');
-                                                                      //
-                                                                      // _launchURL(
-                                                                      //   url,
-                                                                      // );
 
-                                                                      Navigator.push(
-                                                                          context,
-                                                                          MaterialPageRoute(
-                                                                              builder: (context) => TrackLocationScreen(
-                                                                                    userLatLong: LatLng(
-                                                                                      double.parse(singleBookingModel?.data?.first.receiverLatitude ?? '0.0'),
-                                                                                      double.parse(singleBookingModel?.data?.first.receiverLongitude ?? '0.0'),
-                                                                                    ),
-                                                                                    driverLatLong: LatLng(
-                                                                                      _position?.latitude ?? 0.0,
-                                                                                      _position?.longitude ?? 0.0,
-                                                                                    ),
-                                                                                  )));
+                                                                      String lat = singleBookingModel?.data?.first.senderLatitude.toString() ?? ''; //'22.7177'; //
+                                                                      String lon = singleBookingModel?.data?.first.senderLongitude.toString() ?? ''; //'75.8545'; //
+                                                                      String CURENT_LAT = _position?.latitude.toString() ?? '';
+                                                                      String CURENT_LONG = _position ?.longitude.toString() ?? '';
+
+                                                                      final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' + CURENT_LAT + ',' + CURENT_LONG + ' &destination=' + lat.toString() + ',' + lon.toString() + '&travelmode=driving&dir_action=navigate');
+                                                                      _launchURL(url);
+                                                                      print("FROM---${_position?.latitude}, ${_position?.longitude}---TO---${singleBookingModel?.data?.first.senderLatitude}, ${singleBookingModel?.data?.first.senderLongitude}");
+                                                                      // Navigator.push(
+                                                                      //     context,
+                                                                      //     MaterialPageRoute(
+                                                                      //         builder: (context) => TrackLocationScreen(
+                                                                      //               userLatLong: LatLng(
+                                                                      //                 // double.parse(singleBookingModel?.data?.first.receiverLatitude ?? '0.0'),
+                                                                      //                 // double.parse(singleBookingModel?.data?.first.receiverLongitude ?? '0.0'),
+                                                                      //                 double.parse(singleBookingModel?.data?.first.senderLatitude ?? '0.0'),
+                                                                      //                 double.parse(singleBookingModel?.data?.first.senderLongitude ?? '0.0'),
+                                                                      //
+                                                                      //               ),
+                                                                      //               driverLatLong: LatLng(
+                                                                      //                 _position?.latitude ?? 0.0,
+                                                                      //                 _position?.longitude ?? 0.0,
+                                                                      //               ),
+                                                                      //             )));
                                                                     } else {
-                                                                      // String
-                                                                      //     lat =
-                                                                      //     "${singleBookingModel?.data?.first.receiverLatitude}" ??
-                                                                      //         ''; //'22.7177'; //
-                                                                      // String
-                                                                      //     lon =
-                                                                      //     "${singleBookingModel?.data?.first.receiverLongitude}" ??
-                                                                      //         ''; //'75.8545'; //
-                                                                      // String
-                                                                      //     CURENT_LAT =
-                                                                      //     _position?.latitude.toString() ??
-                                                                      //         '';
-                                                                      // String
-                                                                      //     CURENT_LONG =
-                                                                      //     _position?.longitude.toString() ??
-                                                                      //         '';
+                                                                      String lat = "${singleBookingModel?.data?.first.receiverLatitude}" ?? ''; //'22.7177'; //
+                                                                      String lon = "${singleBookingModel?.data?.first.receiverLongitude}" ?? ''; //'75.8545'; //
+                                                                      String CURENT_LAT = _position?.latitude.toString() ?? '';
+                                                                      String CURENT_LONG = _position?.longitude.toString() ?? '';
+
+                                                                      final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' + CURENT_LAT + ',' + CURENT_LONG + ' &destination=' + lat.toString() + ',' + lon.toString() + '&travelmode=driving&dir_action=navigate');
+                                                                      _launchURL(url);
+
+                                                                      print("FROM---${_position?.latitude}, ${_position?.longitude}---TO---${singleBookingModel?.data?.first.receiverLatitude}, ${singleBookingModel?.data?.first.receiverLongitude}");
+                                                                      // Navigator.push(
+                                                                      //     context,
+                                                                      //     MaterialPageRoute(
+                                                                      //         builder: (context) => TrackLocationScreen(
+                                                                      //               userLatLong: LatLng(
+                                                                      //                 // double.parse(singleBookingModel?.data?.first.senderLatitude ?? '0.0'),
+                                                                      //                 // double.parse(singleBookingModel?.data?.first.senderLongitude ?? '0.0'),
+                                                                      //                 double.parse(singleBookingModel?.data?.first.receiverLatitude ?? '0.0'),
+                                                                      //                 double.parse(singleBookingModel?.data?.first.receiverLongitude ?? '0.0'),
                                                                       //
-                                                                      // final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&origin=' +
-                                                                      //     CURENT_LAT +
-                                                                      //     ',' +
-                                                                      //     CURENT_LONG +
-                                                                      //     ' &destination=' +
-                                                                      //     lat.toString() +
-                                                                      //     ',' +
-                                                                      //     lon.toString() +
-                                                                      //     '&travelmode=driving&dir_action=navigate');
-                                                                      //
-                                                                      // _launchURL(
-                                                                      //   url,
-                                                                      // );
-                                                                      Navigator.push(
-                                                                          context,
-                                                                          MaterialPageRoute(
-                                                                              builder: (context) => TrackLocationScreen(
-                                                                                    userLatLong: LatLng(
-                                                                                      double.parse(singleBookingModel?.data?.first.senderLatitude ?? '0.0'),
-                                                                                      double.parse(singleBookingModel?.data?.first.senderLongitude ?? '0.0'),
-                                                                                    ),
-                                                                                    driverLatLong: LatLng(
-                                                                                      _position?.latitude ?? 0.0,
-                                                                                      _position?.longitude ?? 0.0,
-                                                                                    ),
-                                                                                  )));
+                                                                      //               ),
+                                                                      //               driverLatLong: LatLng(
+                                                                      //                 _position?.latitude ?? 0.0,
+                                                                      //                 _position?.longitude ?? 0.0,
+                                                                      //               ),
+                                                                      //             )));
                                                                     }
                                                                   },
-                                                                  child:
-                                                                      Container(
+                                                                  child: Container(
                                                                     width: 300,
                                                                     padding: const EdgeInsets
                                                                             .only(

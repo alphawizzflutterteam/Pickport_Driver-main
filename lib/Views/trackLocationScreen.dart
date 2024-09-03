@@ -2,6 +2,7 @@ import 'package:custom_map_markers/custom_map_markers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jdx/Utils/CustomColor.dart';
 import 'package:jdx/Utils/constants.dart';
@@ -26,24 +27,16 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
   final List<MarkerData> customMarkers = [];
 
   LatLng? initialPosition;
-  final Set<Marker> _markers = {
-    Marker(
-      markerId: MarkerId('start'),
-      position: LatLng(22.7196, 75.8577), // Example starting point
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    ),
-    Marker(
-      markerId: MarkerId('end'),
-      position: LatLng(22.5726, 88.3639), // Example destination point
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-    ),
-  };
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // initialPosition = LatLng(widget.driverLatLong?.latitude ?? 22.7196,
+    //     widget.driverLatLong?.longitude ?? 75.8577);
     initialPosition = LatLng(widget.driverLatLong?.latitude ?? 22.7196,
         widget.driverLatLong?.longitude ?? 75.8577);
+
   }
 
   @override
@@ -64,6 +57,12 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
                         await getPollyLines();
 
                         await setmarker();
+
+                        // controller.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
+                        //   target: initialPosition!,
+                        //   zoom: 12.0,
+                        //   //bearing: bearing,
+                        // )));
                       },
                       initialCameraPosition: CameraPosition(
                         target: initialPosition!,
@@ -104,7 +103,7 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
                       // Add tracking location logic
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.teal,
+                      primary: CustomColors.primaryColor,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
                     ),
@@ -114,65 +113,6 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
               ],
             ),
           ),
-          /*Container(
-            height: 160,
-            color: Colors.white,
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Call logic
-                      },
-                      icon: Icon(Icons.call),
-                      label: Text('Call'),
-                      style: ElevatedButton.styleFrom(primary: Colors.teal),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Cancel logic
-                      },
-                      icon: Icon(Icons.cancel),
-                      label: Text('Cancel'),
-                      style: ElevatedButton.styleFrom(primary: Colors.teal),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Start logic
-                      },
-                      icon: Icon(Icons.play_arrow),
-                      label: Text('Start'),
-                      style: ElevatedButton.styleFrom(primary: Colors.teal),
-                    ),
-                  ],
-                ),
-                Divider(),
-                ListTile(
-                  leading: Image.asset('assets/whatsapplogo.webp',
-                      width: 50, height: 50),
-                  title: Text('Test user'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Booked on 2024-08-31 13:55:22'),
-                      Text('Trip ID-428'),
-                    ],
-                  ),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      // View more logic
-                    },
-                    child: Text('View More'),
-                    style: ElevatedButton.styleFrom(primary: Colors.teal),
-                  ),
-                ),
-              ],
-            ),
-          ),*/
         ],
       ),
     );
@@ -190,6 +130,7 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
       travelMode: TravelMode.driving,
     );
 
+    print("POLYLINE--------${result.status}");
     if (result.points.isNotEmpty) {
       for (var point in result.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
@@ -230,8 +171,8 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
     if (mapController != null) {
       bounds = LatLngBounds(
         southwest: initialPosition!,
-        northeast: LatLng(widget.userLatLong?.latitude ?? 0.0,
-            widget.userLatLong?.longitude ?? 0.0),
+        northeast: LatLng(widget.userLatLong?.latitude ?? 22.7533,
+            widget.userLatLong?.longitude ?? 75.8937),
       );
     }
 
@@ -253,6 +194,16 @@ class _TrackLocationScreenState extends State<TrackLocationScreen> {
       if (fits(bounds!, screenBounds)) {
         keepZoomingOut = false;
         final double zoomLevel = await controller.getZoomLevel() - padding;
+        print('${centerBounds.latitude}_________${centerBounds.longitude}_');
+
+
+        if(centerBounds.latitude > 50){
+
+          centerBounds = LatLng(centerBounds.longitude, centerBounds.latitude);
+
+        }
+
+
         controller.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target: centerBounds,
           zoom: zoomLevel,

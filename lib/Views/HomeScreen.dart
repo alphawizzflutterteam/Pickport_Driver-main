@@ -1204,7 +1204,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       color: colors.blackTemp,
                                                       fontFamily: 'lora')),
                                               Text(
-                                                  "₹ ${ctrl.currentOrderHistoryList[index].total_amount ?? ''}",
+                                                  // "₹ ${ctrl.currentOrderHistoryList[index].total_amount ?? ''}",
+                                                  "₹ ${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toString() ?? ''}",
                                                   style: const TextStyle(
                                                       fontSize: 14,
                                                       color: colors.blackTemp,

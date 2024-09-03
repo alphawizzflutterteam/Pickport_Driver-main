@@ -618,6 +618,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
               if (mounted)
                 setState(() {
                   _isNetworkAvail = true;
+                  isLoading = false;
                 });
               // callApi();
             }
