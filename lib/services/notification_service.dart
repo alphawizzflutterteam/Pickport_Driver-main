@@ -154,6 +154,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jdx/Controller/BottomNevBar.dart';
 import 'package:jdx/Controller/home_controller.dart';
 import 'package:jdx/Views/HomeScreen.dart';
 
@@ -208,6 +209,7 @@ class LocalNotificationService {
             ctrl.getOrders(status: message.data['status']);
           }
           display(message);
+          // Get.to(BottomNav());
           //handleNotification(message.data);
         }
       },

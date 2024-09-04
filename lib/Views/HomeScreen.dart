@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -88,14 +89,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     fetchAndUploadLocation();
-    inIt();
     getProfile();
     getSliderApi();
     getDriverApi();
     getCheckStatusApi();
     startTimer();
+    inIt();
     super.initState();
   }
+
 
   GetProfileModel? getProfileModel;
   String qrCodeResult = "Not Yet Scanned";
@@ -486,9 +488,20 @@ class _HomeScreenState extends State<HomeScreen> {
       print("PLACE CMAKR ERRR $err");
     }
 
+    FirebaseMessaging.onMessage.listen(
+          (message) {
+        if (message.notification != null) {
+          print("message.dataHome ${message.data}");
+          setSegmentValue(selectedSegmentVal);
+          // display(message);
+          //handleNotification(message.data);
+        }
+      },
+    );
+
     getUserOrderHistory("0");
     getDriverRating(userId ?? '300');
-    getDriverRating(userId ?? '300');
+    // getDriverRating(userId ?? '300');
     getDriverApi();
   }
 
@@ -582,6 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //   isButtonDisabled = false;
       // });
       fetchAndUploadLocation();
+      setSegmentValue(0);
     });
   }
 
