@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jdx/Controller/home_controller.dart';
 import 'package:jdx/Models/driverFeedbackModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
+import 'package:jdx/Utils/CustomColor.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/trackLocationScreen.dart';
 import 'package:jdx/services/location/location.dart';
@@ -39,6 +40,7 @@ class PercelDetails extends StatefulWidget {
 
 class _PercelDetailsState extends State<PercelDetails> {
   bool isNetworkAvail = true;
+  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
   Position? _position;
 
@@ -123,7 +125,7 @@ class _PercelDetailsState extends State<PercelDetails> {
               body: singleBookingModel == null
                   ? const Center(
                       child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: CustomColors.White,
                     ))
                   : Container(
                       child: Stack(
@@ -1480,15 +1482,17 @@ class _PercelDetailsState extends State<PercelDetails> {
               ? const SizedBox.shrink()
               : InkWell(
                   onTap: () {
-                    if (enablePickup) {
-                      showUpdateOrderStatusDialog();
-                    } else {
-                      if (singleBookingModel?.data?.first.status == "3") {
-                        Fluttertoast.showToast(
-                            msg: "Please click on the drop location first.");
+                    if(!isLoading){
+                      if (enablePickup) {
+                        showUpdateOrderStatusDialog();
                       } else {
-                        Fluttertoast.showToast(
-                            msg: "Please click on the pickup location first.");
+                        if (singleBookingModel?.data?.first.status == "3") {
+                          Fluttertoast.showToast(
+                              msg: "Please click on the drop location first.");
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "Please click on the pickup location first.");
+                        }
                       }
                     }
                   },
@@ -1500,7 +1504,10 @@ class _PercelDetailsState extends State<PercelDetails> {
                           borderRadius: BorderRadius.circular(10),
                           color: enablePickup ? colors.primary : Colors.grey),
                       child: Center(
-                          child: Text(
+                          child: isLoading ? CircularProgressIndicator(
+                            color: CustomColors.White,
+                          )
+                              : Text(
                         // getTranslated(context, "Submit"),
                         singleBookingModel?.data?.first.status == "3"
                             ? getTranslated(context, "Deliver")
@@ -1862,6 +1869,9 @@ class _PercelDetailsState extends State<PercelDetails> {
         // 'please enter right otp'
       );
     } else {
+      setState(() {
+        isLoading = true;
+      });
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
 
@@ -1885,6 +1895,9 @@ class _PercelDetailsState extends State<PercelDetails> {
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
+        setState(() {
+          isLoading = false;
+        });
         _otpController.clear();
         var result = await response.stream.bytesToString();
         var finalResult = jsonDecode(result);
@@ -1901,6 +1914,9 @@ class _PercelDetailsState extends State<PercelDetails> {
             // Get.back();
           }
         } else {
+          setState(() {
+            isLoading = false;
+          });
           Fluttertoast.showToast(msg: 'Wrong Otp...please enter correct otp');
         }
 

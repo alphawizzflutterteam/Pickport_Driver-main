@@ -610,6 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _isNetworkAvail = await isNetworkAvailable();
         Future.delayed(const Duration(seconds: 2));
         inIt();
+        getDriverApi();
         setSegmentValue(0);
       },
       child: _isNetworkAvail ?

@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jdx/Utils/Color.dart';
+import 'package:jdx/Views/Mywallet.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/SupportNewScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -517,7 +518,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       var finalResult = jsonDecode(result);
       Fluttertoast.showToast(msg: "${finalResult['message']}");
       if (finalResult['status'] == true) {
-        Navigator.pop(context);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyWallet()));
       }
     } else {
       setState(() {
