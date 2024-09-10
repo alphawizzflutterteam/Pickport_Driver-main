@@ -546,7 +546,7 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
                                           child: Container(
                                             alignment: Alignment.center,
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 12),
+                                                horizontal: 8, vertical: 12),
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(10),
                                               color: Colors.white,
@@ -567,7 +567,7 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
                                           child: Container(
                                             alignment: Alignment.center,
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 12),
+                                                horizontal: 8, vertical: 12),
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(10),
                                               color: Colors.white,

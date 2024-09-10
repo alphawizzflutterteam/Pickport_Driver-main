@@ -93,6 +93,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           Expanded(
             flex: 18,
             child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
               child: Column(
                 children: [
                   Container(
@@ -104,7 +105,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 30, left: 15, right: 15),
                       child: SizedBox(
-                        height: MediaQuery.of(context).size.height,
+                        height: MediaQuery.of(context).size.height / 1.2,
                         width: double.maxFinite,
                         child: notificationList.isEmpty
                             ? Center(
@@ -114,8 +115,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               ))
                             : ListView.builder(
                                 scrollDirection: Axis.vertical,
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: false,
+                                padding: EdgeInsets.zero,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                shrinkWrap: true,
                                 itemCount: notificationList.length,
                                 itemBuilder: (context, index) {
                                   return InkWell(

@@ -382,7 +382,7 @@ class _MyWalletState extends State<MyWallet> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 12),
+                                        horizontal: 4, vertical: 12),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.white,
@@ -402,7 +402,7 @@ class _MyWalletState extends State<MyWallet> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 12),
+                                        horizontal: 4, vertical: 12),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.white,

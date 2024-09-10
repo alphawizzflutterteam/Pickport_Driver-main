@@ -1908,7 +1908,7 @@ class _PercelDetailsState extends State<PercelDetails> {
             showDialogCompleted(
                 singleBookingModel?.data?.first.reciverFullAddress ?? "",
                 singleBookingModel?.data?.first.senderAddress ?? "",
-                singleBookingModel?.data?.first.saleId ?? "0",
+                singleBookingModel?.data?.first.orderId ?? "0",
                 singleBookingModel?.data?.first.totalAmount ?? "");
           } else {
             // Get.back();
