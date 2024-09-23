@@ -129,20 +129,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  const Text(
-                                                    'Id:               ',
-                                                    style:
-                                                        TextStyle(color: Colors.red),
-                                                  ),
-                                                  Text(notificationList[index].id ??
-                                                      '')
-                                                ],
-                                              ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
+                                              notificationList[index].orderId != null && notificationList[index].orderId != '0' ? Padding(
+                                                padding: const EdgeInsets.only(bottom: 5.0),
+                                                child: Row(
+                                                  children: [
+                                                    const Text(
+                                                      'Id:               ',
+                                                      style:
+                                                          TextStyle(color: Colors.red),
+                                                    ),
+                                                    Text(notificationList[index].orderId ??
+                                                        '')
+                                                  ],
+                                                ),
+                                              )
+                                              : Container(),
+                                              // const SizedBox(
+                                              //   height: 5,
+                                              // ),
                                               Row(
                                                 children: [
                                                   const Text(

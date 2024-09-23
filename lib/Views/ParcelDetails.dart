@@ -932,55 +932,55 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                 "4"
                                             ? Container()
                                             : Card(
-                                                child: Column(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          const Text(
-                                                            "Delivery Ratings",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          feedbacks.isNotEmpty
-                                                              ? Row(
-                                                                  children: [
-                                                                    const Icon(
-                                                                      Icons
-                                                                          .star,
-                                                                      color: Colors
-                                                                          .yellow,
-                                                                    ),
-                                                                    Text(
-                                                                        "(${feedbacks.first.rating ?? ""})"),
-                                                                  ],
-                                                                )
-                                                              : const Text(
-                                                                  "No Delivery Ratings yet..."),
-                                                          feedbacks.isNotEmpty
-                                                              ? Text(feedbacks
-                                                                      .first
-                                                                      .feedback ??
-                                                                  "")
-                                                              : Container(),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                // child: Column(
+                                                //   children: [
+                                                //     Padding(
+                                                //       padding:
+                                                //           const EdgeInsets.all(
+                                                //               8.0),
+                                                //       child: Column(
+                                                //         crossAxisAlignment:
+                                                //             CrossAxisAlignment
+                                                //                 .start,
+                                                //         children: [
+                                                //           const Text(
+                                                //             "Delivery Ratings",
+                                                //             style: TextStyle(
+                                                //                 color: Colors
+                                                //                     .black,
+                                                //                 fontWeight:
+                                                //                     FontWeight
+                                                //                         .bold),
+                                                //           ),
+                                                //           const SizedBox(
+                                                //             height: 5,
+                                                //           ),
+                                                //           feedbacks.isNotEmpty
+                                                //               ? Row(
+                                                //                   children: [
+                                                //                     const Icon(
+                                                //                       Icons
+                                                //                           .star,
+                                                //                       color: Colors
+                                                //                           .yellow,
+                                                //                     ),
+                                                //                     Text(
+                                                //                         "(${feedbacks.first.rating ?? ""})"),
+                                                //                   ],
+                                                //                 )
+                                                //               : const Text(
+                                                //                   "No Delivery Ratings yet..."),
+                                                //           feedbacks.isNotEmpty
+                                                //               ? Text(feedbacks
+                                                //                       .first
+                                                //                       .feedback ??
+                                                //                   "")
+                                                //               : Container(),
+                                                //         ],
+                                                //       ),
+                                                //     ),
+                                                //   ],
+                                                // ),
                                               ),
                                         const SizedBox(
                                           height: 10,
@@ -1906,7 +1906,7 @@ class _PercelDetailsState extends State<PercelDetails> {
           Fluttertoast.showToast(msg: "${finalResult['meassge']}");
           if (singleBookingModel?.data?.first.status == "3") {
             showDialogCompleted(
-                singleBookingModel?.data?.first.reciverFullAddress ?? "",
+                singleBookingModel?.data?.first.receiverAddress ?? "",
                 singleBookingModel?.data?.first.senderAddress ?? "",
                 singleBookingModel?.data?.first.orderId ?? "0",
                 singleBookingModel?.data?.first.totalAmount ?? "");

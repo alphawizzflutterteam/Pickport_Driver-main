@@ -492,6 +492,9 @@ class _HomeScreenState extends State<HomeScreen> {
           (message) {
         if (message.notification != null) {
           print("message.dataHome ${message.data}");
+          if(message.data['booking_type']=='1'){
+            setSegmentValue(1);
+          }
           setSegmentValue(selectedSegmentVal);
           // display(message);
           //handleNotification(message.data);
@@ -1673,7 +1676,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("Parcel Id #${ctrl. schedOrderHistoryList[index].orderId ?? ''}"),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("Parcel Id #${ctrl. schedOrderHistoryList[index].orderId ?? ''}"),
+                                          Card(
+                                            elevation: 0,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(2.0),
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.access_time, size: 18, color: colors.primary),
+                                                  SizedBox(width: 2),
+                                                  Text("Scheduled", style: const TextStyle(fontSize: 14,color: colors.primary)),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -2264,7 +2285,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontFamily: "lora",
                                 fontSize: 20),
                           )
-                        : Text(
+                        :
+                    Text(
                             "₹ ${driverAmount}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -3450,18 +3472,26 @@ print("RatingAPI----${request.url}");
 
                       return InkWell(
                         onTap: () {
-                          if (parcelDataList
-                                  ?.data?[index].parcelDetails?.first.status ==
-                              "4") {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PercelDetails(
-                                          pId: parcelDataList
-                                              ?.data?[index].orderId,
-                                          isCheck: true,
-                                        )));
-                          } else {}
+                          // if (parcelDataList?.data?[index].parcelDetails?.first.status ==
+                          //     "4" || parcelDataList?.data?[index].parcelDetails?.first.status ==
+                          //     "4") {
+                          //   Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //           builder: (context) => PercelDetails(
+                          //                 pId: parcelDataList
+                          //                     ?.data?[index].orderId,
+                          //                 isCheck: true,
+                          //               )));
+                          // } else {}
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PercelDetails(
+                                    pId: parcelDataList
+                                        ?.data?[index].orderId,
+                                    isCheck: true,
+                                  )));
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -3593,8 +3623,9 @@ print("RatingAPI----${request.url}");
                                                   .message ==
                                               ""
                                           ? Container()
-                                          : Text(
-                                              "Reason: ${parcelDataList?.data?[index].parcelDetails?.first.message ?? ""}"),
+                                          :
+                                  // Text(
+                                  //             "Reason: ${parcelDataList?.data?[index].parcelDetails?.first.message ?? ""}"),
                                   const SizedBox(
                                     height: 10,
                                   ),
