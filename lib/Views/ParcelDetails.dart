@@ -448,9 +448,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                   const SizedBox(
                                                     height: 10,
                                                   ),
-                                                  singleBookingModel?.data
-                                                              ?.first.status ==
-                                                          "4"
+                                                  singleBookingModel?.data?.first.status == "4" || singleBookingModel?.data?.first.status == "6"
                                                       ? const SizedBox.shrink()
                                                       : singleBookingModel
                                                                   ?.data
@@ -800,9 +798,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                   const SizedBox(
                                                     height: 10,
                                                   ),
-                                                  singleBookingModel?.data
-                                                              ?.first.status ==
-                                                          "4"
+                                                  singleBookingModel?.data?.first.status == "4" || singleBookingModel?.data?.first.status == "6"
                                                       ? const SizedBox.shrink()
                                                       : selectedStatus ==
                                                               'Delivered'
@@ -985,7 +981,8 @@ class _PercelDetailsState extends State<PercelDetails> {
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        Row(
+                                        singleBookingModel?.data?.first.status == "6" ? Container()
+                                            : Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
@@ -1140,7 +1137,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                                             fontWeight: FontWeight.bold,
                                                                             fontSize: 15)),
                                                                     Text(
-                                                                        "₹ ${double.parse(singleBookingModel?.data?.first.totalAmount.toString() ?? "0.0") - double.parse(singleBookingModel?.data?.first.couponDiscount.toString() ?? '0.0')}"),
+                                                                        "₹ ${(double.parse(singleBookingModel?.data?.first.totalAmount.toString() ?? "0.0") - double.parse(singleBookingModel?.data?.first.couponDiscount.toString() ?? '0.0')).toStringAsFixed(0)}"),
                                                                   ],
                                                                 ),
                                                                 const SizedBox(
@@ -1159,7 +1156,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                                             fontWeight: FontWeight.bold,
                                                                             fontSize: 15)),
                                                                     Text(
-                                                                        "₹ ${singleBookingModel?.data?.first.adminCommission}"),
+                                                                        "₹ ${double.parse(singleBookingModel?.data?.first.adminCommission).toStringAsFixed(0)}"),
                                                                   ],
                                                                 ),
                                                                 const SizedBox(
@@ -1209,7 +1206,7 @@ class _PercelDetailsState extends State<PercelDetails> {
                                                                               15),
                                                                     ),
                                                                     Text(
-                                                                        "₹ ${double.parse(singleBookingModel?.data?.first.totalAmount ?? "0") - double.parse(singleBookingModel?.data?.first.couponDiscount ?? "0")}"),
+                                                                        "₹ ${(double.parse(singleBookingModel?.data?.first.totalAmount ?? "0") - double.parse(singleBookingModel?.data?.first.couponDiscount ?? "0")).toStringAsFixed(0)}"),
                                                                   ],
                                                                 ),
                                                                 const SizedBox(
@@ -1444,6 +1441,8 @@ class _PercelDetailsState extends State<PercelDetails> {
           const SizedBox(
             height: 5,
           ),
+          singleBookingModel?.data?.first.status == "6"
+              ? CircleAvatar(backgroundColor: Colors.red, child: Text("×", style: TextStyle(fontSize: 28, color: Colors.white)),) :
           singleBookingModel?.data?.first.status == "4"
               ? Center(
                   child: Image.asset(
@@ -1452,7 +1451,14 @@ class _PercelDetailsState extends State<PercelDetails> {
           const SizedBox(
             height: 5,
           ),
-          singleBookingModel?.data?.first.status == "4"
+          singleBookingModel?.data?.first.status == "6"
+              ? Center(
+              child: Text(
+                getTranslated(context, "Cancelled"),
+                //  "Delivered",
+                style: const TextStyle(
+                    color: colors.blackTemp, fontWeight: FontWeight.bold),
+              )) : singleBookingModel?.data?.first.status == "4"
               ? Center(
                   child: Text(
                   getTranslated(context, "Delivered"),
@@ -1478,7 +1484,7 @@ class _PercelDetailsState extends State<PercelDetails> {
           const SizedBox(
             height: 12,
           ),
-          singleBookingModel?.data?.first.status == "4"
+          singleBookingModel?.data?.first.status == "4" || singleBookingModel?.data?.first.status == "6"
               ? const SizedBox.shrink()
               : InkWell(
                   onTap: () {

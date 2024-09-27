@@ -303,7 +303,7 @@ class _MyWalletState extends State<MyWallet> {
                         Text(
                           wallet.toString() == "null"
                               ? "₹ 0"
-                              : "₹ ${(wallet ?? '0')}",
+                              : "₹ ${(double.parse(wallet!).toStringAsFixed(0) ?? '0')}",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
@@ -475,7 +475,7 @@ class _MyWalletState extends State<MyWallet> {
                                                               FontWeight.bold),
                                                     ),
                                                     Text(
-                                                      '₹${item?.amount}',
+                                                      '₹${double.parse(item.amount!).toStringAsFixed(0)}',
                                                       style: const TextStyle(
                                                           fontSize: 14.0,
                                                           fontWeight:

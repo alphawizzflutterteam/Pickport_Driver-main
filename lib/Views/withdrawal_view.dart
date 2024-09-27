@@ -421,7 +421,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                         height: 3,
                                       ),
                                       Text(
-                                        "₹ ${getTransactionModel?.data?[i].amount}",
+                                        "₹ ${double.parse((getTransactionModel?.data?[i].amount).toString()).toStringAsFixed(0)}",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -569,7 +569,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   wallet == null ||  wallet == "null"
                       ? Text(getTranslated(context, "No Balance") )
                       : Text(
-                          "₹${wallet}",
+                          "₹${double.parse(wallet!).toStringAsFixed(0)}",
                           style: TextStyle(
                               color: colors.blackTemp,
                               fontSize: 20,

@@ -677,7 +677,7 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
       'user_phone': mobController.text,
       'firebaseToken': '',
     });
-
+    print(request.url);
     print(request.fields.toString());
 
     request.headers.addAll(headers);

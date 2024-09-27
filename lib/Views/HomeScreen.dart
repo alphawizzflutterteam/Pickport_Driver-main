@@ -1223,7 +1223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       fontFamily: 'lora')),
                                               Text(
                                                   // "₹ ${ctrl.currentOrderHistoryList[index].total_amount ?? ''}",
-                                                  "₹ ${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toString() ?? ''}",
+                                                  "₹ ${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toStringAsFixed(0) ?? ''}",
                                                   style: const TextStyle(
                                                       fontSize: 14,
                                                       color: colors.blackTemp,
@@ -1569,7 +1569,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           content: Text(
-            'To begin accepting orders, please ensure your Wallet is Topped up with a Minimum Balance of $mini and Provide an option to recharge using Our wallet recharge method.',
+            'To begin accepting orders, please ensure your Wallet is Topped up with a Minimum Balance of $mini Rs.',
           ),
           actions: [
             TextButton(
@@ -1755,7 +1755,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       color: colors.blackTemp,
                                                       fontFamily: 'lora')),
                                               Text(
-                                                  "₹ ${double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.couponDiscount!) ?? ''}",
+                                                  "₹ ${(double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toStringAsFixed(0) ?? ''}",
                                                   style: const TextStyle(
                                                       fontSize: 14,
                                                       color: colors.blackTemp,
@@ -2287,7 +2287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         :
                     Text(
-                            "₹ ${driverAmount}",
+                            "₹ ${double.parse(driverAmount!).toStringAsFixed(0)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontFamily: "lora",
@@ -2328,7 +2328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 12),
                           )
                         : Text(
-                            "₹ ${driverEraning}",
+                            "₹ ${double.parse(driverEraning!).toStringAsFixed(0)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontFamily: "lora",
