@@ -654,7 +654,7 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
                                                               context,
                                                               "Amount")),
                                                           Text(
-                                                            "₹ ${filterList[i].driverAmount}",
+                                                            "₹ ${double.parse(filterList[i].driverAmount).toStringAsFixed(0)}",
                                                             style: TextStyle(
                                                                 fontFamily:
                                                                     "lora"),
@@ -673,7 +673,7 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
                                                               context,
                                                               "Commission Charge")),
                                                           Text(
-                                                            "₹ ${filterList[i].adminCommission}",
+                                                            "₹ ${double.parse(filterList[i].adminCommission).toStringAsFixed(0)}",
                                                             style: TextStyle(
                                                                 fontFamily:
                                                                     "lora"),

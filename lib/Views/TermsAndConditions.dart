@@ -110,9 +110,16 @@ class _TermsConditionsWidgetState extends State<TermsConditionsWidget> {
               child: gettmc == null
                   ? Center(child: CircularProgressIndicator())
                   : ListView(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                       //crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Html(data: "${gettmc!.data!.pgDescri}"),
+                        // Html(data: "${gettmc!.data!.pgDescri}"),
+                        Text(
+                          '${gettmc!.data!.pgDescri}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
                       ],
                     ),
             ),

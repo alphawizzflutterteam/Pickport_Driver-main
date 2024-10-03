@@ -501,6 +501,16 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
     );
+    FirebaseMessaging.onMessageOpenedApp.listen(
+          (message) {
+        if (message.notification != null) {
+
+          print(message.notification!.body);
+          print("message.data22 ${message.data}");
+          setSegmentValue(selectedSegmentVal);
+        }
+      },
+    );
 
     getUserOrderHistory("0");
     getDriverRating(userId ?? '300');
@@ -2383,7 +2393,9 @@ class _HomeScreenState extends State<HomeScreen> {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
       print('finalResult__________${finalResult}_________');
-      setState(() {});
+      setState(() {
+        setSegmentValue(selectedSegmentVal);
+      });
     } else {
       print(response.reasonPhrase);
     }
