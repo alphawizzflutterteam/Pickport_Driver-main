@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -105,7 +106,9 @@ class _SignUpScreen extends State<SignUpScreen> {
 
     if (response.statusCode == 200) {
     } else {
-      print(response.reasonPhrase);
+      if (kDebugMode) {
+        print(response.reasonPhrase);
+      }
     }
   }
 
@@ -161,7 +164,9 @@ class _SignUpScreen extends State<SignUpScreen> {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => LoginScreen()));
     } else {
-      print(response.reasonPhrase);
+      if (kDebugMode) {
+        print(response.reasonPhrase);
+      }
     }
   }
 
@@ -277,7 +282,9 @@ class _SignUpScreen extends State<SignUpScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var id = prefs.getString("userId");
 
-    print('${Urls.baseUrl}Authentication/deliveryBoyRegistration/$id');
+    if (kDebugMode) {
+      print('${Urls.baseUrl}Authentication/deliveryBoyRegistration/$id');
+    }
 
     var request = http.MultipartRequest('POST',
         Uri.parse('${Urls.baseUrl}Authentication/deliveryBoyRegistration/$id'));
@@ -298,7 +305,9 @@ class _SignUpScreen extends State<SignUpScreen> {
       "vehicle_insurance": _value1.toString()
     });
 
-    print('____Som______${request.fields}_________');
+    if (kDebugMode) {
+      print('____Som______${request.fields}_________');
+    }
     request.files.add(
         await http.MultipartFile.fromPath('user_image', '${imageFile?.path}'));
     request.files.add(await http.MultipartFile.fromPath(
@@ -320,12 +329,18 @@ class _SignUpScreen extends State<SignUpScreen> {
     request.files.add(await http.MultipartFile.fromPath(
         'pan_card_photob', '${pancardBackFile?.path}'));
 
-    print('____Som___request.files___${request.files}_________');
+    if (kDebugMode) {
+      print('____Som___request.files___${request.files}_________');
+    }
     request.headers.addAll(headers);
-    print('____Som___request.files___${request.files}_________');
+    if (kDebugMode) {
+      print('____Som___request.files___${request.files}_________');
+    }
     http.StreamedResponse response = await request.send();
     //print(await response.stream.bytesToString());
-    print('____Som___response___${response.statusCode}_________');
+    if (kDebugMode) {
+      print('____Som___response___${response.statusCode}_________');
+    }
 
     if (response.statusCode == 200) {
       setState(() {
@@ -372,7 +387,9 @@ class _SignUpScreen extends State<SignUpScreen> {
       setState(() {
         isLoading = false;
       });
-      print(response.reasonPhrase);
+      if (kDebugMode) {
+        print(response.reasonPhrase);
+      }
     }
   }
 
@@ -1744,7 +1761,9 @@ class _SignUpScreen extends State<SignUpScreen> {
                                         ? "AIzaSyBzuKMLLDC-mXOCj13b8Gsyd93pmIoZwRM"
                                         : "AIzaSyBzuKMLLDC-mXOCj13b8Gsyd93pmIoZwRM",
                                     onPlacePicked: (result) {
-                                      print(result.formattedAddress);
+                                      if (kDebugMode) {
+                                        print(result.formattedAddress);
+                                      }
                                       setState(() {
                                         addressController.text =
                                             result.formattedAddress.toString();
@@ -2058,8 +2077,9 @@ class _SignUpScreen extends State<SignUpScreen> {
                                         onTap: () {
                                           setState(() {
                                             selected = 1;
-                                            print(
-                                                '____Som______${selected}_________');
+                                            if (kDebugMode) {
+                                              print('____Som______${selected}_________');
+                                            }
                                           });
                                         },
                                         child: Container(
@@ -2077,7 +2097,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                                               ),
                                               Text(
                                                 getTranslated(
-                                                    context, "2 Wheeler Gear"),
+                                                    context, "2 Wheeler Non Gear"),
                                                 // '2 Wheeler Gear',
                                                 style: const TextStyle(
                                                   fontSize: 14,
@@ -2093,14 +2113,15 @@ class _SignUpScreen extends State<SignUpScreen> {
                                       InkWell(
                                         onTap: () {
                                           setState(() {
-                                            selected = 5;
+                                            selected = 3;
+                                            //print('____Som__ddd____${selected}_________');
                                           });
                                         },
                                         child: Container(
                                           child: Row(
                                             children: [
                                               Icon(
-                                                selected == 5
+                                                selected == 3
                                                     ? Icons.radio_button_checked
                                                     : Icons.radio_button_off_outlined,
                                                 color: colors.secondary,
@@ -2127,16 +2148,15 @@ class _SignUpScreen extends State<SignUpScreen> {
                                       InkWell(
                                         onTap: () {
                                           setState(() {
-                                            selected = 3;
-                                            print(
-                                                '____Som__ddd____${selected}_________');
+                                            selected = 5;
+                                            //print('____Som__ddd____${selected}_________');
                                           });
                                         },
                                         child: Container(
                                           child: Row(
                                             children: [
                                               Icon(
-                                                selected == 3
+                                                selected == 5
                                                     ? Icons.radio_button_checked
                                                     : Icons.radio_button_off_outlined,
                                                 color: colors.secondary,
@@ -2165,14 +2185,15 @@ class _SignUpScreen extends State<SignUpScreen> {
                                       InkWell(
                                         onTap: () {
                                           setState(() {
-                                            selected = 6;
+                                            selected = 2;
+                                            //print('____Som__ddd____${selected}_________');
                                           });
                                         },
                                         child: Container(
                                           child: Row(
                                             children: [
                                               Icon(
-                                                selected == 6
+                                                selected == 2
                                                     ? Icons.radio_button_checked
                                                     : Icons.radio_button_off_outlined,
                                                 color: colors.secondary,
@@ -2183,7 +2204,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                                               ),
                                               Text(
                                                 getTranslated(
-                                                    context, "2 Wheeler Non Gear"),
+                                                    context, "2 Wheeler Gear"),
                                                 // '2 Wheeler Non Gear',
                                                 style: const TextStyle(
                                                   fontSize: 14,
@@ -2200,6 +2221,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                                         onTap: () {
                                           setState(() {
                                             selected = 4;
+                                            //print('____Som__ddd____${selected}_________');
                                           });
                                         },
                                         child: Container(
@@ -2216,7 +2238,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                                                 width: 5,
                                               ),
                                               Text(
-                                                "${getTranslated(context, "Tata Ace")}                 ",
+                                                "${getTranslated(context, "Tata Ace")}",
 
                                                 // 'Tata 407',
                                                 style: const TextStyle(
@@ -2233,14 +2255,15 @@ class _SignUpScreen extends State<SignUpScreen> {
                                       InkWell(
                                         onTap: () {
                                           setState(() {
-                                            selected = 2;
+                                            selected = 6;
+                                            //print('____Som__ddd____${selected}_________');
                                           });
                                         },
                                         child: Container(
                                           child: Row(
                                             children: [
                                               Icon(
-                                                selected == 2
+                                                selected == 6
                                                     ? Icons.radio_button_checked
                                                     : Icons.radio_button_off_outlined,
                                                 color: colors.secondary,
@@ -2277,7 +2300,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                           Row(
                             children: [
                               Radio(
-                                value: 0,
+                                value: 1,
                                 fillColor: MaterialStateColor.resolveWith(
                                         (states) => colors.secondary),
                                 activeColor: colors.secondary,
@@ -2298,7 +2321,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                                 width: 5,
                               ),
                               Radio(
-                                  value: 1,
+                                  value: 0,
                                   fillColor: MaterialStateColor.resolveWith(
                                           (states) => colors.secondary),
                                   activeColor: colors.secondary,
@@ -2328,7 +2351,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                           Row(
                             children: [
                               Radio(
-                                value: 0,
+                                value: 1,
                                 fillColor: MaterialStateColor.resolveWith(
                                         (states) => colors.secondary),
                                 activeColor: colors.secondary,
@@ -2349,7 +2372,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                                 width: 5,
                               ),
                               Radio(
-                                  value: 1,
+                                  value: 0,
                                   fillColor: MaterialStateColor.resolveWith(
                                           (states) => colors.secondary),
                                   activeColor: colors.secondary,
@@ -2631,7 +2654,9 @@ class _SignUpScreen extends State<SignUpScreen> {
         getStatusModel = finalResult;
       });
     } else {
-      print(response.reasonPhrase);
+      if (kDebugMode) {
+        print(response.reasonPhrase);
+      }
     }
   }
 
@@ -2661,7 +2686,9 @@ class _SignUpScreen extends State<SignUpScreen> {
         // Fluttertoast.showToast(msg: "${finalResult['message']}");
       });
     } else {
-      print(response.reasonPhrase);
+      if (kDebugMode) {
+        print(response.reasonPhrase);
+      }
     }
   }
 

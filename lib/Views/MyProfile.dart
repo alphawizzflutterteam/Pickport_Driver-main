@@ -2123,8 +2123,7 @@ class _MyprofileState extends State<Myprofile> {
                                           ),
                                           Text(
                                             getTranslated(
-                                                context, "2 Wheeler Gear"),
-                                            // '2 Wheeler Gear',
+                                                context, "2 Wheeler Non Gear"),
                                             style: TextStyle(
                                               fontSize: 14,
                                             ),
@@ -2146,7 +2145,7 @@ class _MyprofileState extends State<Myprofile> {
                                       child: Row(
                                         children: [
                                           Icon(
-                                            vehicleType == 5
+                                            vehicleType == 3
                                                 ? Icons.radio_button_checked
                                                 : Icons
                                                     .radio_button_off_outlined,
@@ -2181,7 +2180,7 @@ class _MyprofileState extends State<Myprofile> {
                                       child: Row(
                                         children: [
                                           Icon(
-                                            vehicleType == 3
+                                            vehicleType == 5
                                                 ? Icons.radio_button_checked
                                                 : Icons
                                                     .radio_button_off_outlined,
@@ -2218,7 +2217,7 @@ class _MyprofileState extends State<Myprofile> {
                                       child: Row(
                                         children: [
                                           Icon(
-                                            vehicleType == 6
+                                            vehicleType == 2
                                                 ? Icons.radio_button_checked
                                                 : Icons
                                                     .radio_button_off_outlined,
@@ -2230,7 +2229,7 @@ class _MyprofileState extends State<Myprofile> {
                                           ),
                                           Text(
                                             getTranslated(
-                                                context, "2 Wheeler Non Gear"),
+                                                context, "2 Wheeler Gear"),
                                             // '2 Wheeler Non Gear',
                                             style: TextStyle(
                                               fontSize: 14,
@@ -2288,7 +2287,7 @@ class _MyprofileState extends State<Myprofile> {
                                       child: Row(
                                         children: [
                                           Icon(
-                                            vehicleType == 2
+                                            vehicleType == 6
                                                 ? Icons.radio_button_checked
                                                 : Icons
                                                     .radio_button_off_outlined,
