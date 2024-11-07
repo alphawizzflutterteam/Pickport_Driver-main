@@ -46,8 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
   int selected = 0;
   getLoginApi() async {
     _isNetworkAvail = await isNetworkAvailable();
-    isLoading = true;
-    setState(() {});
+    setState(() {
+      isLoading = true;
+    });
     var headers = {
       'Cookie': 'ci_session=c7d48d7dcbb70c45bae12c8d08e77251655897e8'
     };

@@ -1901,14 +1901,14 @@ class _PercelDetailsState extends State<PercelDetails> {
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        setState(() {
-          isLoading = false;
-        });
         _otpController.clear();
         var result = await response.stream.bytesToString();
         var finalResult = jsonDecode(result);
         debugPrint("+++++++++++++$finalResult");
         if (finalResult['status'] == true) {
+          setState(() {
+            isLoading = false;
+          });
           Fluttertoast.showToast(msg: "${finalResult['meassge']}");
           if (singleBookingModel?.data?.first.status == "3") {
             showDialogCompleted(
@@ -1941,6 +1941,10 @@ class _PercelDetailsState extends State<PercelDetails> {
         //  //
         // }
       } else {
+        setState(() {
+          isLoading = false;
+        });
+        bookingOrderDetailsApi();
         _otpController.clear();
         print(response.reasonPhrase);
       }

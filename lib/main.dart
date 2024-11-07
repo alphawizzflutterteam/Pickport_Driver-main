@@ -1,9 +1,12 @@
 
+import 'dart:math';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:jdx/Utils/Color.dart';
 import 'package:jdx/Utils/CustomColor.dart';
@@ -14,7 +17,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'Views/splash.dart';
 
-
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 @pragma('vm:entry-point')
 Future<void> backgroundHandler(RemoteMessage message) async {
   debugPrint(message.data.toString());
@@ -55,7 +58,7 @@ void main() async {
     statusBarColor: CustomColors.primaryColor, // status bar color
   ));
   //notificationClass.initNotification();
-  LocalNotificationService.initialize();
+  // LocalNotificationService.initialize();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 
 
@@ -143,6 +146,95 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: colors.primary_app,
       ),
       home: SplashScreen(),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize Firebase messaging
+    FirebaseMessaging.instance.subscribeToTopic('all');
+
+    // Initialize local notifications
+    _initializeFlutterLocalNotifications();
+
+    // Listen for foreground messages
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   RemoteNotification? notification = message.notification;
+    //   AndroidNotification? android = message.notification?.android;
+    //
+    //   if (notification != null && android != null) {
+    //     _showNotification(notification.title!, notification.body!, message.data['test']);
+    //   }
+    // });
+    FirebaseMessaging.onMessage.listen(
+          (message) {
+        if (message.notification != null) {
+          print("message.data11 ${message.data}");
+          // if(message.data['type']=='order'){
+          //   ctrl.getOrders(status: message.data['status']);
+          // }
+          _showNotification(message);
+        }
+      },
+    );
+
+    // Handle notification taps
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+    });
+  }
+
+  void _initializeFlutterLocalNotifications() {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future<void> _showNotification(RemoteMessage message) async {
+    AndroidNotificationDetails androidPlatformChannelSpecifics;
+
+    if (message.data['new_order'] == '1') {
+      // Custom sound
+      androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+        'custom_channel_id',
+        'Custom Sound Channel',
+        channelDescription: 'Channel for custom sound notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        sound: RawResourceAndroidNotificationSound('test'),  // Use custom sound
+      );
+    } else {
+      // Default system sound
+      androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+        'default_channel_id',
+        'Default Channel',
+        channelDescription: 'Channel for default sound notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        sound: null,  // Play default system sound
+      );
+    }
+
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    Random random = Random();
+    int id = random.nextInt(1000);
+    await flutterLocalNotificationsPlugin.show(
+      id,
+      message.notification!.title,
+      message.notification!.body,
+      // notificationDetails,
+      // payload: message.data['_id'],
+      platformChannelSpecifics,
     );
   }
 }

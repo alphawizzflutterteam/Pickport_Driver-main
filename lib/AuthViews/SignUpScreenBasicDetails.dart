@@ -53,6 +53,8 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
 
   final _formKey = GlobalKey<FormState>();
   bool isValidPhone = false;
+  final String emailPattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
+  String mobilepattern = r'^[6-9]\d{9}$'; // Indian mobile number pattern
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +232,16 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                               return getTranslated(
                                   context, "Mobile Number must be of 10 digit");
                               //"  Mobile Number must be of 10 digit";
+                            } else if (v.contains(' ')) {
+                              setState(() {
+                                isValidPhone = false;
+                              });
+                              return 'No spaces allowed';
+                            } else if (!RegExp(mobilepattern).hasMatch(v)) {
+                              setState(() {
+                                isValidPhone = true;
+                              });
+                              return 'Please enter a valid number';
                             } else {
                               setState(() {
                                 isValidPhone = true;
@@ -285,17 +297,15 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                               hintText: getTranslated(context, "Email id")
                               //  "Email Id",
                               ),
-                          validator: (v) {
-                            if (!v!.isEmpty && !v.contains("@")) {
-                              return getTranslated(
-                                  context, "Enter Valid Email Id");
-                              // "  Email id is required";
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter an email';
+                            } else if (value.contains(' ')) {
+                              return 'No spaces allowed';
+                            } else if (!RegExp(emailPattern).hasMatch(value)) {
+                              return 'Please enter a valid email';
                             }
-                            // if (!v.contains("@")) {
-                            //   return getTranslated(
-                            //       context, "Enter Valid Email Id");
-                            //   //"  Enter Valid Email Id";
-                            // }
+                            return null;
                           },
                         ),
                       ),
@@ -524,34 +534,37 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
                       padding: const EdgeInsets.only(top: 70.0),
                       child: InkWell(
                         onTap: () {
-                          if (_formKey.currentState!.validate()) {
-                            if (cPassController.text.isEmpty ||
-                                (cPassController.text == passController.text)) {
-                              if (isTerm == false) {
-                                Fluttertoast.showToast(
-                                    msg:
-                                        "Please agree to all Terms & Conditions and Privacy Policy"
-                                    // getTranslated(
-                                    //     context, "I agree to all")
-                                    );
-                                // "I agree to all ");
-                              } else {
-                                checkEmail();
-                              }
-                              return;
-                            } else if (cPassController.text !=
-                                passController.text) {
-                              Fluttertoast.showToast(
-                                  msg: getTranslated(
-                                      context, "Passwords do not match"));
-                            } else {
-                              Fluttertoast.showToast(
-                                  msg: getTranslated(
-                                      context, "Please confirm your password"));
-                              // "All field are required");
-                            }
-                          }
-                        },
+                          if(!isLoading){
+                                  if (_formKey.currentState!.validate()) {
+                                    if (cPassController.text.isEmpty ||
+                                        (cPassController.text ==
+                                            passController.text)) {
+                                      if (isTerm == false) {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                                "Please agree to all Terms & Conditions and Privacy Policy"
+                                            // getTranslated(
+                                            //     context, "I agree to all")
+                                            );
+                                        // "I agree to all ");
+                                      } else {
+                                        checkEmail();
+                                      }
+                                      return;
+                                    } else if (cPassController.text !=
+                                        passController.text) {
+                                      Fluttertoast.showToast(
+                                          msg: getTranslated(context,
+                                              "Passwords do not match"));
+                                    } else {
+                                      Fluttertoast.showToast(
+                                          msg: getTranslated(context,
+                                              "Please confirm your password"));
+                                      // "All field are required");
+                                    }
+                                  }
+                                }
+                              },
                         child: Container(
                             decoration: BoxDecoration(
                                 color: colors.primary,
@@ -632,6 +645,9 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
 
   checkEmail() async {
     _isNetworkAvail = await isNetworkAvailable();
+    setState(() {
+      isLoading = true;
+    });
     var headers = {
       'Cookie': 'ci_session=023100c1035f5f0b55db582760dbd86312368c54'
     };
@@ -648,19 +664,25 @@ class _SignUpScreenBasicDetails extends State<SignUpScreenBasicDetails> {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
       if (finalResult['status'] == false) {
+        setState(() {
+          isLoading = false;
+        });
         Fluttertoast.showToast(msg: "${finalResult['message']}");
       } else {
         signUpApi();
       }
     } else {
+      setState(() {
+        isLoading = false;
+      });
       print(response.reasonPhrase);
     }
   }
 
   signUpApi() async {
-    setState(() {
-      isLoading = true;
-    });
+    // setState(() {
+    //   isLoading = true;
+    // });
     _isNetworkAvail = await isNetworkAvailable();
     var headers = {
       'Cookie': 'ci_session=441db6d062b9f121348edb7be09465992a51c601'

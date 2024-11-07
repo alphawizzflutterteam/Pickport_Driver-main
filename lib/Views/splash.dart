@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // TODO: implement initState
     //Timer(Duration(seconds: 5), () {Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> SignInScreen()));});
     super.initState();
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 2), () {
       checkLogin();
     });
     // _controller = VideoPlayerController.asset("assets/images/splash.gif");
@@ -70,16 +70,17 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: SizedBox(
           width: double.infinity,
-          child: Gif(
-            duration: const Duration(seconds: 6),
-            autostart: Autostart.once,
-            image: AssetImage("assets/images/driver2.gif"),
+          child: Image.asset(
+            "assets/images/splash_img.png",
             fit: BoxFit.fill,
-            // child: Image.asset(
-            //   "assets/images/driver2.gif",
-            //   fit: BoxFit.fill,
-            // ),
-          )),
+          ),
+          // Gif(
+          //   duration: const Duration(seconds: 3),
+          //   autostart: Autostart.once,
+          //   image: AssetImage("assets/images/driver2.gif"),
+          //   fit: BoxFit.fill,
+          // )
+      ),
     );
   }
 }

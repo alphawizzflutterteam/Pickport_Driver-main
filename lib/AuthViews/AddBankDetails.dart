@@ -760,9 +760,11 @@ class _AddBankDetailsState extends State<AddBankDetails> {
                           } else if (_formKey.currentState!.validate() &&
                               imageFile1 != null &&
                               bankName != null) {
-                            // signUpApi();
-                            signUp();
-                          }
+                            if(isLoding == false){
+                                    // signUpApi();
+                                    signUp();
+                                  }
+                                }
                           // else if(selected == ""){
                           //   Fluttertoast.showToast(msg:
                           //   getTranslated(context, "Select Account Type"),
@@ -920,6 +922,7 @@ class _AddBankDetailsState extends State<AddBankDetails> {
         imageFile = null;
         drivingLicenseBackFile = null;
         drivingLicenseFile = null;
+        vehicleImage = null;
         rcBackFile = null;
         rcFrontFile = null;
         aadharCardBackFile = null;

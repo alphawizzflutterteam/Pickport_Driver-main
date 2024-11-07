@@ -269,7 +269,7 @@ class _ReferAndEranScreenState extends State<ReferAndEranScreen> {
   Future<void> share({String? referCode}) async {
     FlutterShare.share(
         title: 'PickPort Driver',
-        text: 'Use my reference code : $referCode',
+        text: 'Join Pickport Driver partner and get ₹50 Off on your first 5 Orders Delivery \nRefer code : $referCode',
         linkUrl: 'https://play.google.com/store/apps/details?id=com.pickportdriver',
         chooserTitle: 'PickPort Driver');
   }

@@ -252,7 +252,7 @@ class LocalNotificationService {
       const NotificationDetails notificationDetails = NotificationDetails(
           android: AndroidNotificationDetails(
             "default_notification_channel",
-            "DR.Apps",
+            "Pickport",
             importance: Importance.max,
             priority: Priority.high,
             playSound: true,

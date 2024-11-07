@@ -436,7 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
             getProfileModel!.data!.verified!.pan_card_photof == "0" ||
             getProfileModel!.data!.verified!.userImage == "0" ||
             getProfileModel!.data!.verified!.rcCardPhoto == "0" ||
-            getProfileModel!.data!.verified!.accountNumber == "0") {
+            getProfileModel!.data!.verified!.accountNumber == "0" ||
+            getProfileModel!.data!.verified!.vehicle_image == "0") {
           Navigator.push(
             context,
             MaterialPageRoute(

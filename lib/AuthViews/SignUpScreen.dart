@@ -838,10 +838,10 @@ class _SignUpScreen extends State<SignUpScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    // vehicleImage = null;
     //inIt();
     //getStateApi();
   }
-
   inIt() async {
     location = await getUserCurrentPosition();
   }
@@ -1732,7 +1732,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                           controller: addressController,
                           decoration: InputDecoration(
                               contentPadding: const EdgeInsets.only(
-                                top: 20,
+                                top: 20, right: 8,
                               ),
                               prefixIcon: Image.asset(
                                 'assets/images/ADDRESS.png',
@@ -2480,15 +2480,17 @@ class _SignUpScreen extends State<SignUpScreen> {
                       child: InkWell(
                         onTap: () {
                           bool isValidateFiles = isValidate();
-                          if (_formKey.currentState!.validate() &&
-                              isValidateFiles) {
-                            signUpAPISECOND();
-                          } else {
-                            // Fluttertoast.showToast(
-                            //     msg: getTranslated(context, "All field are required"));
-                            // "All field are required");
-                          }
-                        },
+                          if(!isLoading){
+                                  if (_formKey.currentState!.validate() &&
+                                      isValidateFiles) {
+                                    signUpAPISECOND();
+                                  } else {
+                                    // Fluttertoast.showToast(
+                                    //     msg: getTranslated(context, "All field are required"));
+                                    // "All field are required");
+                                  }
+                                }
+                              },
                         child: Container(
                             decoration: BoxDecoration(
                                 color: colors.primary,
@@ -2617,6 +2619,7 @@ class _SignUpScreen extends State<SignUpScreen> {
           imageFile != null &&
           drivingLicenseFile != null &&
           drivingLicenseBackFile != null &&
+          vehicleImage != null &&
           aadharCardFrontFile != null &&
           aadharCardBackFile != null &&
           rcFrontFile != null &&
