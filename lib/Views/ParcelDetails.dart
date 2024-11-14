@@ -7,6 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/Models/driverFeedbackModel.dart';
 import 'package:jdx/Utils/ApiPath.dart';
 import 'package:jdx/Utils/CustomColor.dart';
@@ -1955,10 +1956,20 @@ class _PercelDetailsState extends State<PercelDetails> {
             // Get.back();
           }
         } else {
-          setState(() {
-            isLoading = false;
-          });
-          Fluttertoast.showToast(msg: 'Wrong Otp...please enter correct otp');
+          if (finalResult['data'] == "Invalid Token") {
+            print("Logout Now-----------");
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('userId', "");
+            prefs.setString("userToken", "");
+            Fluttertoast.showToast(msg: finalResult['data'].toString());
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          } else {
+            setState(() {
+              isLoading = false;
+            });
+            Fluttertoast.showToast(msg: 'Wrong Otp...please enter correct otp');
+          }
         }
 
         // if(finalResult['status']) {

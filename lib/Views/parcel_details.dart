@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/Controller/BottomNevBar.dart';
 import 'package:jdx/CustomWidgets/CustomElevetedButton.dart';
 import 'package:jdx/Models/Acceptorder.dart';
@@ -1579,7 +1580,17 @@ class _ParcelDetailsViewState extends State<ParcelDetailsView> {
                 MaterialPageRoute(builder: (context) => const BottomNav()));
           }
         } else {
-          Fluttertoast.showToast(msg: '${finalResult['data']}');
+          if (finalResult['data'] == "Invalid Token") {
+            print("Logout Now-----------");
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('userId', "");
+            prefs.setString("userToken", "");
+            Fluttertoast.showToast(msg: finalResult['data'].toString());
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          } else {
+            Fluttertoast.showToast(msg: '${finalResult['data']}');
+          }
         }
       } else {
         _otpController.clear();

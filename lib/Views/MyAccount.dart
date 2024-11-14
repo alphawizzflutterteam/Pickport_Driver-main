@@ -155,9 +155,19 @@ class _MyAccountState extends State<MyAccount> {
       print(result);
       var finalResult = GetProfileModel.fromJson(jsonDecode(result));
       print("thisi is ============>${result}");
-      setState(() {
-        getProfileModel = finalResult;
-      });
+      if (finalResult.message == "Invalid Token.") {
+        print("Logout Now-----------");
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('userId', "");
+        prefs.setString("userToken", "");
+        Fluttertoast.showToast(msg: finalResult.message.toString());
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      } else {
+        setState(() {
+          getProfileModel = finalResult;
+        });
+      }
     } else {
       print(response.reasonPhrase);
     }

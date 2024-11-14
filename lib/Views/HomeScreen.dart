@@ -355,6 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('userId', "");
         prefs.setString("userToken", "");
+        Fluttertoast.showToast(msg: finalResult.message.toString());
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginScreen()));
       } else {
@@ -1155,18 +1156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               // isButtonDisabled = isAccepted? false: true;
                               return InkWell(
                                 onTap: () {
-                                  if (ctrl.currentOrderHistoryList[index]
-                                          .parcelDetails.first.status ==
-                                      "2") {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => PercelDetails(
-                                                pId: ctrl
-                                                    .currentOrderHistoryList[
-                                                        index]
-                                                    .orderId)));
-                                  }
+
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -1462,56 +1452,60 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ),
                                                     )
                                                   : InkWell(
-                                                      onTap:
-                                                          // orderHistoryList[index].isAccepted ?? false
-                                                          //     ? null
-                                                          //     :
-                                                          () async {
-                                                        var min =
-                                                            await getMinimumWallet();
-                                                        if (double.parse(
-                                                                driverAmount ??
-                                                                    "0") <
-                                                            min) {
-                                                          _showAlertDialog(
-                                                              context, min);
-                                                          // Fluttertoast.showToast(
-                                                          //     msg:
-                                                          //         "To begin accepting order, please ensure your Wallet is Topped up with a Minimum Balance of 150 and Provide an option to recharge using Our wallet recharge method.");
-                                                        } else {
-                                                          if (ctrl
-                                                                      .currentOrderHistoryList[
-                                                                          index]
-                                                                      .parcelDetails
-                                                                      .first
-                                                                      .status ==
-                                                                  "2" ||
-                                                              ctrl
-                                                                      .currentOrderHistoryList[
-                                                                          index]
-                                                                      .parcelDetails
-                                                                      .first
-                                                                      .status ==
-                                                                  "3") {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder: (context) => PercelDetails(
-                                                                        pId: ctrl
-                                                                            .currentOrderHistoryList[index]
-                                                                            .orderId)));
-                                                          }
-
-                                                          ctrl
-                                                              .currentOrderHistoryList[
-                                                                  index]
-                                                              .isAccepted = true;
-
-                                                          ctrl.orderRejectedOrAccept(
-                                                              index,
+                                                      onTap: () async {
+                                                        var min = await getMinimumWallet();
+                                                        if (ctrl.currentOrderHistoryList[index]
+                                                            .parcelDetails.first.status ==
+                                                            "2") {
+                                                          Navigator.push(
                                                               context,
-                                                              "0",
-                                                              city);
+                                                              MaterialPageRoute(
+                                                                  builder: (context) => PercelDetails(
+                                                                      pId: ctrl
+                                                                          .currentOrderHistoryList[
+                                                                      index]
+                                                                          .orderId)));
+                                                        } else {
+                                                          if (double.parse(
+                                                                  driverAmount ??
+                                                                      "0") <
+                                                              min) {
+                                                            _showAlertDialog(
+                                                                context, min);
+                                                            // Fluttertoast.showToast(
+                                                            //     msg:
+                                                            //         "To begin accepting order, please ensure your Wallet is Topped up with a Minimum Balance of 150 and Provide an option to recharge using Our wallet recharge method.");
+                                                          } else {
+                                                            if (ctrl
+                                                                        .currentOrderHistoryList[
+                                                                            index]
+                                                                        .parcelDetails
+                                                                        .first
+                                                                        .status ==
+                                                                    "2" ||
+                                                                ctrl
+                                                                        .currentOrderHistoryList[
+                                                                            index]
+                                                                        .parcelDetails
+                                                                        .first
+                                                                        .status ==
+                                                                    "3") {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) => PercelDetails(
+                                                                          pId: ctrl
+                                                                              .currentOrderHistoryList[index]
+                                                                              .orderId)));
+                                                            }
+
+                                                            ctrl
+                                                                .currentOrderHistoryList[
+                                                                    index]
+                                                                .isAccepted = true;
+                                                            ctrl.orderRejectedOrAccept(
+                                                                index, context, "0", city);
+                                                          }
                                                         }
                                                       },
                                                       child: Container(
@@ -2535,11 +2529,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body[RequestKeys.uToken] = userToken.toString();
       var res = await api.getOrderHistoryData(body);
       if (res.status ?? false) {
-        if (res.message == "Invalid Token.") {
+        if (res.message == "Invalid Token") {
           print("Logout Now-----------");
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('userId', "");
           prefs.setString("userToken", "");
+          Fluttertoast.showToast(msg: res.message.toString());
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => LoginScreen()));
         } else {
@@ -2742,16 +2737,16 @@ class _HomeScreenState extends State<HomeScreen> {
     String status;
     if (i == 0) {
       // getUserOrderHistory('0');
-      ctrl.getOrders(status: '0');
+      ctrl.getOrders(status: '0', context: context);
       // parcelHistory(2);
     } else if (i == 1) {
       print("scheduled delivery--");
       // getUserOrderHistory("1");
-      ctrl.getOrders(status: '1');
+      ctrl.getOrders(status: '1', context: context);
       //getAcceptedOrder('2');
     } else {
       getAcceptedOrder('4');
-      ctrl.getOrders(status: '4');
+      ctrl.getOrders(status: '4', context: context);
       // getParcelHistory();
     }
     setState(() {});

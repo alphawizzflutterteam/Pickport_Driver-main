@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/Utils/Color.dart';
 import 'package:jdx/Views/Mywallet.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
@@ -68,12 +69,22 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       final result = await response.stream.bytesToString();
       var finalResult = GetProfileModel.fromJson(jsonDecode(result));
       print("thisi is ============>${result}");
-      setState(() {
-        getProfileModel = finalResult;
-        wallet = "${getProfileModel!.data!.user!.wallet}";
-        print("Wallet bal: $wallet");
-        //Fluttertoast.showToast(msg: qrCodeResult);
-      });
+      if (finalResult.message == "Invalid Token.") {
+        print("Logout Now-----------");
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('userId', "");
+        prefs.setString("userToken", "");
+        Fluttertoast.showToast(msg: finalResult.message.toString());
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      } else {
+        setState(() {
+          getProfileModel = finalResult;
+          wallet = "${getProfileModel!.data!.user!.wallet}";
+          print("Wallet bal: $wallet");
+          //Fluttertoast.showToast(msg: qrCodeResult);
+        });
+      }
     } else {
       print(response.reasonPhrase);
     }

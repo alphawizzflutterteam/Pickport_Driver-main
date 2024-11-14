@@ -206,7 +206,7 @@ class LocalNotificationService {
         if (message.notification != null) {
           print("message.data11 ${message.data}");
           if(message.data['type']=='order'){
-            ctrl.getOrders(status: message.data['status']);
+            // ctrl.getOrders(status: message.data['status']);
           }
           display(message);
           // Get.to(BottomNav());

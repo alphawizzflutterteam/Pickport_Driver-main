@@ -33,7 +33,7 @@ class HomeController extends AppBaseController {
     startTimer();
     _initLocationService();
 
-    getOrders(status: '0');
+    // getOrders(status: '0');
   }
   Api api=Api();
   List<OrderHistoryData> currentOrderHistoryList = [];
@@ -57,7 +57,7 @@ class HomeController extends AppBaseController {
     });
   }
 
-  Future<void> getOrders({required String status})async{
+  Future<void> getOrders({required String status, required BuildContext context,})async{
 
     try{
       if(status=="0"){
@@ -96,6 +96,12 @@ class HomeController extends AppBaseController {
         //  Fluttertoast.showToast(msg: '${res.message}');
         if(res.message == "Invalid Token") {
            Fluttertoast.showToast(msg: '${res.message}');
+           print("Logout Now-----------");
+           prefs1.setString('userId', "");
+           prefs1.setString("userToken", "");
+           Fluttertoast.showToast(msg: res.message.toString());
+           Navigator.pushReplacement(
+               context, MaterialPageRoute(builder: (context) => LoginScreen()));
         } else {
           isLoading = false;
           update();
@@ -138,7 +144,7 @@ class HomeController extends AppBaseController {
         var json=jsonDecode(response.body);
         Fluttertoast.showToast(msg: json['message']);
         log(response.body);
-        getOrders(status: status);
+        // getOrders(status: status, context: context);
       }
     });
 
