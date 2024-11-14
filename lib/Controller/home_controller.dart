@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/Controller/base_Controller/base_controller.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,6 +68,8 @@ class HomeController extends AppBaseController {
 
       SharedPreferences prefs1 = await SharedPreferences.getInstance();
       String userId = prefs1.getString('userId').toString();
+      String userToken = prefs1.getString('userToken').toString();
+      print("UserToken>>>$userToken");
       isLoading=true;
       update();
 
@@ -74,6 +78,7 @@ class HomeController extends AppBaseController {
       body[RequestKeys.long] = _position?.longitude.toString() ?? '';
       body[RequestKeys.userId1] = userId.toString() ?? '';
       body[RequestKeys.status] = status.toString();
+      body[RequestKeys.uToken] = userToken.toString();
       var res = await api.getOrderHistoryData(body);
       if (res.status ?? false) {
 
@@ -89,8 +94,12 @@ class HomeController extends AppBaseController {
         update();
       } else {
         //  Fluttertoast.showToast(msg: '${res.message}');
-        isLoading=false;
-        update();
+        if(res.message == "Invalid Token") {
+           Fluttertoast.showToast(msg: '${res.message}');
+        } else {
+          isLoading = false;
+          update();
+        }
       }
     }catch(e){
       throw Exception(e);

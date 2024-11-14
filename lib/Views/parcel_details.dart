@@ -1538,6 +1538,7 @@ class _ParcelDetailsViewState extends State<ParcelDetailsView> {
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
+      final userToken = prefs.getString('userToken');
 
       var headers = {
         'Cookie': 'ci_session=27190b0a94b885f1a7656c45b1492a2c7a91a862'
@@ -1549,7 +1550,8 @@ class _ParcelDetailsViewState extends State<ParcelDetailsView> {
       request.fields.addAll({
         'user_id': userId ?? '300',
         'otp': otp,
-        'deliveryboy_order_status': status
+        'deliveryboy_order_status': status,
+        'user_token': userToken.toString(),
       });
 
       request.headers.addAll(headers);

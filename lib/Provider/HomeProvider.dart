@@ -27,6 +27,7 @@ class HomeProvider extends GetxController{
     try{
       SharedPreferences prefs1 = await SharedPreferences.getInstance();
       String userId = prefs1.getString('userId').toString();
+      String userToken = prefs1.getString('userToken').toString();
       isLoading=true;
       update();
       Map<String, String> body = {};
@@ -34,6 +35,7 @@ class HomeProvider extends GetxController{
       body[RequestKeys.long] = _position?.longitude.toString() ?? '';
       body[RequestKeys.userId1] = userId.toString() ?? '';
       body[RequestKeys.status] = status.toString();
+      body[RequestKeys.uToken] = userToken.toString();
       var res = await api.getOrderHistoryData(body);
       print("prvderResponse------${body}");
       print('____ffff__888888888____prvder_${res.data.toString()}__________');

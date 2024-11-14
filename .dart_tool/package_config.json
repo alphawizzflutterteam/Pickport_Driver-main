@@ -249,7 +249,7 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///D:/Downloads/flutter_windows_3.7.2-stable/flutter/packages/flutter",
+      "rootUri": "file:///C:/Devlopement/flutter_windows_3.7.2-stable/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -309,7 +309,7 @@
     },
     {
       "name": "flutter_localizations",
-      "rootUri": "file:///D:/Downloads/flutter_windows_3.7.2-stable/flutter/packages/flutter_localizations",
+      "rootUri": "file:///C:/Devlopement/flutter_windows_3.7.2-stable/flutter/packages/flutter_localizations",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -351,13 +351,13 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///D:/Downloads/flutter_windows_3.7.2-stable/flutter/packages/flutter_test",
+      "rootUri": "file:///C:/Devlopement/flutter_windows_3.7.2-stable/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///D:/Downloads/flutter_windows_3.7.2-stable/flutter/packages/flutter_web_plugins",
+      "rootUri": "file:///C:/Devlopement/flutter_windows_3.7.2-stable/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -897,7 +897,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///D:/Downloads/flutter_windows_3.7.2-stable/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///C:/Devlopement/flutter_windows_3.7.2-stable/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -1142,7 +1142,7 @@
       "languageVersion": "2.16"
     }
   ],
-  "generated": "2024-11-13T09:37:30.769073Z",
+  "generated": "2024-11-14T06:23:21.025384Z",
   "generator": "pub",
   "generatorVersion": "2.19.2"
 }

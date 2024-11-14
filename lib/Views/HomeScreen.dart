@@ -353,11 +353,10 @@ class _HomeScreenState extends State<HomeScreen> {
       if (finalResult.message == "Invalid Token.") {
         print("Logout Now-----------");
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        Navigator.pop(context);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginScreen()));
         prefs.setString('userId', "");
         prefs.setString("userToken", "");
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
       } else {
         // var finalResult = GetProfileModel.fromJson(jsonDecode(result));
         setState(() {
@@ -629,7 +628,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _isNetworkAvail = await isNetworkAvailable();
               Future.delayed(const Duration(seconds: 2));
               inIt();
-              getProfile();
+              // getProfile();
               getDriverApi();
               setSegmentValue(0);
             },
@@ -2539,13 +2538,14 @@ class _HomeScreenState extends State<HomeScreen> {
         if (res.message == "Invalid Token.") {
           print("Logout Now-----------");
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          Navigator.pop(context);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => LoginScreen()));
           prefs.setString('userId', "");
           prefs.setString("userToken", "");
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginScreen()));
         } else {
-          orderHistoryList = res.data;
+          setState(() {
+            orderHistoryList = res.data;
+          });
 
           //Future.delayed(const Duration(seconds: 1), () {
           // print('One second has passed.'); // Prints after 1 second.
