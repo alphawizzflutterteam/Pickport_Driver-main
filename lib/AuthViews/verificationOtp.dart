@@ -2,19 +2,16 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:jdx/AuthViews/ChangePassword.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Controller/BottomNevBar.dart';
 import '../Utils/ApiPath.dart';
 import '../Utils/Color.dart';
-
-import 'package:http/http.dart' as http;
-
 import '../Utils/CustomColor.dart';
 import '../services/session.dart';
 
@@ -31,7 +28,7 @@ class _VerificationPageState extends State<VerificationPage> {
   bool _isNetworkAvail = true;
   var pinValue;
 
-  String FCM='';
+  String FCM = '';
   getToken() async {
     _isNetworkAvail = await isNetworkAvailable();
     var fcmToken = await FirebaseMessaging.instance.getToken();
@@ -39,6 +36,7 @@ class _VerificationPageState extends State<VerificationPage> {
     FCM = fcmToken.toString();
     print("FCM ID Is______________ $FCM");
   }
+
   bool isLoading = false;
   verifyOtpApi() async {
     _isNetworkAvail = await isNetworkAvailable();
@@ -70,6 +68,7 @@ class _VerificationPageState extends State<VerificationPage> {
         String? userPhone = finalResult['data']['user_phone'];
         String? userEmail = finalResult['data']['user_email'];
         String? userImage = finalResult['data']['user_image'];
+        String? userToken = finalResult['data']['user_token'];
         print("User id+++++++++++++++++>${userId}");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("userId", userId ?? '');
@@ -77,6 +76,7 @@ class _VerificationPageState extends State<VerificationPage> {
         prefs.setString("userPhone", userPhone ?? '-userphone-');
         prefs.setString("userEmail", userEmail ?? '-useremail-');
         prefs.setString("userImage", userImage ?? '-userimage-');
+        prefs.setString("userToken", userToken ?? '-usertoken-');
         Fluttertoast.showToast(
           msg: '${finalResult['message']}',
         );
@@ -206,242 +206,246 @@ class _VerificationPageState extends State<VerificationPage> {
   String? newPin;
   @override
   Widget build(BuildContext context) {
-    return _isNetworkAvail ?
-          Scaffold(
-        backgroundColor: colors.primary,
-        appBar: AppBar(
-          backgroundColor: colors.primary,
-          elevation: 0,
-          centerTitle: true,
-          // leadingWidth: 0,
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                    color: colors.whiteTemp,
-                    borderRadius: BorderRadius.circular(100)),
-                child: const Center(
-                    child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                )),
-              ),
-            ),
-          ),
-          title: Container(
-              padding: const EdgeInsets.all(2),
-              child: Center(
+    return _isNetworkAvail
+        ? Scaffold(
+            backgroundColor: colors.primary,
+            appBar: AppBar(
+              backgroundColor: colors.primary,
+              elevation: 0,
+              centerTitle: true,
+              // leadingWidth: 0,
+              leading: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 25),
-                  child: Text(
-                    getTranslated(context, "Verification"),
-                    //'Verification',
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                        color: colors.whiteTemp,
+                        borderRadius: BorderRadius.circular(100)),
+                    child: const Center(
+                        child: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                    )),
                   ),
                 ),
-              )),
-        ),
-        body: SingleChildScrollView(
-          child: SizedBox(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(
-                height: 5,
               ),
-              Container(
-                height: MediaQuery.of(context).size.height,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(35),
-                        topRight: Radius.circular(35))),
+              title: Container(
+                  padding: const EdgeInsets.all(2),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 25),
+                      child: Text(
+                        getTranslated(context, "Verification"),
+                        //'Verification',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+                  )),
+            ),
+            body: SingleChildScrollView(
+              child: SizedBox(
                 child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 60,
-                    ),
-                    Text(
-                      getTranslated(context, "Code has sent to"),
-                      // "Code has sent to",
-                      style: TextStyle(fontSize: 18,color: Colors.black),
-                    ),
-                    Text(
-                      "+91 ${widget.mobile.toString()}",
-                      style: const TextStyle(
-                          fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                    // Text(
-                    //   "OTP: ${widget.otp.toString()}",
-                    //   style: const TextStyle(
-                    //       color: Colors.black, fontWeight: FontWeight.bold),
-                    // ),
-                    // controller.otp == "null" ?
-                    // Text('OTP: ',style: const TextStyle(fontSize: 20,color: AppColors.whit),):
-                    // Text('OTP: ${otp}',style: const TextStyle(fontSize: 20,color: Colors.white),),
-
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.3,
-                      child: PinCodeTextField(
-                        //errorBorderColor:Color(0xFF5ACBEF),
-                        //defaultBorderColor: Color(0xFF5ACBEF),
-                        keyboardType: TextInputType.phone,
-                        onChanged: (value) {
-                          widget.otp = value.toString();
-                          newPin = value.toString();
-                        },
-                        textStyle: const TextStyle(color: Colors.black),
-                        cursorColor: colors.blackTemp,
-                        pinTheme: PinTheme(
-                          shape: PinCodeFieldShape.box,
-                          borderRadius: BorderRadius.circular(10),
-                          activeColor: colors.primary,
-                          inactiveColor: colors.primary,
-                          selectedColor: colors.primary,
-                          fieldHeight: 60,
-                          fieldWidth: 60,
-                          selectedFillColor: colors.primary,
-                          inactiveFillColor: colors.primary,
-                          activeFillColor: colors.primary,
-                        ),
-                        //pinBoxRadius:20,
-                        appContext: context, length: 4,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 5,
                       ),
-                    ),
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(35),
+                                topRight: Radius.circular(35))),
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 60,
+                            ),
+                            Text(
+                              getTranslated(context, "Code has sent to"),
+                              // "Code has sent to",
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.black),
+                            ),
+                            Text(
+                              "+91 ${widget.mobile.toString()}",
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            // Text(
+                            //   "OTP: ${widget.otp.toString()}",
+                            //   style: const TextStyle(
+                            //       color: Colors.black, fontWeight: FontWeight.bold),
+                            // ),
+                            // controller.otp == "null" ?
+                            // Text('OTP: ',style: const TextStyle(fontSize: 20,color: AppColors.whit),):
+                            // Text('OTP: ${otp}',style: const TextStyle(fontSize: 20,color: Colors.white),),
 
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      getTranslated(
-                          context, "Haven't received the verification code?"),
-                      // "Haven't received the verification code?",
-                      style: TextStyle(color: Colors.black54, fontSize: 16),
-                    ),
-                    InkWell(
-                        onTap: () {
-                          resendOtp();
-                        },
-                        child: Text(
-                          getTranslated(context, "Resend"),
-                          // "Resend",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        )),
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    // Obx(() => Padding(padding: const EdgeInsets.only(left: 25, right: 25), child: controller.isLoading.value ? const Center(child: CircularProgressIndicator(),) :
-                    //
-                    // )
-
-                    Center(
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          if (newPin != widget.otp) {
-                            Fluttertoast.showToast(
-                                msg: getTranslated(
-                                    context, "Please enter correct pin"));
-                            setState(() {
-                              isLoading = false;
-                            });
-                            // "Please enter correct pin");
-                          } else if (newPin == null) {
-                            Fluttertoast.showToast(
-                                msg:
-                                    getTranslated(context, "Please enter pin"));
-                            setState(() {
-                              isLoading = false;
-                            });
-                            //"Please enter pin");
-                          } else {
-                            setState(() {
-                              isLoading = false;
-                            });
-
-                            verifyOtpApi();
-                          }
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          decoration: BoxDecoration(
-                              color: colors.primary,
-                              borderRadius: BorderRadius.circular(15)),
-                          child: isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Center(
-                                  child: Text(
-                                    getTranslated(context, "Verify Code"),
-                                    //"Verify Code",
-                                    style: TextStyle(
-                                      color: CustomColors.White,
-                                      fontSize: 18,
-                                    ),
-                                  ),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 1.3,
+                              child: PinCodeTextField(
+                                //errorBorderColor:Color(0xFF5ACBEF),
+                                //defaultBorderColor: Color(0xFF5ACBEF),
+                                keyboardType: TextInputType.phone,
+                                onChanged: (value) {
+                                  widget.otp = value.toString();
+                                  newPin = value.toString();
+                                },
+                                textStyle: const TextStyle(color: Colors.black),
+                                cursorColor: colors.blackTemp,
+                                pinTheme: PinTheme(
+                                  shape: PinCodeFieldShape.box,
+                                  borderRadius: BorderRadius.circular(10),
+                                  activeColor: colors.primary,
+                                  inactiveColor: colors.primary,
+                                  selectedColor: colors.primary,
+                                  fieldHeight: 60,
+                                  fieldWidth: 60,
+                                  selectedFillColor: colors.primary,
+                                  inactiveFillColor: colors.primary,
+                                  activeFillColor: colors.primary,
                                 ),
+                                //pinBoxRadius:20,
+                                appContext: context, length: 4,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              getTranslated(context,
+                                  "Haven't received the verification code?"),
+                              // "Haven't received the verification code?",
+                              style: TextStyle(
+                                  color: Colors.black54, fontSize: 16),
+                            ),
+                            InkWell(
+                                onTap: () {
+                                  resendOtp();
+                                },
+                                child: Text(
+                                  getTranslated(context, "Resend"),
+                                  // "Resend",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                )),
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            // Obx(() => Padding(padding: const EdgeInsets.only(left: 25, right: 25), child: controller.isLoading.value ? const Center(child: CircularProgressIndicator(),) :
+                            //
+                            // )
+
+                            Center(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  if (newPin != widget.otp) {
+                                    Fluttertoast.showToast(
+                                        msg: getTranslated(context,
+                                            "Please enter correct pin"));
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    // "Please enter correct pin");
+                                  } else if (newPin == null) {
+                                    Fluttertoast.showToast(
+                                        msg: getTranslated(
+                                            context, "Please enter pin"));
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    //"Please enter pin");
+                                  } else {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+
+                                    verifyOtpApi();
+                                  }
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 15),
+                                  decoration: BoxDecoration(
+                                      color: colors.primary,
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: isLoading
+                                      ? const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Center(
+                                          child: Text(
+                                            getTranslated(
+                                                context, "Verify Code"),
+                                            //"Verify Code",
+                                            style: TextStyle(
+                                              color: CustomColors.White,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                            // CustomButton(
+                            //   onTap: (){
+                            //     setState((){
+                            //       isLoading = true;
+                            //     });
+                            //     if(newPin != widget.otp){
+                            //       Fluttertoast.showToast(msg: "Please enter correct pin");
+                            //
+                            //     } else if(newPin == null) {
+                            //       Fluttertoast.showToast(msg: "Please enter pin");
+                            //     }
+                            //     else{
+                            //       setState((){
+                            //         isLoading = false;
+                            //       });
+                            //       verifyOtpApi();
+                            //     }
+                            //   },
+                            //   buttonText: getTranslated(context, "Verify Code"),
+                            // )
+                          ],
                         ),
-                      ),
-                    ),
-                    // CustomButton(
-                    //   onTap: (){
-                    //     setState((){
-                    //       isLoading = true;
-                    //     });
-                    //     if(newPin != widget.otp){
-                    //       Fluttertoast.showToast(msg: "Please enter correct pin");
-                    //
-                    //     } else if(newPin == null) {
-                    //       Fluttertoast.showToast(msg: "Please enter pin");
-                    //     }
-                    //     else{
-                    //       setState((){
-                    //         isLoading = false;
-                    //       });
-                    //       verifyOtpApi();
-                    //     }
-                    //   },
-                    //   buttonText: getTranslated(context, "Verify Code"),
-                    // )
-                  ],
-                ),
-              )
-            ]),
-          ),
-        ))
-        : NoInternetScreen(
-        onPressed: () {
-          Future.delayed(Duration(seconds: 1)).then((_) async {
-            _isNetworkAvail = await isNetworkAvailable();
-            if (_isNetworkAvail) {
-              if (mounted)
-                setState(() {
-                  _isNetworkAvail = true;
-                });
-              // callApi();
-            }
+                      )
+                    ]),
+              ),
+            ))
+        : NoInternetScreen(onPressed: () {
+            Future.delayed(Duration(seconds: 1)).then((_) async {
+              _isNetworkAvail = await isNetworkAvailable();
+              if (_isNetworkAvail) {
+                if (mounted)
+                  setState(() {
+                    _isNetworkAvail = true;
+                  });
+                // callApi();
+              }
+            });
           });
-        }
-    );
   }
 }
-
-

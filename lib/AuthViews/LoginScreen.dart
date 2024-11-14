@@ -1,27 +1,24 @@
 import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:jdx/AuthViews/verificationOtp.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
 import 'package:jdx/Views/TermsAndConditions.dart';
 import 'package:jdx/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Controller/BottomNevBar.dart';
 import '../Models/login_model.dart';
 import '../Utils/ApiPath.dart';
 import '../Utils/Color.dart';
 import '../Utils/CustomColor.dart';
-import '../Views/GetHelp.dart';
 import '../Views/HelpScreen.dart';
 import '../Views/PrivacyPolicy.dart';
 import 'ForgetPasswordScreen.dart';
-import 'SignUpScreen.dart';
-import 'package:http/http.dart' as http;
-
 import 'SignUpScreenBasicDetails.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -74,11 +71,14 @@ class _LoginScreenState extends State<LoginScreen> {
         String? userId = finalResult.data?.userId;
         String? userName = finalResult.data?.userFullname;
         String? userImage = finalResult.data?.userImage;
+        String? userToken = finalResult.data?.userToken;
         print("User id+++++++++++++++++>$userId");
+        print("User token+++++++++++++++++>$userToken");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("userId", userId ?? '');
         prefs.setString("userName", userName ?? '-username-');
         prefs.setString("userImage", userImage ?? '-userimage-');
+        prefs.setString("userToken", userToken ?? '-usertoken-');
         isLoading = false;
 
         Navigator.pushReplacement(context,
@@ -118,10 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}Authentication/DeliveryLogin'));
-    request.fields.addAll({
-      'user_phone': mobileController.text,
-      'token': token.toString()
-    });
+    request.fields.addAll(
+        {'user_phone': mobileController.text, 'token': token.toString()});
 
     print('____Som______${request.fields}_________');
     request.headers.addAll(headers);

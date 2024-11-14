@@ -1,18 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jdx/AuthViews/LoginScreen.dart';
+import 'package:http/http.dart' as http;
 import 'package:jdx/Utils/CustomColor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Models/GetProfileModel.dart';
 import '../Utils/ApiPath.dart';
 import '../Utils/Color.dart';
-import 'package:http/http.dart' as http;
-
 import '../services/session.dart';
 
 class EditBankDetails extends StatefulWidget {
@@ -41,13 +37,17 @@ class _EditBankDetailsState extends State<EditBankDetails> {
   getProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
+    String? userToken = prefs.getString("userToken");
     print(" this is  User++++++++++++++>${userId}");
     var headers = {
       'Cookie': 'ci_session=6de5f73f50c4977cb7f3af6afe61f4b340359530'
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}User_Dashboard/getUserProfile'));
-    request.fields.addAll({'user_id': userId.toString()});
+    request.fields.addAll({
+      'user_id': userId.toString(),
+      'user_token': userToken.toString(),
+    });
 
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -426,31 +426,31 @@ class _EditBankDetailsState extends State<EditBankDetails> {
                             //       selected = 1;
                             //     });
                             //   },
-                              //child:
-                              Container(
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      selected == 1
-                                          ? Icons.radio_button_checked
-                                          : Icons.radio_button_off_outlined,
-                                      color: colors.secondary,
-                                      size: 16,
+                            //child:
+                            Container(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    selected == 1
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_off_outlined,
+                                    color: colors.secondary,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  const Text(
+                                    "Current Account",
+                                    // getTranslated(context, "Current Account"),
+                                    // 'Current Account',
+                                    style: TextStyle(
+                                      fontSize: 14,
                                     ),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    const Text(
-                                      "Current Account",
-                                      // getTranslated(context, "Current Account"),
-                                      // 'Current Account',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
+                            ),
                             //)
                           ],
                         ),

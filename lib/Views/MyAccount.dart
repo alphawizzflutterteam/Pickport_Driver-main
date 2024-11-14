@@ -1,39 +1,24 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:jdx/AuthViews/ChangePassword.dart';
+import 'package:http/http.dart' as http;
 import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/CustomWidgets/CustomElevetedButton.dart';
-import 'package:jdx/Models/order_accept_response.dart';
 import 'package:jdx/Utils/ApiPath.dart';
-import 'package:jdx/Views/DriverErningHistroy.dart';
-import 'package:jdx/Views/Feedback.dart';
 import 'package:jdx/Views/MyProfile.dart';
 import 'package:jdx/Views/OnlineOfflineHistory.dart';
-import 'package:jdx/Views/PaymentScreen.dart';
-import 'package:jdx/Views/driver_payment_system.dart';
-import 'package:jdx/Views/past_parcel_history.dart';
-import 'package:jdx/Views/share_qr/scan_qr.dart';
 import 'package:jdx/Views/withdrawal_view.dart';
-import 'package:jdx/services/api_services/request_key.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+
 import '../AuthViews/LanguageSelction.dart';
 import '../Models/GetProfileModel.dart';
 import '../Utils/Color.dart';
-import '../changelanguage.dart';
 import '../services/session.dart';
 import 'AboutUs.dart';
-import 'CommissionCharge.dart';
 import 'EditBankDetails.dart';
-import 'Mywallet.dart';
 import 'Parcel HistoryPage.dart';
 import 'PrivacyPolicy.dart';
 import 'ReferAndEran.dart';
@@ -78,6 +63,7 @@ class _MyAccountState extends State<MyAccount> {
                           MaterialPageRoute(
                               builder: (context) => LoginScreen()));
                       prefs.setString('userId', "");
+                      prefs.setString("userToken", "");
                       setState(() {});
                     },
                     child: Container(
@@ -148,13 +134,17 @@ class _MyAccountState extends State<MyAccount> {
   getProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
+    String? userToken = prefs.getString("userToken");
     print(" this is  User++++++++++++++>${userId}");
     var headers = {
       'Cookie': 'ci_session=6de5f73f50c4977cb7f3af6afe61f4b340359530'
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}User_Dashboard/getUserProfile'));
-    request.fields.addAll({'user_id': userId.toString()});
+    request.fields.addAll({
+      'user_id': userId.toString(),
+      'user_token': userToken.toString(),
+    });
     print(" this is  User++++++++++++++>${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -216,13 +206,14 @@ class _MyAccountState extends State<MyAccount> {
             ),
             Expanded(
                 child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               decoration: BoxDecoration(
                   color: Colors.blue.shade50,
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(35),
                       topRight: Radius.circular(35))),
               child: ListView(
+                // padding: EdgeInsets.only(top: 20),
                 children: [
                   Padding(
                     padding:
@@ -283,7 +274,9 @@ class _MyAccountState extends State<MyAccount> {
                                         ),
                                       ),
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2.2,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2.2,
                                         child: Text(
                                           getProfileModel!
                                                   .data!.user!.userEmail ??
@@ -606,9 +599,10 @@ class _MyAccountState extends State<MyAccount> {
                                       width: 20,
                                     ),
                                     Container(
-                                      constraints: BoxConstraints(maxWidth: 200),
+                                      constraints:
+                                          BoxConstraints(maxWidth: 200),
                                       child: Text(
-                                        getTranslated(context,  "OnlineOffline"),
+                                        getTranslated(context, "OnlineOffline"),
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
@@ -617,10 +611,8 @@ class _MyAccountState extends State<MyAccount> {
                                         maxLines: 1,
                                       ),
                                     )
-
                                   ],
                                 ),
-
                                 Container(
                                     height: 30,
                                     width: 30,
@@ -731,9 +723,11 @@ class _MyAccountState extends State<MyAccount> {
                                       width: 20,
                                     ),
                                     Container(
-                                      constraints: BoxConstraints(maxWidth: 200),
+                                      constraints:
+                                          BoxConstraints(maxWidth: 200),
                                       child: Text(
-                                        getTranslated(context, "Refer and earn"),
+                                        getTranslated(
+                                            context, "Refer and earn"),
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
@@ -742,7 +736,6 @@ class _MyAccountState extends State<MyAccount> {
                                         maxLines: 1,
                                       ),
                                     )
-
                                   ],
                                 ),
                                 InkWell(
@@ -834,13 +827,13 @@ class _MyAccountState extends State<MyAccount> {
                   ),
                   Padding(
                     padding:
-                    const EdgeInsets.only(top: 10.0, left: 5, right: 5),
+                        const EdgeInsets.only(top: 10.0, left: 5, right: 5),
                     child: InkWell(
                       onTap: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>ChangeLanguageee(),
+                              builder: (context) => ChangeLanguageee(),
                             ));
                       },
                       child: Container(
@@ -871,7 +864,8 @@ class _MyAccountState extends State<MyAccount> {
                                       width: 20,
                                     ),
                                     Text(
-                                      getTranslated(context, "CHOOSE_LANGUAGE_LBL"),
+                                      getTranslated(
+                                          context, "CHOOSE_LANGUAGE_LBL"),
                                       // 'Support',
                                       style: TextStyle(
                                           fontSize: 14,
@@ -885,7 +879,7 @@ class _MyAccountState extends State<MyAccount> {
                                     decoration: BoxDecoration(
                                         color: Colors.blue.shade50,
                                         borderRadius:
-                                        BorderRadius.circular(30)),
+                                            BorderRadius.circular(30)),
                                     child: const Icon(
                                       Icons.arrow_forward_ios,
                                       size: 14,
@@ -897,7 +891,6 @@ class _MyAccountState extends State<MyAccount> {
                       ),
                     ),
                   ),
-
 
                   Padding(
                     padding:
@@ -991,7 +984,8 @@ class _MyAccountState extends State<MyAccount> {
                                       width: 20,
                                     ),
                                     Container(
-                                      constraints: BoxConstraints(maxWidth: 200),
+                                      constraints:
+                                          BoxConstraints(maxWidth: 200),
                                       child: Text(
                                         getTranslated(
                                             context, "Terms & Conditions"),

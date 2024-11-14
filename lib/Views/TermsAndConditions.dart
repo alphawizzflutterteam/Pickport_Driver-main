@@ -2,13 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:http/http.dart' as http;
 import 'package:jdx/Models/GetTmc.dart';
 
 import '../Utils/ApiPath.dart';
 import '../Utils/AppBar.dart';
 import '../Utils/Color.dart';
-import 'package:http/http.dart' as http;
-
 import '../services/session.dart';
 
 class TermsConditionsWidget extends StatefulWidget {
@@ -24,7 +23,8 @@ class _TermsConditionsWidgetState extends State<TermsConditionsWidget> {
     getTermCondition();
   }
 
-  GetTmc? gettmc;
+  // GetTmc? gettmc;
+  var gettmc;
   getTermCondition() async {
     var headers = {
       'Cookie': 'ci_session=c6e9b8fa5907fd26fe43fffdfc36c4433f340576'
@@ -44,7 +44,7 @@ class _TermsConditionsWidgetState extends State<TermsConditionsWidget> {
       var ResultTMC = GetTmc.fromJson(jsonDecode(result));
       print(" this is tmccccccccccccccccc${ResultTMC.toJson().toString()}");
       setState(() {
-        gettmc = ResultTMC;
+        gettmc = ResultTMC.data;
       });
     } else {
       print(response.reasonPhrase);
@@ -110,18 +110,25 @@ class _TermsConditionsWidgetState extends State<TermsConditionsWidget> {
               child: gettmc == null
                   ? Center(child: CircularProgressIndicator())
                   : ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                       //crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Html(data: "${gettmc!.data!.pgDescri}"),
-                        Text(
-                          '${gettmc!.data!.pgDescri}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
+                        Html(data: "${gettmc!.pgDescri}"),
                       ],
                     ),
+              // ListView(
+              //         padding:
+              //             EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              //         //crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           // Html(data: "${gettmc!.data!.pgDescri}"),
+              //           Text(
+              //             '${gettmc.pgDescri}',
+              //             style: const TextStyle(
+              //               fontSize: 16,
+              //             ),
+              //           ),
+              //         ],
+              //       ),
             ),
           )
         ],

@@ -2,35 +2,28 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:carousel_slider/carousel_options.dart';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:jdx/AuthViews/SignUpScreen.dart';
+import 'package:jdx/AuthViews/LoginScreen.dart';
 import 'package:jdx/Controller/home_controller.dart';
-import 'package:jdx/Models/Get_transaction_model.dart';
 import 'package:jdx/Models/get_driver_rating_response.dart';
-import 'package:jdx/Models/order_accept_response.dart';
 import 'package:jdx/Models/order_history_response.dart';
-import 'package:jdx/Provider/HomeProvider.dart';
 import 'package:jdx/Views/DriverErningHistroy.dart';
 import 'package:jdx/Views/Mywallet.dart';
 import 'package:jdx/Views/NoInternetScreen.dart';
-import 'package:jdx/Views/order_details.dart';
-import 'package:jdx/Views/parcel_details.dart';
 import 'package:jdx/verifyDocuments/pendingScreen.dart';
 import 'package:jdx/verifyDocuments/reviewScreens.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../AuthViews/AddBankDetails.dart';
+
 import '../Models/Acceptorder.dart';
 import '../Models/GetProfileModel.dart';
 import '../Models/getSliderModel.dart';
@@ -41,8 +34,6 @@ import '../Utils/CustomColor.dart';
 import '../services/api_services/api.dart';
 import '../services/api_services/request_key.dart';
 import '../services/location/location.dart';
-import 'package:http/http.dart' as http;
-
 import '../services/session.dart';
 import '../verifyDocuments/VerifyBankDetails.dart';
 import '../verifyDocuments/verifyDocs.dart';
@@ -97,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
     inIt();
     super.initState();
   }
-
 
   GetProfileModel? getProfileModel;
   String qrCodeResult = "Not Yet Scanned";
@@ -339,122 +329,140 @@ class _HomeScreenState extends State<HomeScreen> {
     _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
+    String? userToken = prefs.getString("userToken");
     print(" this is  User++++++++++++++>$userId");
+    print(" this is  UserToken++++++++++++++>$userToken");
     var headers = {
       'Cookie': 'ci_session=6de5f73f50c4977cb7f3af6afe61f4b340359530'
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}User_Dashboard/getUserProfile'));
-    request.fields.addAll({'user_id': userId.toString()});
+    request.fields.addAll({
+      'user_id': userId.toString(),
+      'user_token': userToken.toString(),
+    });
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
+
     if (response.statusCode == 200) {
       isdocumetsVerified = false;
 
       var result = await response.stream.bytesToString();
       log(result.toString());
       var finalResult = GetProfileModel.fromJson(jsonDecode(result));
-      setState(() {
-        getProfileModel = finalResult;
-        // Fluttertoast.showToast(
-        //     msg: getProfileModel!.data!.verified!.accountNumber.toString());
+      if (finalResult.message == "Invalid Token.") {
+        print("Logout Now-----------");
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+        prefs.setString('userId', "");
+        prefs.setString("userToken", "");
+      } else {
+        // var finalResult = GetProfileModel.fromJson(jsonDecode(result));
+        setState(() {
+          getProfileModel = finalResult;
+          // Fluttertoast.showToast(
+          //     msg: getProfileModel!.data!.verified!.accountNumber.toString());
 
-        if (getProfileModel?.data?.verified == null) {
-          showDocumentScree();
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => ReviewScreen(
-          //       getProfileModel: getProfileModel,
-          //     ),
-          //   ),
-          // );
-        } else if (getProfileModel!.data!.user!.vehicleNo == "" ||
-            getProfileModel!.data!.user!.vehicleNo == null) {
-          showDocumentScree();
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => ReviewScreen(
-          //       getProfileModel: getProfileModel,
-          //     ),
-          //   ),
-          // );
+          if (getProfileModel?.data?.verified == null) {
+            showDocumentScree();
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => ReviewScreen(
+            //       getProfileModel: getProfileModel,
+            //     ),
+            //   ),
+            // );
+          } else if (getProfileModel!.data!.user!.vehicleNo == "" ||
+              getProfileModel!.data!.user!.vehicleNo == null) {
+            showDocumentScree();
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => ReviewScreen(
+            //       getProfileModel: getProfileModel,
+            //     ),
+            //   ),
+            // );
 
-          //null -> not updated
-          //0->pending
-          //1 - >verified
+            //null -> not updated
+            //0->pending
+            //1 - >verified
 //2-> rejected
-        } else if (getProfileModel!.data!.verified!.aadhaarCardPhoto == null ||
-            getProfileModel!.data!.verified!.drivingLicencePhoto == null ||
-            getProfileModel!.data!.verified!.pan_card_photof == null ||
-            getProfileModel!.data!.verified!.userImage == null ||
-            getProfileModel!.data!.verified!.rcCardPhoto == null) {
-          showDocumentScree();
-        } else if (getProfileModel!.data!.verified!.aadhaarCardPhoto == "2" ||
-            getProfileModel!.data!.verified!.drivingLicencePhoto == "2" ||
-            getProfileModel!.data!.verified!.pan_card_photof == "2" ||
-            getProfileModel!.data!.verified!.userImage == "2" ||
-            getProfileModel!.data!.verified!.vehicle_image == "2" ||
-            getProfileModel!.data!.verified!.rcCardPhoto == "2") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReviewScreen(
-                getProfileModel: getProfileModel,
+          } else if (getProfileModel!.data!.verified!.aadhaarCardPhoto ==
+                  null ||
+              getProfileModel!.data!.verified!.drivingLicencePhoto == null ||
+              getProfileModel!.data!.verified!.pan_card_photof == null ||
+              getProfileModel!.data!.verified!.userImage == null ||
+              getProfileModel!.data!.verified!.rcCardPhoto == null) {
+            showDocumentScree();
+          } else if (getProfileModel!.data!.verified!.aadhaarCardPhoto == "2" ||
+              getProfileModel!.data!.verified!.drivingLicencePhoto == "2" ||
+              getProfileModel!.data!.verified!.pan_card_photof == "2" ||
+              getProfileModel!.data!.verified!.userImage == "2" ||
+              getProfileModel!.data!.verified!.vehicle_image == "2" ||
+              getProfileModel!.data!.verified!.rcCardPhoto == "2") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReviewScreen(
+                  getProfileModel: getProfileModel,
+                ),
               ),
-            ),
-          );
-        } else if (getProfileModel!.data!.verified!.accountNumber == null) {
-          //open edit bank page
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VerifyBankDetails(),
-            ),
-          );
+            );
+          } else if (getProfileModel!.data!.verified!.accountNumber == null) {
+            //open edit bank page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VerifyBankDetails(),
+              ),
+            );
 
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => ReviewScreen(
-          //       getProfileModel: getProfileModel,
-          //     ),
-          //   ),
-          // );
-        } else if (getProfileModel!.data!.verified!.accountNumber == "2") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReviewScreen(
-                getProfileModel: getProfileModel,
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => ReviewScreen(
+            //       getProfileModel: getProfileModel,
+            //     ),
+            //   ),
+            // );
+          } else if (getProfileModel!.data!.verified!.accountNumber == "2") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReviewScreen(
+                  getProfileModel: getProfileModel,
+                ),
               ),
-            ),
-          );
-        } else if (getProfileModel!.data!.verified!.aadhaarCardPhoto == "0" ||
-            getProfileModel!.data!.verified!.drivingLicencePhoto == "0" ||
-            getProfileModel!.data!.verified!.pan_card_photof == "0" ||
-            getProfileModel!.data!.verified!.userImage == "0" ||
-            getProfileModel!.data!.verified!.rcCardPhoto == "0" ||
-            getProfileModel!.data!.verified!.accountNumber == "0" ||
-            getProfileModel!.data!.verified!.vehicle_image == "0") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const PendingScreen(),
-            ),
-          );
-          // // showunverifiedDialog();
-        } else if (getProfileModel!.data!.verified!.accountNumber == null ||
-            getProfileModel!.data!.verified!.accountNumber == "0") {
-          showunverifiedDialog();
-        } else {
-          isdocumetsVerified = true;
-        }
-        //  print(
-        //      '____Som______${getProfileModel!.data!.user!.userFullname}_________');
-        // // Fluttertoast.showToast(msg: qrCodeResult);
-      });
+            );
+          } else if (getProfileModel!.data!.verified!.aadhaarCardPhoto == "0" ||
+              getProfileModel!.data!.verified!.drivingLicencePhoto == "0" ||
+              getProfileModel!.data!.verified!.pan_card_photof == "0" ||
+              getProfileModel!.data!.verified!.userImage == "0" ||
+              getProfileModel!.data!.verified!.rcCardPhoto == "0" ||
+              getProfileModel!.data!.verified!.accountNumber == "0" ||
+              getProfileModel!.data!.verified!.vehicle_image == "0") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PendingScreen(),
+              ),
+            );
+            // // showunverifiedDialog();
+          } else if (getProfileModel!.data!.verified!.accountNumber == null ||
+              getProfileModel!.data!.verified!.accountNumber == "0") {
+            showunverifiedDialog();
+          } else {
+            isdocumetsVerified = true;
+          }
+          //  print(
+          //      '____Som______${getProfileModel!.data!.user!.userFullname}_________');
+          // // Fluttertoast.showToast(msg: qrCodeResult);
+        });
+      }
     } else {
       print(response.reasonPhrase);
     }
@@ -490,10 +498,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     FirebaseMessaging.onMessage.listen(
-          (message) {
+      (message) {
         if (message.notification != null) {
           print("message.dataHome ${message.data}");
-          if(message.data['booking_type']=='1'){
+          if (message.data['booking_type'] == '1') {
             setSegmentValue(1);
           }
           setSegmentValue(selectedSegmentVal);
@@ -503,9 +511,8 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
     FirebaseMessaging.onMessageOpenedApp.listen(
-          (message) {
+      (message) {
         if (message.notification != null) {
-
           print(message.notification!.body);
           print("message.data22 ${message.data}");
           setSegmentValue(selectedSegmentVal);
@@ -524,14 +531,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchAndUploadLocation() async {
     _isNetworkAvail = await isNetworkAvailable();
     try {
-
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       final response = await http.post(
-        Uri.parse("https://pickport.in/api/Authentication/driver_lat_lang_update"),
+        Uri.parse(
+            "https://pickport.in/api/Authentication/driver_lat_lang_update"),
         body: {
-          'user_id':userId.toString(),
+          'user_id': userId.toString(),
           'latitude': position.latitude.toString(),
           'longitude': position.longitude.toString(),
         },
@@ -546,8 +553,6 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception(e);
     }
   }
-
-
 
   getSliderApi() async {
     _isNetworkAvail = await isNetworkAvailable();
@@ -620,948 +625,1000 @@ class _HomeScreenState extends State<HomeScreen> {
     return getProfileModel == null
         ? CircularProgressIndicator()
         : RefreshIndicator(
-      onRefresh: () async {
-        _isNetworkAvail = await isNetworkAvailable();
-        Future.delayed(const Duration(seconds: 2));
-        inIt();
-        getDriverApi();
-        setSegmentValue(0);
-      },
-      child: _isNetworkAvail ?
-      Scaffold(
-        // FloatingActionButton
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerFloat,
-        //    bottomSheet:  Padding(
-        //      padding: const EdgeInsets.all(8.0),
-        //      child: Container(
-        //        child: Row(
-        //          children: [
-        //            Row(
-        //              children: [
-        //                isOnline
-        //                    ? const Text(
-        //                  "Online",
-        //                  style: TextStyle(color: Colors.green),
-        //                )
-        //                    : const Text(
-        //                  "Offline",
-        //                  style: TextStyle(color: Colors.red),
-        //                ),
-        //                const SizedBox(
-        //                  width: 10,
-        //                ),
-        //                Switch.adaptive(
-        //                    activeColor: Colors.green,
-        //                    inactiveTrackColor: Colors.red,
-        //                    value: isOnline,
-        //                    onChanged: (val) {
-        //                      setState(() {
-        //                        isOnline = val;
-        //                        getUserStatusOnlineOrOffline();
-        //                      });
-        //                    }),
-        //              ],
-        //            ),
-        //          ],
-        //        ),
-        //      ),
-        //    ),
-        floatingActionButton: Container(
-          decoration: BoxDecoration(
-              color: CustomColors.primaryColor,
-              border: Border.all(color: CustomColors.secondaryColor),
-              borderRadius: BorderRadius.circular(10)),
-          width: 110,
-          height: 50,
-          child: Center(
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 8,
-                ),
-                Expanded(
-                  child: Text(
-                    status == 1 ? getTranslated(context,'Online',)
-                        : getTranslated(context,'Offline'),
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: status == 2 ? Colors.red : Colors.green),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Switch(
-                  activeColor: Colors.green,
-                  inactiveTrackColor: Colors.red,
-                  value: status == 1,
-                  onChanged: (value) {
-                    setState(() {
-                      status = value ? 1 : 2;
-                      getStatus(status);
-                      value ? Fluttertoast.showToast(msg: "Driver is Online", gravity: ToastGravity.CENTER)
-                          : Fluttertoast.showToast(msg: "Driver is Offline", gravity: ToastGravity.CENTER);
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        backgroundColor: colors.primary,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: colors.primary,
-          elevation: 0,
-          toolbarHeight: 70,
-          leadingWidth: 0,
-          title: Row(
-            children: [
-              InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MyAccount()),
-                    ).then((value) {
-                      setState(() {
-                        getProfile();
-                        getDriverApi();
-                      });
-                    });
-                  },
-                  child: Icon(Icons.menu)),
-              // const SizedBox(
-              //   width: 10,
-              // ),
-              Container(
-                height: 70,
-                width: 70,
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(),
-                child: getProfileModel?.data?.user?.userImage == null
-                    ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-                    : ClipRRect(
-                  borderRadius: BorderRadius.circular(80),
-                  child: Image.network(
-                    "${getProfileModel!.data!.user!.userImage}",
-                    fit: BoxFit.fill,
-                  ),
-                ),
-              ),
-              getProfileModel?.data?.user?.userFullname == null
-                  ? Center(child: CircularProgressIndicator())
-                  : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Text(
-                  //    getTranslated(context, "Hello"),
-                  //   // 'Hello,',
-                  //    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  //  ),
-                  Text(
-                    '${getProfileModel!.data!.user!.userFullname}',
-                    style: const TextStyle(
-                        fontSize: 14, color: Colors.white),
-                  ),
-                  Text(
-                    '${getProfileModel!.data!.user!.vehicleNo}',
-                    style: const TextStyle(
-                        fontSize: 14, color: Colors.white),
-                  ),
-                  Text(
-                    '${getProfileModel!.data!.user!.vehicleTypeString}',
-                    style: const TextStyle(
-                        fontSize: 12, color: Colors.white),
-                  )
-                ],
-              ),
-            ],
-          ),
-
-          actions: [
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                        const NotificationScreen()));
-              },
-              child: Container(
-                height: 40,
-                width: 40,
-                padding: const EdgeInsets.all(5),
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.white),
-                child: const Icon(
-                  Icons.notifications_active,
-                  color: CustomColors.primaryColor,
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 15,
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                        const SupportNewScreen()));
-              },
-              child: Container(
-                height: 40,
-                width: 40,
-                padding: const EdgeInsets.all(5),
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.white),
-                child: const Icon(
-                  Icons.headset_rounded,
-                  color: CustomColors.primaryColor,
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-          ],
-          // leading: Image.asset('assets/images/jdx_logo.png',
-          //     color: Colors.transparent),
-          // backgroundColor: Colors.cyan.withOpacity(0.10),
-          // elevation: 0,
-          // actions: [
-          //
-          //   // Container(
-          //   //   height: 10,
-          //   //   width: 80,
-          //   //   child: CupertinoSwitch(
-          //   //     value: _switchValue,
-          //   //     onChanged: (value) {
-          //   //       setState(() {
-          //   //         _switchValue = value;
-          //   //       });
-          //   //     },
-          //   //   ),
-          //   // ),
-          // ],
-        ),
-        body: getProfileModel == null
-            ? const Center(child: CircularProgressIndicator())
-            : Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 20),
-                  decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(35),
-                          topRight: Radius.circular(35))),
-                  child: ListView(
-                    children: [
-                      Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
+            onRefresh: () async {
+              _isNetworkAvail = await isNetworkAvailable();
+              Future.delayed(const Duration(seconds: 2));
+              inIt();
+              getProfile();
+              getDriverApi();
+              setSegmentValue(0);
+            },
+            child: _isNetworkAvail
+                ? Scaffold(
+                    // FloatingActionButton
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.centerFloat,
+                    //    bottomSheet:  Padding(
+                    //      padding: const EdgeInsets.all(8.0),
+                    //      child: Container(
+                    //        child: Row(
+                    //          children: [
+                    //            Row(
+                    //              children: [
+                    //                isOnline
+                    //                    ? const Text(
+                    //                  "Online",
+                    //                  style: TextStyle(color: Colors.green),
+                    //                )
+                    //                    : const Text(
+                    //                  "Offline",
+                    //                  style: TextStyle(color: Colors.red),
+                    //                ),
+                    //                const SizedBox(
+                    //                  width: 10,
+                    //                ),
+                    //                Switch.adaptive(
+                    //                    activeColor: Colors.green,
+                    //                    inactiveTrackColor: Colors.red,
+                    //                    value: isOnline,
+                    //                    onChanged: (val) {
+                    //                      setState(() {
+                    //                        isOnline = val;
+                    //                        getUserStatusOnlineOrOffline();
+                    //                      });
+                    //                    }),
+                    //              ],
+                    //            ),
+                    //          ],
+                    //        ),
+                    //      ),
+                    //    ),
+                    floatingActionButton: Container(
+                      decoration: BoxDecoration(
+                          color: CustomColors.primaryColor,
+                          border:
+                              Border.all(color: CustomColors.secondaryColor),
+                          borderRadius: BorderRadius.circular(10)),
+                      width: 110,
+                      height: 50,
+                      child: Center(
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              child: Text(
+                                status == 1
+                                    ? getTranslated(
+                                        context,
+                                        'Online',
+                                      )
+                                    : getTranslated(context, 'Offline'),
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: status == 2
+                                        ? Colors.red
+                                        : Colors.green),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Switch(
+                              activeColor: Colors.green,
+                              inactiveTrackColor: Colors.red,
+                              value: status == 1,
+                              onChanged: (value) {
+                                setState(() {
+                                  status = value ? 1 : 2;
+                                  getStatus(status);
+                                  value
+                                      ? Fluttertoast.showToast(
+                                          msg: "Driver is Online",
+                                          gravity: ToastGravity.CENTER)
+                                      : Fluttertoast.showToast(
+                                          msg: "Driver is Offline",
+                                          gravity: ToastGravity.CENTER);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    backgroundColor: colors.primary,
+                    appBar: AppBar(
+                      automaticallyImplyLeading: false,
+                      backgroundColor: colors.primary,
+                      elevation: 0,
+                      toolbarHeight: 70,
+                      leadingWidth: 0,
+                      title: Row(
                         children: [
-                          getSliderModel == null
-                              ? const Center(
-                              child:
-                              CircularProgressIndicator())
-                              : CarouselSlider(
-                              items: getSliderModel?.data!
-                                  .map(
-                                    (item) => Stack(
-                                    alignment: Alignment
-                                        .center,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets
-                                            .all(
-                                            8.0),
-                                        child:
-                                        ClipRRect(
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                                10),
-                                            child:
-                                            Container(
-                                              height:
-                                              200,
-                                              decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(
-                                                        "${item.sliderImage}",
-                                                      ),
-                                                      fit: BoxFit.fill)),
-                                            )),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const MyAccount()),
+                                ).then((value) {
+                                  setState(() {
+                                    getProfile();
+                                    getDriverApi();
+                                  });
+                                });
+                              },
+                              child: Icon(Icons.menu)),
+                          // const SizedBox(
+                          //   width: 10,
+                          // ),
+                          Container(
+                            height: 70,
+                            width: 70,
+                            padding: const EdgeInsets.all(12),
+                            decoration: const BoxDecoration(),
+                            child:
+                                getProfileModel?.data?.user?.userImage == null
+                                    ? const Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : ClipRRect(
+                                        borderRadius: BorderRadius.circular(80),
+                                        child: Image.network(
+                                          "${getProfileModel!.data!.user!.userImage}",
+                                          fit: BoxFit.fill,
+                                        ),
                                       ),
-                                    ]),
-                              )
-                                  .toList(),
-                              carouselController:
-                              carouselController,
-                              options: CarouselOptions(
-                                  height: 150,
-                                  scrollPhysics:
-                                  const BouncingScrollPhysics(),
-                                  autoPlay: true,
-                                  aspectRatio: 1.8,
-                                  viewportFraction: 1,
-                                  onPageChanged:
-                                      (index, reason) {
-                                    setState(() {
-                                      _currentPost = index;
-                                    });
-                                  })),
-                          const SizedBox(
-                            height: 5,
                           ),
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.center,
-                            children: _buildDots(),
-                          ),
-                          // sliderPointers (items , currentIndex),
+                          getProfileModel?.data?.user?.userFullname == null
+                              ? Center(child: CircularProgressIndicator())
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Text(
+                                    //    getTranslated(context, "Hello"),
+                                    //   // 'Hello,',
+                                    //    style: const TextStyle(fontSize: 16, color: Colors.white),
+                                    //  ),
+                                    Text(
+                                      '${getProfileModel!.data!.user!.userFullname}',
+                                      style: const TextStyle(
+                                          fontSize: 14, color: Colors.white),
+                                    ),
+                                    Text(
+                                      '${getProfileModel!.data!.user!.vehicleNo}',
+                                      style: const TextStyle(
+                                          fontSize: 14, color: Colors.white),
+                                    ),
+                                    Text(
+                                      '${getProfileModel!.data!.user!.vehicleTypeString}',
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                    )
+                                  ],
+                                ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      walletAmount(),
-                      status == 0
-                          ? Container()
-                          : _segmentButton(),
-                      const SizedBox(
-                        height: 0,
-                      ),
-                      status == 0
-                          ? Container()
-                          : selectedSegmentVal == 0
-                          ? currentDelivery(context)
-                          : selectedSegmentVal == 1
-                          ? scheduleDelivery(context)
-                          : completeOrder(),
-                      const SizedBox(
-                        height: 50,
-                      )
-                    ],
-                  ),
-                ),
-              )
-              // const SizedBox(
-              //   height: 10,
-              // ),
-              // _driverRating?.rating == null
-              //     ? const SizedBox()
-              //     : Row(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         children: [
-              //           Text(
-              //             'Hi, ${name.toString().capitalizeFirst}',
-              //             style: TextStyle(
-              //                 color: Colors.green,
-              //                 fontWeight: FontWeight.w400,
-              //                 fontSize: 30),
-              //           ),
-              //           Row(
-              //             children: [
-              //               RatingBar.builder(
-              //                 itemSize: 18,
-              //                 ignoreGestures: true,
-              //                 initialRating:
-              //                     double.parse(_driverRating?.rating ?? ''),
-              //                 minRating: 1,
-              //                 direction: Axis.horizontal,
-              //                 allowHalfRating: true,
-              //                 itemCount: 5,
-              //                 itemPadding: EdgeInsets.zero,
-              //                 itemBuilder: (context, _) => Icon(
-              //                   Icons.star,
-              //                   color: Colors.red,
-              //                 ),
-              //                 onRatingUpdate: (rating) {
-              //                   print(rating);
-              //                 },
-              //               ),
-              //               const SizedBox(
-              //                 width: 10,
-              //               ),
-              //               Text.rich(TextSpan(children: [
-              //                 TextSpan(
-              //                     text: '${_driverRating?.rating}',
-              //                     style: const TextStyle(color: Colors.red)),
-              //                 const TextSpan(
-              //                     text: '/5.0',
-              //                     style: TextStyle(color: Colors.grey)),
-              //               ]))
-              //             ],
-              //           ),
-              //         ],
-              //       ),
-              // const SizedBox(
-              //   height: 20,
-              // // ),
-              // const Text(
-              //   'Current Leads',
-              //   style: TextStyle(
-              //       color: Colors.redAccent,
-              //       fontWeight: FontWeight.w400,
-              //       fontSize: 17),
-              // ),
-            ],
-          ),
-        ),
-        // bottomSheet: Container(
-        //   color: colors.primary,
-        //   height: 60,
-        //   width: MediaQuery.of(context).size.width,
-        //   child: Row(children: [
-        //     Expanded(
-        //         child: InkWell(
-        //       onTap: () {
-        //         setState(() {
-        //           isOnline = true;
-        //           getUserStatusOnlineOrOffline();
-        //         });
-        //       },
-        //       child: Container(
-        //         child: Row(
-        //           mainAxisAlignment: MainAxisAlignment.center,
-        //           children: [
-        //             Icon(
-        //               Icons.check_circle_rounded,
-        //               color: isOnline ? Colors.green : Colors.white,
-        //             ),
-        //             const SizedBox(width: 5,),
-        //             Text(
-        //               getTranslated(context, "Online"),
-        //               //'Online',
-        //               style: TextStyle(
-        //                   fontSize: 16,
-        //                   color: isOnline ? Colors.green : Colors.white),
-        //             )
-        //           ],
-        //         ),
-        //       ),
-        //     )),
-        //     Container(
-        //       width: 1,
-        //       height: 60,
-        //       color: Colors.white,
-        //     ),
-        //     Expanded(
-        //         child: InkWell(
-        //       onTap: () {
-        //         setState(() {
-        //           isOnline = false;
-        //           getUserStatusOnlineOrOffline();
-        //           print('____Som______${isOnline}_________');
-        //         });
-        //       },
-        //       child: Container(
-        //         child: Row(
-        //           mainAxisAlignment: MainAxisAlignment.center,
-        //         children: [
-        //           Icon(
-        //             Icons.wifi_tethering_off,
-        //             color: isOnline ? Colors.white : Colors.red,
-        //           ),
-        //           const SizedBox(width: 5,),
-        //           Text(
-        //             getTranslated(context, "Offline"),
-        //             // 'Offline',
-        //             style: TextStyle(
-        //                 fontSize: 16,
-        //                 color: isOnline ? Colors.white : Colors.red),
-        //           ),
-        //         ],
-        //         ),
-        //       ),
-        //     ))
-        //   ]),
-        // ),
-      )
-          : NoInternetScreen(onPressed: () {
-        Future.delayed(Duration(seconds: 1)).then((_) async {
-          _isNetworkAvail = await isNetworkAvailable();
-          if (_isNetworkAvail) {
-            if (mounted)
-              setState(() {
-                _isNetworkAvail = true;
-                isLoading = false;
-              });
-            // callApi();
-          }
-        });
-      })
-    );
+
+                      actions: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const NotificationScreen()));
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            padding: const EdgeInsets.all(5),
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.white),
+                            child: const Icon(
+                              Icons.notifications_active,
+                              color: CustomColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SupportNewScreen()));
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            padding: const EdgeInsets.all(5),
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.white),
+                            child: const Icon(
+                              Icons.headset_rounded,
+                              color: CustomColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                      ],
+                      // leading: Image.asset('assets/images/jdx_logo.png',
+                      //     color: Colors.transparent),
+                      // backgroundColor: Colors.cyan.withOpacity(0.10),
+                      // elevation: 0,
+                      // actions: [
+                      //
+                      //   // Container(
+                      //   //   height: 10,
+                      //   //   width: 80,
+                      //   //   child: CupertinoSwitch(
+                      //   //     value: _switchValue,
+                      //   //     onChanged: (value) {
+                      //   //       setState(() {
+                      //   //         _switchValue = value;
+                      //   //       });
+                      //   //     },
+                      //   //   ),
+                      //   // ),
+                      // ],
+                    ),
+                    body: getProfileModel == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 20),
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue.shade50,
+                                        borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(35),
+                                            topRight: Radius.circular(35))),
+                                    child: ListView(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            getSliderModel == null
+                                                ? const Center(
+                                                    child:
+                                                        CircularProgressIndicator())
+                                                : CarouselSlider(
+                                                    items: getSliderModel?.data!
+                                                        .map(
+                                                          (item) => Stack(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          8.0),
+                                                                  child: ClipRRect(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                      child: Container(
+                                                                        height:
+                                                                            200,
+                                                                        decoration: BoxDecoration(
+                                                                            image: DecorationImage(
+                                                                                image: NetworkImage(
+                                                                                  "${item.sliderImage}",
+                                                                                ),
+                                                                                fit: BoxFit.fill)),
+                                                                      )),
+                                                                ),
+                                                              ]),
+                                                        )
+                                                        .toList(),
+                                                    carouselController:
+                                                        carouselController,
+                                                    options: CarouselOptions(
+                                                        height: 150,
+                                                        scrollPhysics:
+                                                            const BouncingScrollPhysics(),
+                                                        autoPlay: true,
+                                                        aspectRatio: 1.8,
+                                                        viewportFraction: 1,
+                                                        onPageChanged:
+                                                            (index, reason) {
+                                                          setState(() {
+                                                            _currentPost =
+                                                                index;
+                                                          });
+                                                        })),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: _buildDots(),
+                                            ),
+                                            // sliderPointers (items , currentIndex),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        walletAmount(),
+                                        status == 0
+                                            ? Container()
+                                            : _segmentButton(),
+                                        const SizedBox(
+                                          height: 0,
+                                        ),
+                                        status == 0
+                                            ? Container()
+                                            : selectedSegmentVal == 0
+                                                ? currentDelivery(context)
+                                                : selectedSegmentVal == 1
+                                                    ? scheduleDelivery(context)
+                                                    : completeOrder(),
+                                        const SizedBox(
+                                          height: 50,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                // const SizedBox(
+                                //   height: 10,
+                                // ),
+                                // _driverRating?.rating == null
+                                //     ? const SizedBox()
+                                //     : Row(
+                                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //         children: [
+                                //           Text(
+                                //             'Hi, ${name.toString().capitalizeFirst}',
+                                //             style: TextStyle(
+                                //                 color: Colors.green,
+                                //                 fontWeight: FontWeight.w400,
+                                //                 fontSize: 30),
+                                //           ),
+                                //           Row(
+                                //             children: [
+                                //               RatingBar.builder(
+                                //                 itemSize: 18,
+                                //                 ignoreGestures: true,
+                                //                 initialRating:
+                                //                     double.parse(_driverRating?.rating ?? ''),
+                                //                 minRating: 1,
+                                //                 direction: Axis.horizontal,
+                                //                 allowHalfRating: true,
+                                //                 itemCount: 5,
+                                //                 itemPadding: EdgeInsets.zero,
+                                //                 itemBuilder: (context, _) => Icon(
+                                //                   Icons.star,
+                                //                   color: Colors.red,
+                                //                 ),
+                                //                 onRatingUpdate: (rating) {
+                                //                   print(rating);
+                                //                 },
+                                //               ),
+                                //               const SizedBox(
+                                //                 width: 10,
+                                //               ),
+                                //               Text.rich(TextSpan(children: [
+                                //                 TextSpan(
+                                //                     text: '${_driverRating?.rating}',
+                                //                     style: const TextStyle(color: Colors.red)),
+                                //                 const TextSpan(
+                                //                     text: '/5.0',
+                                //                     style: TextStyle(color: Colors.grey)),
+                                //               ]))
+                                //             ],
+                                //           ),
+                                //         ],
+                                //       ),
+                                // const SizedBox(
+                                //   height: 20,
+                                // // ),
+                                // const Text(
+                                //   'Current Leads',
+                                //   style: TextStyle(
+                                //       color: Colors.redAccent,
+                                //       fontWeight: FontWeight.w400,
+                                //       fontSize: 17),
+                                // ),
+                              ],
+                            ),
+                          ),
+                    // bottomSheet: Container(
+                    //   color: colors.primary,
+                    //   height: 60,
+                    //   width: MediaQuery.of(context).size.width,
+                    //   child: Row(children: [
+                    //     Expanded(
+                    //         child: InkWell(
+                    //       onTap: () {
+                    //         setState(() {
+                    //           isOnline = true;
+                    //           getUserStatusOnlineOrOffline();
+                    //         });
+                    //       },
+                    //       child: Container(
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //           children: [
+                    //             Icon(
+                    //               Icons.check_circle_rounded,
+                    //               color: isOnline ? Colors.green : Colors.white,
+                    //             ),
+                    //             const SizedBox(width: 5,),
+                    //             Text(
+                    //               getTranslated(context, "Online"),
+                    //               //'Online',
+                    //               style: TextStyle(
+                    //                   fontSize: 16,
+                    //                   color: isOnline ? Colors.green : Colors.white),
+                    //             )
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     )),
+                    //     Container(
+                    //       width: 1,
+                    //       height: 60,
+                    //       color: Colors.white,
+                    //     ),
+                    //     Expanded(
+                    //         child: InkWell(
+                    //       onTap: () {
+                    //         setState(() {
+                    //           isOnline = false;
+                    //           getUserStatusOnlineOrOffline();
+                    //           print('____Som______${isOnline}_________');
+                    //         });
+                    //       },
+                    //       child: Container(
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //         children: [
+                    //           Icon(
+                    //             Icons.wifi_tethering_off,
+                    //             color: isOnline ? Colors.white : Colors.red,
+                    //           ),
+                    //           const SizedBox(width: 5,),
+                    //           Text(
+                    //             getTranslated(context, "Offline"),
+                    //             // 'Offline',
+                    //             style: TextStyle(
+                    //                 fontSize: 16,
+                    //                 color: isOnline ? Colors.white : Colors.red),
+                    //           ),
+                    //         ],
+                    //         ),
+                    //       ),
+                    //     ))
+                    //   ]),
+                    // ),
+                  )
+                : NoInternetScreen(onPressed: () {
+                    Future.delayed(Duration(seconds: 1)).then((_) async {
+                      _isNetworkAvail = await isNetworkAvailable();
+                      if (_isNetworkAvail) {
+                        if (mounted)
+                          setState(() {
+                            _isNetworkAvail = true;
+                            isLoading = false;
+                          });
+                        // callApi();
+                      }
+                    });
+                  }));
   }
 
   currentDelivery(BuildContext context) {
     return GetBuilder(
-      init: HomeController(),
-      dispose: (state) {
-        ctrl.timer?.cancel();
-      },
-      builder: (HomeController ctrl) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: double.maxFinite,
-              child: ctrl.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ctrl.currentOrderHistoryList.length == 0
-                      ? Center(
-                          child: Text(
-                          "No Orders Found",
-                          //   'Data not available'
-                        ))
-                      : ListView.builder(
-                          // reverse: true,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: ctrl.currentOrderHistoryList.length,
-                          itemBuilder: (context, index) {
-                            bool isAccepted = ctrl.currentOrderHistoryList[index]
-                                        .parcelDetails
-                                        .first
-                                        .status ==
-                                    "2"
-                                ? true
-                                : false;
-                            // isButtonDisabled = isAccepted? false: true;
-                            return InkWell(
-                              onTap: () {
-                                if (ctrl.currentOrderHistoryList[index]
-                                        .parcelDetails
-                                        .first
-                                        .status ==
-                                    "2") {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => PercelDetails(
-                                              pId: ctrl.currentOrderHistoryList[index]
-                                                  .orderId)));
-                                }
-                              },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                elevation: 2,
-                                color: Colors.white,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 20),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8.0),
-                                                // child: Text(
-                                                //     getTranslated(
-                                                //         context, "Customer Name"),
-                                                //     //  "Customer Name",
-                                                //     style: const TextStyle(
-                                                //         fontSize: 14,
-                                                //         color: colors.black54)),
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text('Parcel Id #',
+        init: HomeController(),
+        dispose: (state) {
+          ctrl.timer?.cancel();
+        },
+        builder: (HomeController ctrl) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: double.maxFinite,
+                child: ctrl.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ctrl.currentOrderHistoryList.length == 0
+                        ? Center(
+                            child: Text(
+                            "No Orders Found",
+                            //   'Data not available'
+                          ))
+                        : ListView.builder(
+                            // reverse: true,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: ctrl.currentOrderHistoryList.length,
+                            itemBuilder: (context, index) {
+                              bool isAccepted = ctrl
+                                          .currentOrderHistoryList[index]
+                                          .parcelDetails
+                                          .first
+                                          .status ==
+                                      "2"
+                                  ? true
+                                  : false;
+                              // isButtonDisabled = isAccepted? false: true;
+                              return InkWell(
+                                onTap: () {
+                                  if (ctrl.currentOrderHistoryList[index]
+                                          .parcelDetails.first.status ==
+                                      "2") {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => PercelDetails(
+                                                pId: ctrl
+                                                    .currentOrderHistoryList[
+                                                        index]
+                                                    .orderId)));
+                                  }
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  elevation: 2,
+                                  color: Colors.white,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 20),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 8.0),
+                                                  // child: Text(
+                                                  //     getTranslated(
+                                                  //         context, "Customer Name"),
+                                                  //     //  "Customer Name",
+                                                  //     style: const TextStyle(
+                                                  //         fontSize: 14,
+                                                  //         color: colors.black54)),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text('Parcel Id #',
+                                                        style: const TextStyle(
+                                                            fontSize: 16,
+                                                            color: colors
+                                                                .primary)),
+                                                    Text(
+                                                        ctrl
+                                                                .currentOrderHistoryList[
+                                                                    index]
+                                                                .orderId ??
+                                                            '',
+                                                        style: const TextStyle(
+                                                            fontSize: 16,
+                                                            color: colors
+                                                                .primary)),
+                                                  ],
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 8.0),
+                                                  child: Text(
+                                                      getTranslated(context,
+                                                          "Customer Name"),
+                                                      //  "Customer Name",
                                                       style: const TextStyle(
-                                                          fontSize: 16,
-                                                          color: colors.primary)), Text(
-                                                      ctrl.currentOrderHistoryList[index]
-                                                          .orderId ??
-                                                          '',
-                                                      style: const TextStyle(
-                                                          fontSize: 16,
-                                                          color: colors.primary)),
-                                                ],
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8.0),
-                                                child: Text(
-                                                    getTranslated(
-                                                        context, "Customer Name"),
-                                                    //  "Customer Name",
+                                                          fontSize: 14,
+                                                          color:
+                                                              colors.black54)),
+                                                ),
+                                                Text(
+                                                    ctrl
+                                                            .currentOrderHistoryList[
+                                                                index]
+                                                            .senderName ??
+                                                        '',
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        color: colors.primary)),
+                                              ],
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                // "${orderHistoryList[index].parcelDetails
+                                                //     .first.bookingDate ?? ''}"
+
+                                                Text(
+                                                    "${DateFormat('dd/MM/yyyy').format(DateFormat('dd-MMM-yyyy').parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.bookingDate ?? ''))} ${ctrl.currentOrderHistoryList[index].parcelDetails.first.bookingTime}",
                                                     style: const TextStyle(
                                                         fontSize: 14,
-                                                        color: colors.black54)),
-                                              ),
-                                              Text(
-                                                  ctrl. currentOrderHistoryList[index]
-                                                          .senderName ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: colors.primary)),
-                                            ],
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              // "${orderHistoryList[index].parcelDetails
-                                              //     .first.bookingDate ?? ''}"
-
-                                              Text(
-                                                  "${DateFormat('dd/MM/yyyy').format(DateFormat('dd-MMM-yyyy').parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.bookingDate ?? ''))} ${ctrl.currentOrderHistoryList[index].parcelDetails.first.bookingTime}",
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: colors.blackTemp,
-                                                      fontFamily: 'lora')),
-                                              Text(
-                                                  // "₹ ${ctrl.currentOrderHistoryList[index].total_amount ?? ''}",
-                                                  "₹ ${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toStringAsFixed(0) ?? ''}",
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: colors.blackTemp,
-                                                      fontFamily: 'lora')),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.all(8),
-                                                  decoration: const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.red),
-                                                  child: const Icon(
-                                                    Icons.pin_drop,
-                                                    size: 14,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Container(
-                                                  height: 40,
-                                                  width: 1,
-                                                  color: Colors.black,
-                                                ),
-                                                Container(
-                                                  padding: const EdgeInsets.all(8),
-                                                  decoration: const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.grey),
-                                                  child: const Icon(
-                                                    Icons.pin_drop,
-                                                    size: 14,
-                                                    color: Colors.yellow,
-                                                  ),
-                                                )
+                                                        color: colors.blackTemp,
+                                                        fontFamily: 'lora')),
+                                                Text(
+                                                    // "₹ ${ctrl.currentOrderHistoryList[index].total_amount ?? ''}",
+                                                    "₹ ${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toStringAsFixed(0) ?? ''}",
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        color: colors.blackTemp,
+                                                        fontFamily: 'lora')),
                                               ],
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Container(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Container(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        getTranslated(context,
-                                                            "Pick up Point"),
-                                                        // "Pick up Point",
-                                                        style: const TextStyle(
-                                                            color: colors.primary,
-                                                            fontSize: 12),
-                                                      ),
-                                                      Container(
-                                                        width:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.65,
-                                                        child: Text(
-                                                          ctrl. currentOrderHistoryList[index]
-                                                              .senderAddress,
-                                                          style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontSize: 12),
-                                                        ),
-                                                      ),
-                                                    ],
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: Colors.red),
+                                                    child: const Icon(
+                                                      Icons.pin_drop,
+                                                      size: 14,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 20,
-                                                ),
-                                                Container(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        getTranslated(
-                                                            context, "Drop Point"),
-                                                        //  "Drop Point",
-                                                        style: const TextStyle(
-                                                            color: colors.primary,
-                                                            fontSize: 12),
-                                                      ),
-                                                      Container(
-                                                        width:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.65,
-                                                        child: Text(
-                                                          ctrl. currentOrderHistoryList[index]
-                                                                  .parcelDetails
-                                                                  .first
-                                                                  .receiverAddress ??
-                                                              "",
-                                                          style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontSize: 12),
-                                                        ),
-                                                      ),
-                                                    ],
+                                                  Container(
+                                                    height: 40,
+                                                    width: 1,
+                                                    color: Colors.black,
                                                   ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(getTranslated(context, 'Pickup Distance')),
-                                          Text(
-                                              "${(double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())).toStringAsFixed(2)} Km"),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(getTranslated(
-                                              context, "Drop Distance")),
-                                          Text(
-                                              "${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString())).toStringAsFixed(2)} Km"),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: (isButtonDisabled == true &&
-                                                ctrl.currentOrderHistoryList[index]
-                                                            .status ==
-                                                        '0')
-                                                ? Container(
-                                                    height: 35,
-                                                    width: double.maxFinite,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                30),
-                                                        color: colors.primary),
-                                                    child: const Center(
-                                                      child: Text(
-                                                        "Wait For 5 Second..",
-                                                        style: TextStyle(
-                                                            color:
-                                                                colors.whiteTemp),
-                                                      ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: Colors.grey),
+                                                    child: const Icon(
+                                                      Icons.pin_drop,
+                                                      size: 14,
+                                                      color: Colors.yellow,
                                                     ),
                                                   )
-                                                : InkWell(
-                                                    onTap:
-                                                        // orderHistoryList[index].isAccepted ?? false
-                                                        //     ? null
-                                                        //     :
-                                                        () async {
-                                                      var min =
-                                                          await getMinimumWallet();
-                                                      if (double.parse(
-                                                              driverAmount ?? "0") <
-                                                          min) {
-                                                        _showAlertDialog(
-                                                            context, min);
-                                                        // Fluttertoast.showToast(
-                                                        //     msg:
-                                                        //         "To begin accepting order, please ensure your Wallet is Topped up with a Minimum Balance of 150 and Provide an option to recharge using Our wallet recharge method.");
-                                                      } else {
-                                                        if (ctrl.currentOrderHistoryList[index]
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Container(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          getTranslated(context,
+                                                              "Pick up Point"),
+                                                          // "Pick up Point",
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: colors
+                                                                      .primary,
+                                                                  fontSize: 12),
+                                                        ),
+                                                        Container(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.65,
+                                                          child: Text(
+                                                            ctrl
+                                                                .currentOrderHistoryList[
+                                                                    index]
+                                                                .senderAddress,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 12),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  Container(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          getTranslated(context,
+                                                              "Drop Point"),
+                                                          //  "Drop Point",
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: colors
+                                                                      .primary,
+                                                                  fontSize: 12),
+                                                        ),
+                                                        Container(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.65,
+                                                          child: Text(
+                                                            ctrl
+                                                                    .currentOrderHistoryList[
+                                                                        index]
                                                                     .parcelDetails
                                                                     .first
-                                                                    .status ==
-                                                                "2" ||
-                                                            ctrl. currentOrderHistoryList[index]
-                                                                    .parcelDetails
-                                                                    .first
-                                                                    .status ==
-                                                                "3") {
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      PercelDetails(
-                                                                          pId: ctrl.currentOrderHistoryList[
-                                                                                  index]
-                                                                              .orderId)));
-                                                        }
+                                                                    .receiverAddress ??
+                                                                "",
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 12),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(getTranslated(
+                                                context, 'Pickup Distance')),
+                                            Text(
+                                                "${(double.parse(ctrl.currentOrderHistoryList[index].orderDis.toString())).toStringAsFixed(2)} Km"),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(getTranslated(
+                                                context, "Drop Distance")),
+                                            Text(
+                                                "${(double.parse(ctrl.currentOrderHistoryList[index].parcelDetails.first.distance.toString())).toStringAsFixed(2)} Km"),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: (isButtonDisabled ==
+                                                          true &&
+                                                      ctrl
+                                                              .currentOrderHistoryList[
+                                                                  index]
+                                                              .status ==
+                                                          '0')
+                                                  ? Container(
+                                                      height: 35,
+                                                      width: double.maxFinite,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(30),
+                                                          color:
+                                                              colors.primary),
+                                                      child: const Center(
+                                                        child: Text(
+                                                          "Wait For 5 Second..",
+                                                          style: TextStyle(
+                                                              color: colors
+                                                                  .whiteTemp),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : InkWell(
+                                                      onTap:
+                                                          // orderHistoryList[index].isAccepted ?? false
+                                                          //     ? null
+                                                          //     :
+                                                          () async {
+                                                        var min =
+                                                            await getMinimumWallet();
+                                                        if (double.parse(
+                                                                driverAmount ??
+                                                                    "0") <
+                                                            min) {
+                                                          _showAlertDialog(
+                                                              context, min);
+                                                          // Fluttertoast.showToast(
+                                                          //     msg:
+                                                          //         "To begin accepting order, please ensure your Wallet is Topped up with a Minimum Balance of 150 and Provide an option to recharge using Our wallet recharge method.");
+                                                        } else {
+                                                          if (ctrl
+                                                                      .currentOrderHistoryList[
+                                                                          index]
+                                                                      .parcelDetails
+                                                                      .first
+                                                                      .status ==
+                                                                  "2" ||
+                                                              ctrl
+                                                                      .currentOrderHistoryList[
+                                                                          index]
+                                                                      .parcelDetails
+                                                                      .first
+                                                                      .status ==
+                                                                  "3") {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder: (context) => PercelDetails(
+                                                                        pId: ctrl
+                                                                            .currentOrderHistoryList[index]
+                                                                            .orderId)));
+                                                          }
 
-                                                          ctrl.currentOrderHistoryList[index]
+                                                          ctrl
+                                                              .currentOrderHistoryList[
+                                                                  index]
                                                               .isAccepted = true;
 
                                                           ctrl.orderRejectedOrAccept(
-                                                              index, context, "0",city);
-
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(10),
-                                                      width: MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.30,
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  20),
-                                                          color: (ctrl.currentOrderHistoryList[
-                                                                              index]
-                                                                          .parcelDetails
-                                                                          .first
-                                                                          .status ==
-                                                                      "2" ||
-                                                              ctrl.currentOrderHistoryList[
-                                                                              index]
-                                                                          .parcelDetails
-                                                                          .first
-                                                                          .status ==
-                                                                      "3")
-                                                              ? Colors.grey
-                                                              : Colors.green),
-                                                      child: Center(
-                                                        child: Text(
-                                                            (ctrl.currentOrderHistoryList[index]
-                                                                            .parcelDetails
-                                                                            .first
-                                                                            .status ==
-                                                                        "2" ||
-                                                                ctrl.currentOrderHistoryList[
+                                                              index,
+                                                              context,
+                                                              "0",
+                                                              city);
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.30,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            color: (ctrl
+                                                                            .currentOrderHistoryList[
                                                                                 index]
                                                                             .parcelDetails
                                                                             .first
                                                                             .status ==
+                                                                        "2" ||
+                                                                    ctrl
+                                                                            .currentOrderHistoryList[index]
+                                                                            .parcelDetails
+                                                                            .first
+                                                                            .status ==
                                                                         "3")
-                                                                ? getTranslated(
-                                                                    context,
-                                                                    "View Detail") //'Accepted'
-                                                                : getTranslated(
-                                                                    context,
-                                                                    "Accept"), //'Accept',
-                                                            style: const TextStyle(
-                                                                color:
-                                                                    Colors.white)),
+                                                                ? Colors.grey
+                                                                : Colors.green),
+                                                        child: Center(
+                                                          child: Text(
+                                                              (ctrl.currentOrderHistoryList[index].parcelDetails.first.status ==
+                                                                          "2" ||
+                                                                      ctrl.currentOrderHistoryList[index].parcelDetails.first.status ==
+                                                                          "3")
+                                                                  ? getTranslated(
+                                                                      context,
+                                                                      "View Detail") //'Accepted'
+                                                                  : getTranslated(
+                                                                      context,
+                                                                      "Accept"), //'Accept',
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .white)),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                          ),
+                                            ),
 
-                                          // orderHistoryList[
-                                          //                 index]
-                                          //             .isAccepted ??
-                                          //         false
-                                          //     ? SizedBox
-                                          //         .shrink()
-                                          //     : Expanded(
-                                          //         child:
-                                          //             InkWell(
-                                          //           onTap:
-                                          //               () {
-                                          //             orderRejectedOrAccept(
-                                          //                 index,
-                                          //                 context,
-                                          //                 isRejected:
-                                          //                     true);
-                                          //           },
-                                          //           child:
-                                          //               Container(
-                                          //             width: MediaQuery.of(context).size.width *
-                                          //                 0.35,
-                                          //             padding:
-                                          //                 const EdgeInsets.all(10),
-                                          //             decoration: BoxDecoration(
-                                          //                 borderRadius:
-                                          //                     BorderRadius.circular(20),
-                                          //                 color: Colors.red),
-                                          //             child:
-                                          //                  Center(
-                                          //               child:
-                                          //                   Text(
-                                          //                     getTranslated(context, "Reject"),
-                                          //               //  'Reject',
-                                          //                 style:
-                                          //                     TextStyle(color: Colors.white),
-                                          //               ),
-                                          //             ),
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                        ],
-                                      )
-                                    ],
+                                            // orderHistoryList[
+                                            //                 index]
+                                            //             .isAccepted ??
+                                            //         false
+                                            //     ? SizedBox
+                                            //         .shrink()
+                                            //     : Expanded(
+                                            //         child:
+                                            //             InkWell(
+                                            //           onTap:
+                                            //               () {
+                                            //             orderRejectedOrAccept(
+                                            //                 index,
+                                            //                 context,
+                                            //                 isRejected:
+                                            //                     true);
+                                            //           },
+                                            //           child:
+                                            //               Container(
+                                            //             width: MediaQuery.of(context).size.width *
+                                            //                 0.35,
+                                            //             padding:
+                                            //                 const EdgeInsets.all(10),
+                                            //             decoration: BoxDecoration(
+                                            //                 borderRadius:
+                                            //                     BorderRadius.circular(20),
+                                            //                 color: Colors.red),
+                                            //             child:
+                                            //                  Center(
+                                            //               child:
+                                            //                   Text(
+                                            //                     getTranslated(context, "Reject"),
+                                            //               //  'Reject',
+                                            //                 style:
+                                            //                     TextStyle(color: Colors.white),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-        );
-      }
-    );
+                              );
+                            }),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+            ],
+          );
+        });
   }
 
   void _showAlertDialog(BuildContext context, int mini) {
@@ -1600,10 +1657,8 @@ class _HomeScreenState extends State<HomeScreen> {
     var headers = {
       'Cookie': 'ci_session=30f7a5a1f9dd96a4fc44ef6aa7de3f031bc38734'
     };
-    var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://pickport.in/api/authentication/driver_min_wallet'));
+    var request = http.MultipartRequest('POST',
+        Uri.parse('https://pickport.in/api/authentication/driver_min_wallet'));
     request.fields.addAll({'user_id': '613'});
 
     request.headers.addAll(headers);
@@ -1626,574 +1681,606 @@ class _HomeScreenState extends State<HomeScreen> {
 
   scheduleDelivery(BuildContext context) {
     return GetBuilder(
-      init: HomeController(),
-      builder: (HomeController ctrl) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: double.maxFinite,
-              child: ctrl.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ctrl.schedOrderHistoryList.length == 0
-                      ? Center(
-                          child: Text(
-                          'No Data Found',
-                          //   'Data not available'
-                        ))
-                      : ListView.builder(
-                          // reverse: true,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: ctrl.schedOrderHistoryList.length,
-                          itemBuilder: (context, index) {
-                            bool isAccepted = ctrl.schedOrderHistoryList[index]
-                                        .parcelDetails
-                                        .first
-                                        .status ==
-                                    "2"
-                                ? true
-                                : false;
-                            // isButtonDisabled = isAccepted? false: true;
-                            return InkWell(
-                              onTap: isAccepted
-                                  ? () {
-                                      print(
-                                          '____Som___jj___${ctrl.schedOrderHistoryList[index].orderId}_________');
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           OrderDetailView(orderDetail: orderHistoryList[index]),
-                                      //     ));
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => PercelDetails(
-                                                  pId:ctrl. schedOrderHistoryList[index]
-                                                      .orderId)));
-                                    }
-                                  : null,
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                elevation: 2,
-                                color: Colors.white,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 20),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Parcel Id #${ctrl. schedOrderHistoryList[index].orderId ?? ''}"),
-                                          Card(
-                                            elevation: 0,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(2.0),
-                                              child: Row(
+        init: HomeController(),
+        builder: (HomeController ctrl) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: double.maxFinite,
+                child: ctrl.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ctrl.schedOrderHistoryList.length == 0
+                        ? Center(
+                            child: Text(
+                            'No Data Found',
+                            //   'Data not available'
+                          ))
+                        : ListView.builder(
+                            // reverse: true,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: ctrl.schedOrderHistoryList.length,
+                            itemBuilder: (context, index) {
+                              bool isAccepted = ctrl
+                                          .schedOrderHistoryList[index]
+                                          .parcelDetails
+                                          .first
+                                          .status ==
+                                      "2"
+                                  ? true
+                                  : false;
+                              // isButtonDisabled = isAccepted? false: true;
+                              return InkWell(
+                                onTap: isAccepted
+                                    ? () {
+                                        print(
+                                            '____Som___jj___${ctrl.schedOrderHistoryList[index].orderId}_________');
+                                        // Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           OrderDetailView(orderDetail: orderHistoryList[index]),
+                                        //     ));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PercelDetails(
+                                                        pId: ctrl
+                                                            .schedOrderHistoryList[
+                                                                index]
+                                                            .orderId)));
+                                      }
+                                    : null,
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  elevation: 2,
+                                  color: Colors.white,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 20),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                                "Parcel Id #${ctrl.schedOrderHistoryList[index].orderId ?? ''}"),
+                                            Card(
+                                              elevation: 0,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2.0),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.access_time,
+                                                        size: 18,
+                                                        color: colors.primary),
+                                                    SizedBox(width: 2),
+                                                    Text("Scheduled",
+                                                        style: const TextStyle(
+                                                            fontSize: 14,
+                                                            color: colors
+                                                                .primary)),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 8.0),
+                                                  child: Text(
+                                                      getTranslated(context,
+                                                          "Customer Name"),
+                                                      //  "Customer Name",
+                                                      style: const TextStyle(
+                                                          fontSize: 14,
+                                                          color:
+                                                              colors.black54)),
+                                                ),
+                                                Text(
+                                                    ctrl
+                                                            .schedOrderHistoryList[
+                                                                index]
+                                                            .senderName ??
+                                                        '',
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        color: colors.primary)),
+                                              ],
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                // Text(
+                                                //     DateFormat(
+                                                //         'yyyy-MM-dd')
+                                                //         .format(orderHistoryList[index]
+                                                //         .onDate),
+                                                //     style: const TextStyle(
+                                                //         fontSize:
+                                                //         14,
+                                                //         color: colors
+                                                //             .black54)),
+
+                                                // DateFormat('dd/MM/yyyy').format(date)
+                                                // Text("${DateFormat('dd/MM/yyyy').format( DateFormat('dd-MMM-yyyy').parse(tripDetailsModel!.data!.first.newDate ?? ""))}",style: TextStyle(
+                                                // orderHistoryList[index].parcelDetails.first.bookingDate  ?? ""
+                                                Text(
+                                                    "${DateFormat('dd/MM/yyyy').format(DateFormat('dd-MMM-yyyy').parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.bookingDate ?? ""))}  " +
+                                                        (ctrl
+                                                                .schedOrderHistoryList[
+                                                                    index]
+                                                                .parcelDetails
+                                                                .first
+                                                                .bookingTime ??
+                                                            ""),
+                                                    style: const TextStyle(
+                                                        fontSize: 12,
+                                                        color: colors.blackTemp,
+                                                        fontFamily: 'lora')),
+                                                Text(
+                                                    "₹ ${(double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toStringAsFixed(0) ?? ''}",
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        color: colors.blackTemp,
+                                                        fontFamily: 'lora')),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              child: Column(
                                                 children: [
-                                                  Icon(Icons.access_time, size: 18, color: colors.primary),
-                                                  SizedBox(width: 2),
-                                                  Text("Scheduled", style: const TextStyle(fontSize: 14,color: colors.primary)),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: Colors.red),
+                                                    child: const Icon(
+                                                      Icons.pin_drop,
+                                                      size: 14,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    height: 40,
+                                                    width: 1,
+                                                    color: Colors.black,
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(8),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: Colors.grey),
+                                                    child: const Icon(
+                                                      Icons.pin_drop,
+                                                      size: 14,
+                                                      color: Colors.yellow,
+                                                    ),
+                                                  )
                                                 ],
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8.0),
-                                                child: Text(
-                                                    getTranslated(
-                                                        context, "Customer Name"),
-                                                    //  "Customer Name",
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        color: colors.black54)),
-                                              ),
-                                              Text(
-                                                  ctrl. schedOrderHistoryList[index]
-                                                          .senderName ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: colors.primary)),
-                                            ],
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              // Text(
-                                              //     DateFormat(
-                                              //         'yyyy-MM-dd')
-                                              //         .format(orderHistoryList[index]
-                                              //         .onDate),
-                                              //     style: const TextStyle(
-                                              //         fontSize:
-                                              //         14,
-                                              //         color: colors
-                                              //             .black54)),
-
-                                              // DateFormat('dd/MM/yyyy').format(date)
-                                              // Text("${DateFormat('dd/MM/yyyy').format( DateFormat('dd-MMM-yyyy').parse(tripDetailsModel!.data!.first.newDate ?? ""))}",style: TextStyle(
-                                              // orderHistoryList[index].parcelDetails.first.bookingDate  ?? ""
-                                              Text(
-                                                  "${DateFormat('dd/MM/yyyy').format(DateFormat('dd-MMM-yyyy').parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.bookingDate ?? ""))}  " +
-                                                      (ctrl.schedOrderHistoryList[index]
-                                                              .parcelDetails
-                                                              .first
-                                                              .bookingTime ??
-                                                          ""),
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: colors.blackTemp,
-                                                      fontFamily: 'lora')),
-                                              Text(
-                                                  "₹ ${(double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.totalAmount!) - double.parse(ctrl.schedOrderHistoryList[index].parcelDetails.first.couponDiscount!)).toStringAsFixed(0) ?? ''}",
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: colors.blackTemp,
-                                                      fontFamily: 'lora')),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.all(8),
-                                                  decoration: const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.red),
-                                                  child: const Icon(
-                                                    Icons.pin_drop,
-                                                    size: 14,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Container(
-                                                  height: 40,
-                                                  width: 1,
-                                                  color: Colors.black,
-                                                ),
-                                                Container(
-                                                  padding: const EdgeInsets.all(8),
-                                                  decoration: const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.grey),
-                                                  child: const Icon(
-                                                    Icons.pin_drop,
-                                                    size: 14,
-                                                    color: Colors.yellow,
-                                                  ),
-                                                )
-                                              ],
+                                            const SizedBox(
+                                              width: 10,
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Container(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Container(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        getTranslated(context,
-                                                            "Pick up Point"),
-                                                        // "Pick up Point",
-                                                        style: const TextStyle(
-                                                            color: colors.primary,
-                                                            fontSize: 12),
-                                                      ),
-                                                      Container(
-                                                        width:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.65,
-                                                        child: Text(
-                                                          ctrl.schedOrderHistoryList[index]
-                                                              .senderAddress,
-                                                          style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontSize: 12),
+                                            Container(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          getTranslated(context,
+                                                              "Pick up Point"),
+                                                          // "Pick up Point",
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: colors
+                                                                      .primary,
+                                                                  fontSize: 12),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 20,
-                                                ),
-                                                Container(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        getTranslated(
-                                                            context, "Drop Point"),
-                                                        //  "Drop Point",
-                                                        style: const TextStyle(
-                                                            color: colors.primary,
-                                                            fontSize: 12),
-                                                      ),
-                                                      Container(
-                                                        width:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.65,
-                                                        child: Text(
-                                                          ctrl. schedOrderHistoryList[index]
-                                                                  .parcelDetails
-                                                                  .first
-                                                                  .receiverAddress ??
-                                                              "",
-                                                          style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontSize: 12),
+                                                        Container(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.65,
+                                                          child: Text(
+                                                            ctrl
+                                                                .schedOrderHistoryList[
+                                                                    index]
+                                                                .senderAddress,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 12),
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                )
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Pickup Distance"),
-                                          Text(
-                                              "${ctrl.schedOrderHistoryList[index].orderDis} Km"),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(getTranslated(
-                                              context, "Total Distance")),
-                                          Text(
-                                              "${ctrl.schedOrderHistoryList[index].parcelDetails.first.distance} Km"),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: isButtonDisabled == true
-                                                ? Container(
-                                                    height: 35,
-                                                    width: double.maxFinite,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                30),
-                                                        color: colors.primary),
-                                                    child: const Center(
-                                                      child: Text(
-                                                        "Wait For 5 Second..",
-                                                        style: TextStyle(
-                                                            color:
-                                                                colors.whiteTemp),
-                                                      ),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  Container(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          getTranslated(context,
+                                                              "Drop Point"),
+                                                          //  "Drop Point",
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: colors
+                                                                      .primary,
+                                                                  fontSize: 12),
+                                                        ),
+                                                        Container(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.65,
+                                                          child: Text(
+                                                            ctrl
+                                                                    .schedOrderHistoryList[
+                                                                        index]
+                                                                    .parcelDetails
+                                                                    .first
+                                                                    .receiverAddress ??
+                                                                "",
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 12),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   )
-                                                : InkWell(
-                                                    onTap: () async {
-                                                      var min =
-                                                          await getMinimumWallet();
-                                                      if (double.parse(
-                                                              driverAmount ?? "0") <
-                                                          min) {
-                                                        _showAlertDialog(
-                                                            context, min);
-                                                        // Fluttertoast.showToast(
-                                                        //     msg:
-                                                        //         "To begin accepting order, please ensure your Wallet is Topped up with a Minimum Balance of 150 and Provide an option to recharge using Our wallet recharge method.");
-                                                      } else {
-
-                                                        ctrl.schedOrderHistoryList[index]
-                                                              .isAccepted = true;
-                                                        ctrl. orderRejectedOrAccept(
-                                                              index, context, "1",city);
-
-                                                        if (ctrl.schedOrderHistoryList[index]
-                                                                .parcelDetails
-                                                                .first
-                                                                .status ==
-                                                            "2") {
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      PercelDetails(
-                                                                          pId: ctrl.schedOrderHistoryList[
-                                                                                  index]
-                                                                              .orderId)));
-                                                        }
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(10),
-                                                      width: MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.30,
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Pickup Distance"),
+                                            Text(
+                                                "${ctrl.schedOrderHistoryList[index].orderDis} Km"),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(getTranslated(
+                                                context, "Total Distance")),
+                                            Text(
+                                                "${ctrl.schedOrderHistoryList[index].parcelDetails.first.distance} Km"),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: isButtonDisabled == true
+                                                  ? Container(
+                                                      height: 35,
+                                                      width: double.maxFinite,
                                                       decoration: BoxDecoration(
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                  20),
-                                                          color: isButtonDisabled
-                                                              ? Colors.blue
-                                                              : (ctrl.schedOrderHistoryList[index]
-                                                                              .parcelDetails
-                                                                              .first
-                                                                              .status ==
-                                                                          "2" ||
-                                                              ctrl. schedOrderHistoryList[
-                                                                                  index]
-                                                                              .parcelDetails
-                                                                              .first
-                                                                              .status ==
-                                                                          "3")
-                                                                  ? Colors.grey
-                                                                  : Colors.green),
-                                                      child: Center(
+                                                              BorderRadius
+                                                                  .circular(30),
+                                                          color:
+                                                              colors.primary),
+                                                      child: const Center(
                                                         child: Text(
-                                                            (ctrl.schedOrderHistoryList[index]
-                                                                            .parcelDetails
-                                                                            .first
-                                                                            .status ==
-                                                                        "2" ||
-                                                                ctrl.schedOrderHistoryList[
-                                                                                index]
-                                                                            .parcelDetails
-                                                                            .first
-                                                                            .status ==
-                                                                        "3")
-                                                                ? getTranslated(
-                                                                    context,
-                                                                    "View Detail") //'Accepted'
-                                                                : getTranslated(
-                                                                    context,
-                                                                    "Accept"), //'Accept',
-                                                            style: const TextStyle(
-                                                                color:
-                                                                    Colors.white)),
+                                                          "Wait For 5 Second..",
+                                                          style: TextStyle(
+                                                              color: colors
+                                                                  .whiteTemp),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : InkWell(
+                                                      onTap: () async {
+                                                        var min =
+                                                            await getMinimumWallet();
+                                                        if (double.parse(
+                                                                driverAmount ??
+                                                                    "0") <
+                                                            min) {
+                                                          _showAlertDialog(
+                                                              context, min);
+                                                          // Fluttertoast.showToast(
+                                                          //     msg:
+                                                          //         "To begin accepting order, please ensure your Wallet is Topped up with a Minimum Balance of 150 and Provide an option to recharge using Our wallet recharge method.");
+                                                        } else {
+                                                          ctrl
+                                                              .schedOrderHistoryList[
+                                                                  index]
+                                                              .isAccepted = true;
+                                                          ctrl.orderRejectedOrAccept(
+                                                              index,
+                                                              context,
+                                                              "1",
+                                                              city);
+
+                                                          if (ctrl
+                                                                  .schedOrderHistoryList[
+                                                                      index]
+                                                                  .parcelDetails
+                                                                  .first
+                                                                  .status ==
+                                                              "2") {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder: (context) => PercelDetails(
+                                                                        pId: ctrl
+                                                                            .schedOrderHistoryList[index]
+                                                                            .orderId)));
+                                                          }
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.30,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                color: isButtonDisabled
+                                                                    ? Colors.blue
+                                                                    : (ctrl.schedOrderHistoryList[index].parcelDetails.first.status == "2" || ctrl.schedOrderHistoryList[index].parcelDetails.first.status == "3")
+                                                                        ? Colors.grey
+                                                                        : Colors.green),
+                                                        child: Center(
+                                                          child: Text(
+                                                              (ctrl.schedOrderHistoryList[index].parcelDetails.first.status ==
+                                                                          "2" ||
+                                                                      ctrl.schedOrderHistoryList[index].parcelDetails.first.status ==
+                                                                          "3")
+                                                                  ? getTranslated(
+                                                                      context,
+                                                                      "View Detail") //'Accepted'
+                                                                  : getTranslated(
+                                                                      context,
+                                                                      "Accept"), //'Accept',
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .white)),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                          ),
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          // orderHistoryList[
-                                          //                 index]
-                                          //             .isAccepted ??
-                                          //         false
-                                          //     ? SizedBox
-                                          //         .shrink()
-                                          //     : Expanded(
-                                          //         child:
-                                          //             InkWell(
-                                          //           onTap:
-                                          //               () {
-                                          //             orderRejectedOrAccept(
-                                          //                 index,
-                                          //                 context,
-                                          //                 isRejected:
-                                          //                     true);
-                                          //           },
-                                          //           child:
-                                          //               Container(
-                                          //             width: MediaQuery.of(context).size.width *
-                                          //                 0.35,
-                                          //             padding:
-                                          //                 const EdgeInsets.all(10),
-                                          //             decoration: BoxDecoration(
-                                          //                 borderRadius:
-                                          //                     BorderRadius.circular(20),
-                                          //                 color: Colors.red),
-                                          //             child:
-                                          //                  Center(
-                                          //               child:
-                                          //                   Text(
-                                          //                     getTranslated(context, "Reject"),
-                                          //               //  'Reject',
-                                          //                 style:
-                                          //                     TextStyle(color: Colors.white),
-                                          //               ),
-                                          //             ),
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                        ],
-                                      ),
+                                            ),
+                                            const SizedBox(
+                                              width: 20,
+                                            ),
+                                            // orderHistoryList[
+                                            //                 index]
+                                            //             .isAccepted ??
+                                            //         false
+                                            //     ? SizedBox
+                                            //         .shrink()
+                                            //     : Expanded(
+                                            //         child:
+                                            //             InkWell(
+                                            //           onTap:
+                                            //               () {
+                                            //             orderRejectedOrAccept(
+                                            //                 index,
+                                            //                 context,
+                                            //                 isRejected:
+                                            //                     true);
+                                            //           },
+                                            //           child:
+                                            //               Container(
+                                            //             width: MediaQuery.of(context).size.width *
+                                            //                 0.35,
+                                            //             padding:
+                                            //                 const EdgeInsets.all(10),
+                                            //             decoration: BoxDecoration(
+                                            //                 borderRadius:
+                                            //                     BorderRadius.circular(20),
+                                            //                 color: Colors.red),
+                                            //             child:
+                                            //                  Center(
+                                            //               child:
+                                            //                   Text(
+                                            //                     getTranslated(context, "Reject"),
+                                            //               //  'Reject',
+                                            //                 style:
+                                            //                     TextStyle(color: Colors.white),
+                                            //               ),
+                                            //             ),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                          ],
+                                        ),
 
-                                      // Row(
-                                      //   mainAxisAlignment:
-                                      //   MainAxisAlignment
-                                      //       .spaceBetween,
-                                      //   children: [
-                                      //     Expanded(
-                                      //       child: isButtonDisabled == true ? Container(
-                                      //         height: 35,
-                                      //         width: double.maxFinite,
-                                      //         decoration: BoxDecoration(
-                                      //             borderRadius: BorderRadius.circular(30),
-                                      //             color: colors.primary
-                                      //         ),
-                                      //
-                                      //         child: const Center(
-                                      //           child: Text(
-                                      //             "Wait For 5 Second..", style: TextStyle(
-                                      //               color: colors.whiteTemp
-                                      //           ),),
-                                      //         ),
-                                      //       ) : InkWell(
-                                      //         onTap:
-                                      //         // orderHistoryList[index].isAccepted ?? false
-                                      //         //     ? null
-                                      //         //     :
-                                      //             () {
-                                      //           setState(() {
-                                      //             orderHistoryList[index].isAccepted = true;
-                                      //             orderRejectedOrAccept(index, context);
-                                      //           });
-                                      //         },
-                                      //         child:
-                                      //         Container(
-                                      //           padding:
-                                      //           const EdgeInsets.all(10),
-                                      //           width: MediaQuery
-                                      //               .of(context)
-                                      //               .size
-                                      //               .width *
-                                      //               0.30,
-                                      //           decoration: BoxDecoration(
-                                      //               borderRadius:
-                                      //               BorderRadius.circular(
-                                      //                   20),
-                                      //               color: isButtonDisabled
-                                      //                   ? Colors.blue
-                                      //                   : orderHistoryList[index]
-                                      //                   .isAccepted ?? false
-                                      //                   ? Colors.grey
-                                      //                   : Colors.green),
-                                      //           child: Center(
-                                      //             child: Text(
-                                      //                 orderHistoryList[index].isAccepted ??
-                                      //                     false
-                                      //                     ? getTranslated(context,
-                                      //                     "View Detail") //'Accepted'
-                                      //                     : getTranslated(
-                                      //                     context, "Accept"), //'Accept',
-                                      //                 style: const TextStyle(
-                                      //                     color:
-                                      //                     Colors.white)),
-                                      //           ),
-                                      //         ),
-                                      //       ),
-                                      //     ),
-                                      //     const SizedBox(
-                                      //       width: 20,
-                                      //     ),
-                                      //     // orderHistoryList[
-                                      //     //                 index]
-                                      //     //             .isAccepted ??
-                                      //     //         false
-                                      //     //     ? SizedBox
-                                      //     //         .shrink()
-                                      //     //     : Expanded(
-                                      //     //         child:
-                                      //     //             InkWell(
-                                      //     //           onTap:
-                                      //     //               () {
-                                      //     //             orderRejectedOrAccept(
-                                      //     //                 index,
-                                      //     //                 context,
-                                      //     //                 isRejected:
-                                      //     //                     true);
-                                      //     //           },
-                                      //     //           child:
-                                      //     //               Container(
-                                      //     //             width: MediaQuery.of(context).size.width *
-                                      //     //                 0.35,
-                                      //     //             padding:
-                                      //     //                 const EdgeInsets.all(10),
-                                      //     //             decoration: BoxDecoration(
-                                      //     //                 borderRadius:
-                                      //     //                     BorderRadius.circular(20),
-                                      //     //                 color: Colors.red),
-                                      //     //             child:
-                                      //     //                  Center(
-                                      //     //               child:
-                                      //     //                   Text(
-                                      //     //                     getTranslated(context, "Reject"),
-                                      //     //               //  'Reject',
-                                      //     //                 style:
-                                      //     //                     TextStyle(color: Colors.white),
-                                      //     //               ),
-                                      //     //             ),
-                                      //     //           ),
-                                      //     //         ),
-                                      //     //       ),
-                                      //   ],
-                                      // )
-                                    ],
+                                        // Row(
+                                        //   mainAxisAlignment:
+                                        //   MainAxisAlignment
+                                        //       .spaceBetween,
+                                        //   children: [
+                                        //     Expanded(
+                                        //       child: isButtonDisabled == true ? Container(
+                                        //         height: 35,
+                                        //         width: double.maxFinite,
+                                        //         decoration: BoxDecoration(
+                                        //             borderRadius: BorderRadius.circular(30),
+                                        //             color: colors.primary
+                                        //         ),
+                                        //
+                                        //         child: const Center(
+                                        //           child: Text(
+                                        //             "Wait For 5 Second..", style: TextStyle(
+                                        //               color: colors.whiteTemp
+                                        //           ),),
+                                        //         ),
+                                        //       ) : InkWell(
+                                        //         onTap:
+                                        //         // orderHistoryList[index].isAccepted ?? false
+                                        //         //     ? null
+                                        //         //     :
+                                        //             () {
+                                        //           setState(() {
+                                        //             orderHistoryList[index].isAccepted = true;
+                                        //             orderRejectedOrAccept(index, context);
+                                        //           });
+                                        //         },
+                                        //         child:
+                                        //         Container(
+                                        //           padding:
+                                        //           const EdgeInsets.all(10),
+                                        //           width: MediaQuery
+                                        //               .of(context)
+                                        //               .size
+                                        //               .width *
+                                        //               0.30,
+                                        //           decoration: BoxDecoration(
+                                        //               borderRadius:
+                                        //               BorderRadius.circular(
+                                        //                   20),
+                                        //               color: isButtonDisabled
+                                        //                   ? Colors.blue
+                                        //                   : orderHistoryList[index]
+                                        //                   .isAccepted ?? false
+                                        //                   ? Colors.grey
+                                        //                   : Colors.green),
+                                        //           child: Center(
+                                        //             child: Text(
+                                        //                 orderHistoryList[index].isAccepted ??
+                                        //                     false
+                                        //                     ? getTranslated(context,
+                                        //                     "View Detail") //'Accepted'
+                                        //                     : getTranslated(
+                                        //                     context, "Accept"), //'Accept',
+                                        //                 style: const TextStyle(
+                                        //                     color:
+                                        //                     Colors.white)),
+                                        //           ),
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //     const SizedBox(
+                                        //       width: 20,
+                                        //     ),
+                                        //     // orderHistoryList[
+                                        //     //                 index]
+                                        //     //             .isAccepted ??
+                                        //     //         false
+                                        //     //     ? SizedBox
+                                        //     //         .shrink()
+                                        //     //     : Expanded(
+                                        //     //         child:
+                                        //     //             InkWell(
+                                        //     //           onTap:
+                                        //     //               () {
+                                        //     //             orderRejectedOrAccept(
+                                        //     //                 index,
+                                        //     //                 context,
+                                        //     //                 isRejected:
+                                        //     //                     true);
+                                        //     //           },
+                                        //     //           child:
+                                        //     //               Container(
+                                        //     //             width: MediaQuery.of(context).size.width *
+                                        //     //                 0.35,
+                                        //     //             padding:
+                                        //     //                 const EdgeInsets.all(10),
+                                        //     //             decoration: BoxDecoration(
+                                        //     //                 borderRadius:
+                                        //     //                     BorderRadius.circular(20),
+                                        //     //                 color: Colors.red),
+                                        //     //             child:
+                                        //     //                  Center(
+                                        //     //               child:
+                                        //     //                   Text(
+                                        //     //                     getTranslated(context, "Reject"),
+                                        //     //               //  'Reject',
+                                        //     //                 style:
+                                        //     //                     TextStyle(color: Colors.white),
+                                        //     //               ),
+                                        //     //             ),
+                                        //     //           ),
+                                        //     //         ),
+                                        //     //       ),
+                                        //   ],
+                                        // )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
-            ),
-          ],
-        );
-      }
-    );
+                              );
+                            }),
+              ),
+            ],
+          );
+        });
   }
 
   // withdrawalRequest(){
@@ -2296,8 +2383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontFamily: "lora",
                                 fontSize: 20),
                           )
-                        :
-                    Text(
+                        : Text(
                             "₹ ${double.parse(driverAmount!).toStringAsFixed(0)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -2317,8 +2403,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const DriverErningHistroy(),
-                  )
-              );
+                  ));
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -2439,21 +2524,33 @@ class _HomeScreenState extends State<HomeScreen> {
       isLoading = true;
     });
 
-    /*SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');*/
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    final userToken = prefs.getString('userToken');
     try {
       Map<String, String> body = {};
       body[RequestKeys.lat] = _position?.latitude.toString() ?? '';
       body[RequestKeys.long] = _position?.longitude.toString() ?? '';
       body[RequestKeys.userId1] = userId.toString() ?? '';
       body[RequestKeys.status] = status.toString();
+      body[RequestKeys.uToken] = userToken.toString();
       var res = await api.getOrderHistoryData(body);
       if (res.status ?? false) {
-        orderHistoryList = res.data;
+        if (res.message == "Invalid Token.") {
+          print("Logout Now-----------");
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          Navigator.pop(context);
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          prefs.setString('userId', "");
+          prefs.setString("userToken", "");
+        } else {
+          orderHistoryList = res.data;
 
-        //Future.delayed(const Duration(seconds: 1), () {
-        // print('One second has passed.'); // Prints after 1 second.
-        isActive.clear();
+          //Future.delayed(const Duration(seconds: 1), () {
+          // print('One second has passed.'); // Prints after 1 second.
+          isActive.clear();
+        }
 
         setState(() {
           isLoading = false;
@@ -2476,8 +2573,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
-
   getDriverRating(String driverId) async {
     _isNetworkAvail = await isNetworkAvailable();
     var headers = {
@@ -2492,7 +2587,7 @@ class _HomeScreenState extends State<HomeScreen> {
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
-print("RatingAPI----${request.url}");
+    print("RatingAPI----${request.url}");
     print('__________${request.fields}_____________');
 
     if (response.statusCode == 200) {
@@ -2504,7 +2599,8 @@ print("RatingAPI----${request.url}");
     }
     setState(() {});
   }
-  final ctrl= Get.put(HomeController());
+
+  final ctrl = Get.put(HomeController());
   int selectedSegmentVal = 0;
 
   Widget _segmentButton() => Container(
@@ -2525,10 +2621,8 @@ print("RatingAPI----${request.url}");
                         border: Border.all(
                             color: selectedSegmentVal == 0
                                 ? colors.primary
-                                : Colors.white
-                        ),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+                                : Colors.white),
+                        borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: Text(
                         getTranslated(context, "Current Delivery"),
@@ -2568,8 +2662,7 @@ print("RatingAPI----${request.url}");
                             color: selectedSegmentVal == 1
                                 ? colors.primary
                                 : Colors.white),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: Text(
                         getTranslated(context, "Scheduled Delivery"),
@@ -2577,8 +2670,7 @@ print("RatingAPI----${request.url}");
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 10,
-                            color: colors.primary
-                        ),
+                            color: colors.primary),
                       ),
                     )
                     // MaterialButton(
@@ -3442,7 +3534,7 @@ print("RatingAPI----${request.url}");
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             FilterChip(
-              label:  Text(getTranslated(context, 'Completed Orders')),
+              label: Text(getTranslated(context, 'Completed Orders')),
               selected: isSelected == "Completed Orders",
               selectedColor: Colors.green,
               onSelected: (bool value) {
@@ -3501,10 +3593,10 @@ print("RatingAPI----${request.url}");
                               context,
                               MaterialPageRoute(
                                   builder: (context) => PercelDetails(
-                                    pId: parcelDataList
-                                        ?.data?[index].orderId,
-                                    isCheck: true,
-                                  )));
+                                        pId: parcelDataList
+                                            ?.data?[index].orderId,
+                                        isCheck: true,
+                                      )));
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -3637,11 +3729,11 @@ print("RatingAPI----${request.url}");
                                               ""
                                           ? Container()
                                           :
-                                  // Text(
-                                  //             "Reason: ${parcelDataList?.data?[index].parcelDetails?.first.message ?? ""}"),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                          // Text(
+                                          //             "Reason: ${parcelDataList?.data?[index].parcelDetails?.first.message ?? ""}"),
+                                          const SizedBox(
+                                              height: 10,
+                                            ),
                                   /*InkWell(
                                 onTap: (){
                                   Navigator.push(context, MaterialPageRoute(builder: (context) =>  ParcelDetailsView(parcelFullDetail: parcelDataList!.data![index].parcelDetails)));

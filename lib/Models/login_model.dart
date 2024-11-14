@@ -35,6 +35,7 @@ class Data {
   String? userCity;
   String? varificationCode;
   String? userImage;
+  String? userToken;
   String? pincode;
   String? socityId;
   String? houseNo;
@@ -72,51 +73,52 @@ class Data {
 
   Data(
       {this.userId,
-        this.userType,
-        this.userPhone,
-        this.firstname,
-        this.lastname,
-        this.userFullname,
-        this.userEmail,
-        this.userBdate,
-        this.userPassword,
-        this.userCity,
-        this.varificationCode,
-        this.userImage,
-        this.pincode,
-        this.socityId,
-        this.houseNo,
-        this.mobileVerified,
-        this.userGcmCode,
-        this.userIosToken,
-        this.varifiedToken,
-        this.status,
-        this.regCode,
-        this.wallet,
-        this.rewards,
-        this.created,
-        this.modified,
-        this.otp,
-        this.otpStatus,
-        this.social,
-        this.facebookID,
-        this.isEmailVerified,
-        this.vehicleType,
-        this.vehicleNo,
-        this.drivingLicenceNo,
-        this.drivingLicencePhoto,
-        this.loginStatus,
-        this.isAvaible,
-        this.latitude,
-        this.longitude,
-        this.referralCode,
-        this.aadhaarCardNo,
-        this.aadhaarCardPhoto,
-        this.qrCode,
-        this.accountHolderName,
-        this.accountNumber,
-        this.ifscCode,
-        this.bankName});
+      this.userType,
+      this.userPhone,
+      this.firstname,
+      this.lastname,
+      this.userFullname,
+      this.userEmail,
+      this.userBdate,
+      this.userPassword,
+      this.userCity,
+      this.varificationCode,
+      this.userImage,
+      this.userToken,
+      this.pincode,
+      this.socityId,
+      this.houseNo,
+      this.mobileVerified,
+      this.userGcmCode,
+      this.userIosToken,
+      this.varifiedToken,
+      this.status,
+      this.regCode,
+      this.wallet,
+      this.rewards,
+      this.created,
+      this.modified,
+      this.otp,
+      this.otpStatus,
+      this.social,
+      this.facebookID,
+      this.isEmailVerified,
+      this.vehicleType,
+      this.vehicleNo,
+      this.drivingLicenceNo,
+      this.drivingLicencePhoto,
+      this.loginStatus,
+      this.isAvaible,
+      this.latitude,
+      this.longitude,
+      this.referralCode,
+      this.aadhaarCardNo,
+      this.aadhaarCardPhoto,
+      this.qrCode,
+      this.accountHolderName,
+      this.accountNumber,
+      this.ifscCode,
+      this.bankName});
 
   Data.fromJson(Map<String, dynamic> json) {
     userId = json['user_id'];
@@ -131,6 +133,7 @@ class Data {
     userCity = json['user_city'];
     varificationCode = json['varification_code'];
     userImage = json['user_image'];
+    userToken = json['user_token'];
     pincode = json['pincode'];
     socityId = json['socity_id'];
     houseNo = json['house_no'];
@@ -181,6 +184,7 @@ class Data {
     data['user_city'] = this.userCity;
     data['varification_code'] = this.varificationCode;
     data['user_image'] = this.userImage;
+    data['user_token'] = this.userToken;
     data['pincode'] = this.pincode;
     data['socity_id'] = this.socityId;
     data['house_no'] = this.houseNo;

@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:jdx/Utils/ApiPath.dart';
-import '../Models/privacypolicymodel.dart';
-import '../Utils/AppBar.dart';
-import '../Utils/Color.dart';
-import 'package:http/http.dart' as http;
 
+import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:http/http.dart' as http;
+import 'package:jdx/Utils/ApiPath.dart';
+
+import '../Models/privacypolicymodel.dart';
+import '../Utils/Color.dart';
 import '../services/session.dart';
 
 class privacy_policy extends StatefulWidget {
@@ -42,6 +42,7 @@ class _privacy_policyState extends State<privacy_policy> {
       print("privacy-----------");
       var finalResponse = await response.stream.bytesToString();
       var jsonResponse = PrivacypolicyModel.fromJson(jsonDecode(finalResponse));
+      print(" this is privacypolicyyy${jsonResponse.toJson().toString()}");
       setState(() {
         privacyData = jsonResponse.data;
       });
@@ -109,19 +110,21 @@ class _privacy_policyState extends State<privacy_policy> {
               ),
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Html(data: "${privacyData}"),
                       privacyData == null
                           ? Center(child: CircularProgressIndicator())
-                          : Text(
-                              '${privacyData?.pgDescri}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
+                          : Html(data: '${privacyData?.pgDescri}'),
+                      // Text(
+                      //         '${privacyData?.pgDescri}',
+                      //         style: const TextStyle(
+                      //           fontSize: 16,
+                      //         ),
+                      //       ),
                     ],
                   ),
                 ),

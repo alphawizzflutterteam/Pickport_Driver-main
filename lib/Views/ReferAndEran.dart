@@ -4,20 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_share/flutter_share.dart';
-
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jdx/Views/SupportNewScreen.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:jdx/Views/SupportNewScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../Utils/Color.dart';
 import '../Models/GetProfileModel.dart';
 import '../Utils/ApiPath.dart';
 import '../services/session.dart';
-import 'NotificationScreen.dart';
 
 class ReferAndEranScreen extends StatefulWidget {
   const ReferAndEranScreen({Key? key}) : super(key: key);
@@ -40,13 +36,17 @@ class _ReferAndEranScreenState extends State<ReferAndEranScreen> {
   getProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
+    String? userToken = prefs.getString("userToken");
     print(" this is  User++++++++++++++>${userId}");
     var headers = {
       'Cookie': 'ci_session=6de5f73f50c4977cb7f3af6afe61f4b340359530'
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}User_Dashboard/getUserProfile'));
-    request.fields.addAll({'user_id': userId.toString()});
+    request.fields.addAll({
+      'user_id': userId.toString(),
+      'user_token': userToken.toString(),
+    });
     print(" this is  User++++++++++++++>${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -180,13 +180,20 @@ class _ReferAndEranScreenState extends State<ReferAndEranScreen> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child:getProfileModel==null?Shimmer.fromColors(child: Container( height: 25,
-                                width: 80,
-                                color: Colors.white,),  baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,) :Text(
-                                "${getProfileModel?.data?.user!.referralCode}",
-                                style: TextStyle(color: colors.backColor),
-                              ),
+                              child: getProfileModel == null
+                                  ? Shimmer.fromColors(
+                                      child: Container(
+                                        height: 25,
+                                        width: 80,
+                                        color: Colors.white,
+                                      ),
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
+                                    )
+                                  : Text(
+                                      "${getProfileModel?.data?.user!.referralCode}",
+                                      style: TextStyle(color: colors.backColor),
+                                    ),
                             ),
                           ),
                         ),
@@ -269,8 +276,10 @@ class _ReferAndEranScreenState extends State<ReferAndEranScreen> {
   Future<void> share({String? referCode}) async {
     FlutterShare.share(
         title: 'PickPort Driver',
-        text: 'Join Pickport Driver partner and get ₹50 Off on your first 5 Orders Delivery \nRefer code : $referCode',
-        linkUrl: 'https://play.google.com/store/apps/details?id=com.pickportdriver',
+        text:
+            'Join Pickport Driver partner and get ₹50 Off on your first 5 Orders Delivery \nRefer code : $referCode',
+        linkUrl:
+            'https://play.google.com/store/apps/details?id=com.pickportdriver',
         chooserTitle: 'PickPort Driver');
   }
 }

@@ -3,11 +3,12 @@ class RequestKeys {
   static String userId1 = 'delivery_boy_id';
   static String password = 'password';
   static String status = 'status';
+  static String uToken = 'user_token';
   static String userFullName = 'user_fullname';
   static String userEmail = 'user_email';
   static String userPhone = 'user_phone';
   static String vehicleType = 'vehicle_type';
-    static String vehicleNo = 'vehicle_no';
+  static String vehicleNo = 'vehicle_no';
   static String drivingLicenceNo = 'driving_licence_no';
   static String accountHolderName = 'account_holder_name';
   static String userImage = 'user_image';

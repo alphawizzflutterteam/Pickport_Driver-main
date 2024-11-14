@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jdx/Utils/Color.dart';
@@ -17,7 +15,6 @@ import '../Models/GetProfileModel.dart';
 import '../Models/Get_transaction_model.dart';
 import '../Utils/ApiPath.dart';
 import '../services/session.dart';
-import 'HomeScreen.dart';
 
 class WithdrawalScreen extends StatefulWidget {
   WithdrawalScreen({Key? key, this.isFrom, this.gId}) : super(key: key);
@@ -52,13 +49,18 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     _isNetworkAvail = await isNetworkAvailable();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
-    print(" this is  User++++++++++++++>${userId}");
+    String? userToken = prefs.getString("userToken");
+    print(" this is  User++++++++++++++>$userId");
+    print(" this is  UserToken++++++++++++++>$userToken");
     var headers = {
       'Cookie': 'ci_session=6de5f73f50c4977cb7f3af6afe61f4b340359530'
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Urls.baseUrl}User_Dashboard/getUserProfile'));
-    request.fields.addAll({'user_id': userId.toString()});
+    request.fields.addAll({
+      'user_id': userId.toString(),
+      'user_token': userToken.toString(),
+    });
     print(" this is  User++++++++++++++>${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -86,112 +88,115 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _isNetworkAvail ?
-    Scaffold(
-        backgroundColor: colors.primary,
-        body: ListView(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  decoration: const BoxDecoration(color: colors.primary),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle, color: Colors.white),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          getTranslated(context, "Withdraw Money"),
-                          //   'Withdraw Money',
-                          style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          SupportNewScreen()));
-                            },
-                            child: Container(
+    return _isNetworkAvail
+        ? Scaffold(
+            backgroundColor: colors.primary,
+            body: ListView(
+              children: [
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      decoration: const BoxDecoration(color: colors.primary),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
                               padding: const EdgeInsets.all(5),
                               decoration: const BoxDecoration(
                                   shape: BoxShape.circle, color: Colors.white),
-                              child: const Icon(
-                                Icons.headset_rounded,
-                                color: Colors.black,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
-                          ),
+                            Text(
+                              getTranslated(context, "Withdraw Money"),
+                              //   'Withdraw Money',
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SupportNewScreen()));
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white),
+                                  child: const Icon(
+                                    Icons.headset_rounded,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
-            ),
-            Padding(
-              // padding:  EdgeInsets.only(top: MediaQuery.of(context).size.height/3.1),
-              padding: EdgeInsets.only(
-                top: 10,
-              ),
-              child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: const BoxDecoration(
-                    color: Color(0xfff6f6f6),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      // Top-left corner radius
-                      topRight: Radius.circular(30),
-                      // Top-right corner radius
-                    ),
+                      )),
+                ),
+                Padding(
+                  // padding:  EdgeInsets.only(top: MediaQuery.of(context).size.height/3.1),
+                  padding: EdgeInsets.only(
+                    top: 10,
                   ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        tabTop(),
-                        _currentIndex == 1 ? withdrawal() : withdrawalRequest()
-                      ],
-                    ),
-                  )),
-            )
-          ],
-        ))
+                  child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      decoration: const BoxDecoration(
+                        color: Color(0xfff6f6f6),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          // Top-left corner radius
+                          topRight: Radius.circular(30),
+                          // Top-right corner radius
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            tabTop(),
+                            _currentIndex == 1
+                                ? withdrawal()
+                                : withdrawalRequest()
+                          ],
+                        ),
+                      )),
+                )
+              ],
+            ))
         : NoInternetScreen(
-        onPressed: () {
-          Future.delayed(Duration(seconds: 1)).then((_) async {
-            _isNetworkAvail = await isNetworkAvailable();
-            if (_isNetworkAvail) {
-              if (mounted)
-                setState(() {
-                  _isNetworkAvail = true;
-                });
-              // callApi();
-            }
-          });
-        },
-    );
+            onPressed: () {
+              Future.delayed(Duration(seconds: 1)).then((_) async {
+                _isNetworkAvail = await isNetworkAvailable();
+                if (_isNetworkAvail) {
+                  if (mounted)
+                    setState(() {
+                      _isNetworkAvail = true;
+                    });
+                  // callApi();
+                }
+              });
+            },
+          );
   }
 
   int _currentIndex = 1;
@@ -446,28 +451,27 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                     ],
                                   ),
                                   Text(
-                            "${getTransactionModel!.data![i].paymentType}"),
+                                      "${getTransactionModel!.data![i].paymentType}"),
                                   getTransactionModel!.data![i].requestStatus ==
-                                '0'
-                                ?
-                            Text(
-                              'Pending',
-                              style:
-                              TextStyle(color: Colors.yellow),
-                            )
-                                : getTransactionModel!.data![i]
-                                .requestStatus ==
-                                '1'
-                                ? Text(
-                              'Approved',
-                              style: TextStyle(
-                                  color: Colors.green),
-                            )
-                                : Text(
-                              'Rejected',
-                              style: TextStyle(
-                                  color: Colors.red),
-                            )
+                                          '0'
+                                      ? Text(
+                                          'Pending',
+                                          style:
+                                              TextStyle(color: Colors.yellow),
+                                        )
+                                      : getTransactionModel!
+                                                  .data![i].requestStatus ==
+                                              '1'
+                                          ? Text(
+                                              'Approved',
+                                              style: TextStyle(
+                                                  color: Colors.green),
+                                            )
+                                          : Text(
+                                              'Rejected',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            )
                                   // Text(
                                   //   "${getTransactionModel?.data?[i].paymentStatus}",
                                   //   style: TextStyle(
@@ -518,7 +522,8 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       var finalResult = jsonDecode(result);
       Fluttertoast.showToast(msg: "${finalResult['message']}");
       if (finalResult['status'] == true) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyWallet()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => MyWallet()));
       }
     } else {
       setState(() {
@@ -566,8 +571,8 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       ),
                     ],
                   ),
-                  wallet == null ||  wallet == "null"
-                      ? Text(getTranslated(context, "No Balance") )
+                  wallet == null || wallet == "null"
+                      ? Text(getTranslated(context, "No Balance"))
                       : Text(
                           "₹${double.parse(wallet!).toStringAsFixed(0)}",
                           style: TextStyle(
