@@ -367,7 +367,7 @@ class _EditBankDetailsState extends State<EditBankDetails> {
                                   borderRadius: BorderRadius.circular(10),
                                   color: CustomColors.TransparentColor),
                               child: Image.network(
-                                "${getProfileModel!.data!.user!.userImage}",
+                                "${getProfileModel!.data!.user!.checkBook}",
                                 fit: BoxFit.fill,
                               ),
                             )),

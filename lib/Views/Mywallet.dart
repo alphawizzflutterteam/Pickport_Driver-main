@@ -56,6 +56,7 @@ class _MyWalletState extends State<MyWallet> {
       final jsonResponse =
           WalletHistoryModel.fromJson(json.decode(finalResult));
       setState(() {
+        filterList.clear();
         walletHistorymodel = jsonResponse;
         data.addAll(walletHistorymodel!.data!);
         filterList.addAll(data);
@@ -339,8 +340,8 @@ class _MyWalletState extends State<MyWallet> {
                                                 builder: (context) => AddAmount(
                                                       walletBalance:
                                                           wallet ?? '0.0',
-                                                    )))
-                                        .then((value) => walletHistroy());
+                                                    )));
+                                        // .then((value) => walletHistroy());
                                     //  Get.to(AddAmount(walletBalance: wallet??'--',))?.then((value) => walletHistroy() );
                                   }
                                   // addMoney();

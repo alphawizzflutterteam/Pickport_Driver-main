@@ -984,7 +984,10 @@ class _AddBankDetailsState extends State<AddBankDetails> {
     });
     print('____Som______${request.fields}_________');
     request.files.add(
-        await http.MultipartFile.fromPath('user_image', imageFile?.path ?? ""));
+        await http.MultipartFile.fromPath(
+          // 'user_image', imageFile?.path ?? ""
+            'check_book', imageFile?.path ?? ""
+        ));
     print('____Som______${request.files}_________');
     request.headers.addAll(headers);
 

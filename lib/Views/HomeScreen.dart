@@ -486,8 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
     positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter:
-            5, // Minimum change in distance (in meters) before update
+        distanceFilter: 1000, // Minimum change in distance (in meters) before update
       ),
     ).listen((Position position) async {
       // Handle location update

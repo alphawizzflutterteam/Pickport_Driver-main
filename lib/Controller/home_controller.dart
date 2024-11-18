@@ -144,7 +144,7 @@ class HomeController extends AppBaseController {
         var json=jsonDecode(response.body);
         Fluttertoast.showToast(msg: json['message']);
         log(response.body);
-        // getOrders(status: status, context: context);
+        getOrders(status: status, context: context);
       }
     });
 

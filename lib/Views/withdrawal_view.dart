@@ -80,7 +80,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       } else {
         setState(() {
           getProfileModel = finalResult;
-          wallet = "${getProfileModel!.data!.user!.wallet}";
+          wallet = "${getProfileModel?.data?.user?.wallet ?? '0'}";
           print("Wallet bal: $wallet");
           //Fluttertoast.showToast(msg: qrCodeResult);
         });
@@ -585,7 +585,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   wallet == null || wallet == "null"
                       ? Text(getTranslated(context, "No Balance"))
                       : Text(
-                          "₹${double.parse(wallet!).toStringAsFixed(0)}",
+                    wallet.toString() == "null"
+                        ? "₹ 0"
+                        : "₹ ${(double.parse(wallet!).toStringAsFixed(0) ?? '0')}",
                           style: TextStyle(
                               color: colors.blackTemp,
                               fontSize: 20,

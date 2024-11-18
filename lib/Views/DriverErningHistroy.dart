@@ -296,8 +296,12 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
     setState(() {});
   }
   DriverEarnModel? getOnlineOfflineModel;
+  bool _isLoading = false;
   onlineOfflineHistoryApi() async {
     _isNetworkAvail = await isNetworkAvailable();
+    setState(() {
+      _isLoading = true;
+    });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString("userId");
     var headers = {
@@ -312,11 +316,12 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
       var result = await response.stream.bytesToString();
       var finalResult = DriverEarnModel.fromJson(json.decode(result));
       setState(() {
+        _isLoading = false;
         getOnlineOfflineModel = finalResult;
         data.addAll(getOnlineOfflineModel!.data!);
         filterList.addAll(data);
         print("Lengthhhhhh: ${data.length}");
-        print(filterList.first.dateTime);
+        // print(filterList.first.dateTime);
       });
     } else {
       print(response.reasonPhrase);
@@ -407,324 +412,325 @@ class _DriverErningHistroyState extends State<DriverErningHistroy> {
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30)),
                   ),
-                  child: getOnlineOfflineModel == null ||
-                          getOnlineOfflineModel == ""
-                      ? Center(child: CircularProgressIndicator())
-                      : getOnlineOfflineModel?.data?.isEmpty ?? false
-                          ? Center(child: Text("No data available"))
-                          : Column(
-                              children: [
-                               // Row(
-                               //   mainAxisAlignment: MainAxisAlignment.center,
-                               //   children: [ Padding(
-                               //     padding: EdgeInsets.only(
-                               //         top: 5.0, left: 10, right: 10),
-                               //     child: InkWell(
-                               //       onTap: () {
-                               //         Navigator.push(
-                               //             context,
-                               //             MaterialPageRoute(
-                               //                 builder: (context) =>
-                               //                     WithdrawalScreen()));
-                               //       },
-                               //       child: Card(
-                               //         elevation: 2,
-                               //         child: Padding(
-                               //           padding: EdgeInsets.all(18.0),
-                               //           child: Column(
-                               //             mainAxisSize: MainAxisSize.min,
-                               //             children: [
-                               //               Row(
-                               //                 mainAxisAlignment:
-                               //                 MainAxisAlignment.center,
-                               //                 children: const [
-                               //                   Icon(
-                               //                     Icons.account_balance_wallet,
-                               //                     color: colors.primary,
-                               //                   ),
-                               //                   Text(
-                               //                     " " + 'Total Earning',
-                               //                     style: TextStyle(
-                               //                         color: colors.blackTemp,
-                               //                         fontWeight:
-                               //                         FontWeight.bold,
-                               //                         fontSize: 16),
-                               //                   ),
-                               //                 ],
-                               //               ),
-                               //               getOnlineOfflineModel?.total == null
-                               //                   ? Text("No Balance")
-                               //                   : Text(
-                               //                 "₹${getOnlineOfflineModel?.total}",
-                               //                 style: TextStyle(
-                               //                     color: colors.blackTemp,
-                               //                     fontSize: 20,
-                               //                     fontFamily: "lora",
-                               //                     fontWeight:
-                               //                     FontWeight.bold),
-                               //               ),
-                               //               SizedBox(
-                               //                 height: 0,
-                               //               ),
-                               //             ],
-                               //           ),
-                               //         ),
-                               //       ),
-                               //     ),
-                               //   ),
-                               //     Padding(
-                               //       padding: EdgeInsets.only(
-                               //           top: 5.0, left: 10, right: 10),
-                               //       child: InkWell(
-                               //         onTap: () {
-                               //           Navigator.push(
-                               //               context,
-                               //               MaterialPageRoute(
-                               //                   builder: (context) =>
-                               //                       WithdrawalScreen()));
-                               //         },
-                               //         child: Card(
-                               //           elevation: 2,
-                               //           child: Padding(
-                               //             padding: EdgeInsets.all(18.0),
-                               //             child: Column(
-                               //               mainAxisSize: MainAxisSize.min,
-                               //               children: [
-                               //                 Row(
-                               //                   mainAxisAlignment:
-                               //                   MainAxisAlignment.center,
-                               //                   children: const [
-                               //                     Icon(
-                               //                       Icons.account_balance_wallet,
-                               //                       color: colors.primary,
-                               //                     ),
-                               //                     Text(
-                               //                       " " + 'COD Earning',
-                               //                       style: TextStyle(
-                               //                           color: colors.blackTemp,
-                               //                           fontWeight:
-                               //                           FontWeight.bold,
-                               //                           fontSize: 16),
-                               //                     ),
-                               //                   ],
-                               //                 ),
-                               //                 getOnlineOfflineModel?.total == null
-                               //                     ? Text("No Balance")
-                               //                     : Text(
-                               //                   "₹${getOnlineOfflineModel?.total_cod}",
-                               //                   style: TextStyle(
-                               //                       color: colors.blackTemp,
-                               //                       fontSize: 20,
-                               //                       fontFamily: "lora",
-                               //                       fontWeight:
-                               //                       FontWeight.bold),
-                               //                 ),
-                               //                 SizedBox(
-                               //                   height: 0,
-                               //                 ),
-                               //               ],
-                               //             ),
-                               //           ),
-                               //         ),
-                               //       ),
-                               //     ),],
-                               // ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 16,right: 16,top: 16,bottom: 0),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.filter_alt_rounded,
-                                        color: Colors.black,
-                                      ),
-                                      const VerticalDivider(
-                                        color: Colors.transparent,
-                                      ),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => _selectDate(context, 1),
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 12),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            child: Text(isStart
-                                                ? DateFormat('d/MM/y')
-                                                .format(startDate)
-                                                : getTranslated(context, "Start Date")),
-                                          ),
-                                        ),
-                                      ),
-                                      const VerticalDivider(
-                                        color: Colors.transparent,
-                                      ),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => _selectDate(context, 2),
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 12),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            child: Text(isEnd
-                                                ? DateFormat('d/MM/y').format(endDate)
-                                                : getTranslated(context, "End Date")),
-                                          ),
-                                        ),
-                                      ),
-                                      const VerticalDivider(
-                                        color: Colors.transparent,
-                                      ),
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            if (isStart && isEnd) {
-                                              applyFilters();
-                                            } else {
-                                              Fluttertoast.showToast(
-                                                  msg: getTranslated(context, "Please select dates"));
-                                            }
-                                          },
-                                          child: Text(getTranslated(context, "Apply")))
-                                    ],
+                  child: !_isLoading
+                  // getOnlineOfflineModel == null || getOnlineOfflineModel == ""
+                      ? getOnlineOfflineModel?.data?.isEmpty ?? false || getOnlineOfflineModel?.data?.length == 0
+                      ? const Center(child: Text("No data available"))
+                      : Column(
+                    children: [
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [ Padding(
+                      //     padding: EdgeInsets.only(
+                      //         top: 5.0, left: 10, right: 10),
+                      //     child: InkWell(
+                      //       onTap: () {
+                      //         Navigator.push(
+                      //             context,
+                      //             MaterialPageRoute(
+                      //                 builder: (context) =>
+                      //                     WithdrawalScreen()));
+                      //       },
+                      //       child: Card(
+                      //         elevation: 2,
+                      //         child: Padding(
+                      //           padding: EdgeInsets.all(18.0),
+                      //           child: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Row(
+                      //                 mainAxisAlignment:
+                      //                 MainAxisAlignment.center,
+                      //                 children: const [
+                      //                   Icon(
+                      //                     Icons.account_balance_wallet,
+                      //                     color: colors.primary,
+                      //                   ),
+                      //                   Text(
+                      //                     " " + 'Total Earning',
+                      //                     style: TextStyle(
+                      //                         color: colors.blackTemp,
+                      //                         fontWeight:
+                      //                         FontWeight.bold,
+                      //                         fontSize: 16),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //               getOnlineOfflineModel?.total == null
+                      //                   ? Text("No Balance")
+                      //                   : Text(
+                      //                 "₹${getOnlineOfflineModel?.total}",
+                      //                 style: TextStyle(
+                      //                     color: colors.blackTemp,
+                      //                     fontSize: 20,
+                      //                     fontFamily: "lora",
+                      //                     fontWeight:
+                      //                     FontWeight.bold),
+                      //               ),
+                      //               SizedBox(
+                      //                 height: 0,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      //     Padding(
+                      //       padding: EdgeInsets.only(
+                      //           top: 5.0, left: 10, right: 10),
+                      //       child: InkWell(
+                      //         onTap: () {
+                      //           Navigator.push(
+                      //               context,
+                      //               MaterialPageRoute(
+                      //                   builder: (context) =>
+                      //                       WithdrawalScreen()));
+                      //         },
+                      //         child: Card(
+                      //           elevation: 2,
+                      //           child: Padding(
+                      //             padding: EdgeInsets.all(18.0),
+                      //             child: Column(
+                      //               mainAxisSize: MainAxisSize.min,
+                      //               children: [
+                      //                 Row(
+                      //                   mainAxisAlignment:
+                      //                   MainAxisAlignment.center,
+                      //                   children: const [
+                      //                     Icon(
+                      //                       Icons.account_balance_wallet,
+                      //                       color: colors.primary,
+                      //                     ),
+                      //                     Text(
+                      //                       " " + 'COD Earning',
+                      //                       style: TextStyle(
+                      //                           color: colors.blackTemp,
+                      //                           fontWeight:
+                      //                           FontWeight.bold,
+                      //                           fontSize: 16),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //                 getOnlineOfflineModel?.total == null
+                      //                     ? Text("No Balance")
+                      //                     : Text(
+                      //                   "₹${getOnlineOfflineModel?.total_cod}",
+                      //                   style: TextStyle(
+                      //                       color: colors.blackTemp,
+                      //                       fontSize: 20,
+                      //                       fontFamily: "lora",
+                      //                       fontWeight:
+                      //                       FontWeight.bold),
+                      //                 ),
+                      //                 SizedBox(
+                      //                   height: 0,
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),],
+                      // ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16,right: 16,top: 16,bottom: 0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.filter_alt_rounded,
+                              color: Colors.black,
+                            ),
+                            const VerticalDivider(
+                              color: Colors.transparent,
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _selectDate(context, 1),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
                                   ),
+                                  child: Text(isStart
+                                      ? DateFormat('d/MM/y')
+                                      .format(startDate)
+                                      : getTranslated(context, "Start Date")),
                                 ),
-                                filterList.isEmpty
-                                    ? Text("No data available")
-                                    :  Expanded(
-                                      child: Container(
-                                        child:
-                                        ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                         shrinkWrap: true,
-                                        // physics: NeverScrollableScrollPhysics(),
-                                        itemCount: filterList.length ?? 0,
-                                        itemBuilder: (context, i) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          PercelDetails(
-                                                              pId: getOnlineOfflineModel
-                                                                  ?.data?[i]
-                                                                  .orderId)));
-                                            },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5),
-                                              child: Card(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(getTranslated(
-                                                              context,
-                                                              "Parcel Id")),
-                                                          Text(
-                                                              "${filterList[i].orderId}")
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(getTranslated(
-                                                              context,
-                                                              "Amount")),
-                                                          Text(
-                                                            "₹ ${double.parse(filterList[i].driverAmount).toStringAsFixed(0)}",
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                    "lora"),
-                                                          )
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(getTranslated(
-                                                              context,
-                                                              "Commission Charge")),
-                                                          Text(
-                                                            "₹ ${double.parse(filterList[i].adminCommission).toStringAsFixed(0)}",
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                    "lora"),
-                                                          )
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                        children: [
-                                                          Text(getTranslated(context, "Payment Method") ),
-                                                          Text(
-                                                            "${filterList[i].payment_method}",
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                "lora"),
-                                                          )
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                        children: [
-                                                          Text(getTranslated(context, "Date") ),
-                                                          Text(
-                                                            DateFormat('dd-MM-yyyy hh:mma').format(DateTime.parse(filterList[i].dateTime.toString())),
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                "lora"),
-                                                          )
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
+                              ),
+                            ),
+                            const VerticalDivider(
+                              color: Colors.transparent,
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _selectDate(context, 2),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                  ),
+                                  child: Text(isEnd
+                                      ? DateFormat('d/MM/y').format(endDate)
+                                      : getTranslated(context, "End Date")),
+                                ),
+                              ),
+                            ),
+                            const VerticalDivider(
+                              color: Colors.transparent,
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  if (isStart && isEnd) {
+                                    applyFilters();
+                                  } else {
+                                    Fluttertoast.showToast(
+                                        msg: getTranslated(context, "Please select dates"));
+                                  }
+                                },
+                                child: Text(getTranslated(context, "Apply")))
+                          ],
+                        ),
+                      ),
+                      filterList.isEmpty
+                          ? Text("No data available")
+                          :  Expanded(
+                        child: Container(
+                          child:
+                          ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              // physics: NeverScrollableScrollPhysics(),
+                              itemCount: filterList.length ?? 0,
+                              itemBuilder: (context, i) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PercelDetails(
+                                                    pId: getOnlineOfflineModel
+                                                        ?.data?[i]
+                                                        .orderId)));
+                                  },
+                                  child: Padding(
+                                    padding:
+                                    const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5),
+                                    child: Card(
+                                      child: Padding(
+                                        padding:
+                                        const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment
+                                              .start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                Text(getTranslated(
+                                                    context,
+                                                    "Parcel Id")),
+                                                Text(
+                                                    "${filterList[i].orderId}")
+                                              ],
                                             ),
-                                          );
-                                        }),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                Text(getTranslated(
+                                                    context,
+                                                    "Amount")),
+                                                Text(
+                                                  "₹ ${double.parse(filterList[i].driverAmount).toStringAsFixed(0)}",
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                      "lora"),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                Text(getTranslated(
+                                                    context,
+                                                    "Commission Charge")),
+                                                Text(
+                                                  "₹ ${double.parse(filterList[i].adminCommission).toStringAsFixed(0)}",
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                      "lora"),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                Text(getTranslated(context, "Payment Method") ),
+                                                Text(
+                                                  "${filterList[i].payment_method}",
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                      "lora"),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                Text(getTranslated(context, "Date") ),
+                                                Text(
+                                                  DateFormat('dd-MM-yyyy hh:mma').format(DateTime.parse(filterList[i].dateTime.toString())),
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                      "lora"),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                    )
-                              ],
-                            )),
+                                    ),
+                                  ),
+                                );
+                              }),
+                        ),
+                      )
+                    ],
+                  )
+                      : Center(child: CircularProgressIndicator())
+              ),
             ),
           )
         ],

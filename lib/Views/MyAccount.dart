@@ -748,27 +748,17 @@ class _MyAccountState extends State<MyAccount> {
                                     )
                                   ],
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //       builder: (context) =>
-                                    //           PaymentScreen(),
-                                    //     ));
-                                  },
-                                  child: Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: Colors.blue.shade50,
-                                          borderRadius:
-                                              BorderRadius.circular(30)),
-                                      child: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 14,
-                                      )),
-                                )
+                                Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue.shade50,
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                    child: const Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 14,
+                                    ))
                               ],
                             ),
                           ),

@@ -474,9 +474,9 @@ class _MyprofileState extends State<Myprofile> {
     dlf = widget.getProfileModel!.data!.user!.drivingLicencePhoto.toString();
     dlb =
         widget.getProfileModel!.data!.user!.drivingLicencePhotoBack.toString();
-    panf = widget.getProfileModel!.data!.user!.panCard.toString();
+    panf = widget.getProfileModel!.data!.user!.panCardPhotof.toString();
     imageVehicle = widget.getProfileModel!.data!.user!.vehicle_image.toString();
-    panb = widget.getProfileModel!.data!.user!.panCard.toString();
+    panb = widget.getProfileModel!.data!.user!.panCardPhotob.toString();
     addressController.text =
         widget.getProfileModel!.data!.user!.address.toString();
     cityName = widget.getProfileModel!.data!.user!.cityName;
@@ -926,7 +926,7 @@ class _MyprofileState extends State<Myprofile> {
                                     color: CustomColors.TransparentColor,
                                     borderRadius: BorderRadius.circular(10),
                                     image: DecorationImage(
-                                        image: NetworkImage(dlf.toString()),
+                                        image: NetworkImage(panf.toString()),
                                         fit: BoxFit.fill)),
                               ),
                             ),
@@ -943,7 +943,7 @@ class _MyprofileState extends State<Myprofile> {
                                     color: CustomColors.TransparentColor,
                                     borderRadius: BorderRadius.circular(10),
                                     image: DecorationImage(
-                                        image: NetworkImage(dlb.toString()),
+                                        image: NetworkImage(panb.toString()),
                                         fit: BoxFit.fill)),
                               ),
                             ),
@@ -2325,7 +2325,7 @@ class _MyprofileState extends State<Myprofile> {
                       Row(
                         children: [
                           Radio(
-                            value: 0,
+                            value: 1,
                             fillColor: MaterialStateColor.resolveWith(
                                 (states) => colors.secondary),
                             activeColor: colors.secondary,
@@ -2346,7 +2346,7 @@ class _MyprofileState extends State<Myprofile> {
                             height: 5,
                           ),
                           Radio(
-                              value: 1,
+                              value: 0,
                               fillColor: MaterialStateColor.resolveWith(
                                   (states) => colors.secondary),
                               activeColor: colors.secondary,
@@ -2376,7 +2376,7 @@ class _MyprofileState extends State<Myprofile> {
                       Row(
                         children: [
                           Radio(
-                            value: 0,
+                            value: 1,
                             fillColor: MaterialStateColor.resolveWith(
                                 (states) => colors.secondary),
                             activeColor: colors.secondary,
@@ -2397,7 +2397,7 @@ class _MyprofileState extends State<Myprofile> {
                             height: 5,
                           ),
                           Radio(
-                              value: 1,
+                              value: 0,
                               fillColor: MaterialStateColor.resolveWith(
                                   (states) => colors.secondary),
                               activeColor: colors.secondary,
