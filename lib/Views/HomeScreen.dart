@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -482,16 +483,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _position = await getUserCurrentPosition();
 
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter:
+            5, // Minimum change in distance (in meters) before update
+      ),
+    ).listen((Position position) async {
+      // Handle location update
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+      // Your method to update the driver location
+      updateDriverLocation(
+        userId.toString(),
+        latitude,
+        longitude,
+      );
+    });
+
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         _position!.latitude,
         _position!.longitude,
       );
       city = placemarks[0].locality.toString();
-      print(placemarks[0].locality.toString() + "PLACE CMAKR");
-      print(placemarks[0].subLocality.toString() + "PLACE CMAKR");
-      print(placemarks[0].subAdministrativeArea.toString() + "PLACE CMAKR");
-      print(placemarks[0].street.toString() + "PLACE CMAKR");
+      print("${placemarks[0].locality}PLACE CMAKR");
+      print("${placemarks[0].subLocality}PLACE CMAKR");
+      print("${placemarks[0].subAdministrativeArea}PLACE CMAKR");
+      print("${placemarks[0].street}PLACE CMAKR");
     } catch (err, stacktrace) {
       print("PLACE CMAKR ERRR $stacktrace");
       print("PLACE CMAKR ERRR $err");
@@ -524,6 +543,27 @@ class _HomeScreenState extends State<HomeScreen> {
     getDriverRating(userId ?? '300');
     // getDriverRating(userId ?? '300');
     getDriverApi();
+  }
+
+  StreamSubscription<Position>? positionStream;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> updateDriverLocation(
+      String driverId, double lat, double lng) async {
+    try {
+      // Get current location
+      // Update driver's location in the Firestore under order document
+      await _firestore.collection('orders').doc(driverId).set({
+        'latitude': lat,
+        'longitude': lng,
+        'lastUpdated': FieldValue.serverTimestamp(),
+        'driverId': driverId,
+      });
+
+      print("Driver location updated successfully");
+    } catch (e) {
+      print("Error updating location: $e");
+    }
   }
 
   GetSliderModel? getSliderModel;
@@ -1155,9 +1195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : false;
                               // isButtonDisabled = isAccepted? false: true;
                               return InkWell(
-                                onTap: () {
-
-                                },
+                                onTap: () {},
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
@@ -1453,9 +1491,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     )
                                                   : InkWell(
                                                       onTap: () async {
-                                                        var min = await getMinimumWallet();
-                                                        if (ctrl.currentOrderHistoryList[index]
-                                                            .parcelDetails.first.status ==
+                                                        var min =
+                                                            await getMinimumWallet();
+                                                        if (ctrl
+                                                                .currentOrderHistoryList[
+                                                                    index]
+                                                                .parcelDetails
+                                                                .first
+                                                                .status ==
                                                             "2") {
                                                           Navigator.push(
                                                               context,
@@ -1463,7 +1506,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   builder: (context) => PercelDetails(
                                                                       pId: ctrl
                                                                           .currentOrderHistoryList[
-                                                                      index]
+                                                                              index]
                                                                           .orderId)));
                                                         } else {
                                                           if (double.parse(
@@ -1504,7 +1547,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     index]
                                                                 .isAccepted = true;
                                                             ctrl.orderRejectedOrAccept(
-                                                                index, context, "0", city);
+                                                                index,
+                                                                context,
+                                                                "0",
+                                                                city);
                                                           }
                                                         }
                                                       },

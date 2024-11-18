@@ -61,6 +61,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   firebase_core: ^2.8.0
   google_maps_flutter: ^2.1.7
+  cloud_firestore: ^4.8.0
   google_maps_place_picker_mb: ^2.0.0-mb.22
   dropdown_button2: any
   carousel_slider: ^4.2.1
